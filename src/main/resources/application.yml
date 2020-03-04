@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    open-in-view: false
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.StdDateFormat
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+  servlet:
+    context-path: /auth
+
+auth-server:
+  issuer: http://localhost:8080/auth
