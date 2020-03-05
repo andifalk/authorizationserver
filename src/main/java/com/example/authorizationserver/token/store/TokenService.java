@@ -43,7 +43,7 @@ public class TokenService {
   @Transactional
   public JsonWebToken createIdToken(User user, String clientId, String nonce, List<String> scopes, Duration idTokenLifetime) throws JOSEException {
     LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(idTokenLifetime.toMinutes());
-    String token = jsonWebTokenService.createToken(Collections.singletonList(clientId), "test", scopes, user, nonce, expiryDateTime);
+    String token = jsonWebTokenService.createToken(clientId, Collections.singletonList(clientId), "test", scopes, user, nonce, expiryDateTime);
     JsonWebToken jsonWebToken = new JsonWebToken();
     jsonWebToken.setExpiry(expiryDateTime);
     jsonWebToken.setValue(token);
@@ -53,7 +53,7 @@ public class TokenService {
   @Transactional
   public JsonWebToken createJwtAccessToken(User user, String clientId, String nonce, Duration accessTokenLifetime) throws JOSEException {
     LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
-    String token = jsonWebTokenService.createToken(Collections.singletonList(clientId), "test", Collections.emptyList(), user, nonce, expiryDateTime);
+    String token = jsonWebTokenService.createToken(clientId, Collections.singletonList(clientId), "test", Collections.emptyList(), user, nonce, expiryDateTime);
     JsonWebToken jsonWebToken = new JsonWebToken();
     jsonWebToken.setExpiry(expiryDateTime);
     jsonWebToken.setValue(token);

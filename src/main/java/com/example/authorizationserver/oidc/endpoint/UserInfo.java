@@ -1,84 +1,148 @@
 package com.example.authorizationserver.oidc.endpoint;
 
 import com.example.authorizationserver.user.api.resource.AddressResource;
-import com.example.authorizationserver.user.model.Gender;
 import com.example.authorizationserver.user.model.User;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class UserInfo {
 
-  private UUID identifier;
+  private String sub;
 
-  private Gender gender;
+  private String name;
 
-  private String firstName;
+  private String given_name;
 
-  private String lastName;
+  private String family_name;
+
+  private String middle_name;
+
+  private String nickname;
+
+  private String preferred_username;
+
+  private String website;
+
+  private String profile;
+
+  private String picture;
 
   private String email;
 
-  private String username;
+  private boolean email_verified;
 
-  private String phone;
+  private String gender;
 
-  private Set<String> groups = new HashSet<>();
+  private String birthdate;
 
-  private Set<AddressResource> addresses = new HashSet<>();
+  private String zoneinfo;
+
+  private String locale;
+
+  private String phone_number;
+
+  private boolean phone_number_verified;
+
+  private AddressResource address;
+
+  private String updated_at;
 
   public UserInfo() {
   }
 
   public UserInfo(User user) {
-    this.identifier = user.getIdentifier();
-    this.addresses = user.getAddresses().stream().map(AddressResource::new).collect(Collectors.toSet());
+    this.address = user.getAddresses().stream().map(AddressResource::new).collect(Collectors.toSet()).iterator().next();
     this.email = user.getEmail();
-    this.firstName = user.getFirstName();
-    this.lastName = user.getLastName();
-    this.username = user.getUsername();
-    this.gender = user.getGender();
-    this.groups = user.getGroups();
-    this.phone = user.getPhone();
+    this.given_name = user.getFirstName();
+    this.family_name = user.getLastName();
+    this.preferred_username = user.getUsername();
+    this.name = user.getUsername();
+    this.gender = user.getGender().name();
+    this.email_verified = true;
+    this.phone_number = user.getPhone();
+    this.phone_number_verified = true;
+    this.sub = user.getIdentifier().toString();
+    this.locale = "DE";
   }
 
-  public UUID getIdentifier() {
-    return identifier;
+  public String getSub() {
+    return sub;
   }
 
-  public void setIdentifier(UUID identifier) {
-    this.identifier = identifier;
+  public void setSub(String sub) {
+    this.sub = sub;
   }
 
-  public Gender getGender() {
-    return gender;
+  public String getName() {
+    return name;
   }
 
-  public void setGender(Gender gender) {
-    this.gender = gender;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getFirstName() {
-    return firstName;
+  public String getGiven_name() {
+    return given_name;
   }
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
+  public void setGiven_name(String given_name) {
+    this.given_name = given_name;
   }
 
-  public String getLastName() {
-    return lastName;
+  public String getFamily_name() {
+    return family_name;
   }
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
+  public void setFamily_name(String family_name) {
+    this.family_name = family_name;
+  }
+
+  public String getMiddle_name() {
+    return middle_name;
+  }
+
+  public void setMiddle_name(String middle_name) {
+    this.middle_name = middle_name;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
+
+  public String getPreferred_username() {
+    return preferred_username;
+  }
+
+  public void setPreferred_username(String preferred_username) {
+    this.preferred_username = preferred_username;
+  }
+
+  public String getWebsite() {
+    return website;
+  }
+
+  public void setWebsite(String website) {
+    this.website = website;
+  }
+
+  public String getProfile() {
+    return profile;
+  }
+
+  public void setProfile(String profile) {
+    this.profile = profile;
+  }
+
+  public String getPicture() {
+    return picture;
+  }
+
+  public void setPicture(String picture) {
+    this.picture = picture;
   }
 
   public String getEmail() {
@@ -89,50 +153,101 @@ public class UserInfo {
     this.email = email;
   }
 
-  public String getUsername() {
-    return this.username;
+  public boolean isEmail_verified() {
+    return email_verified;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setEmail_verified(boolean email_verified) {
+    this.email_verified = email_verified;
   }
 
-  public String getPhone() {
-    return phone;
+  public String getGender() {
+    return gender;
   }
 
-  public void setPhone(String phone) {
-    this.phone = phone;
+  public void setGender(String gender) {
+    this.gender = gender;
   }
 
-  public Set<String> getGroups() {
-    return groups;
+  public String getBirthdate() {
+    return birthdate;
   }
 
-  public void setGroups(Set<String> groups) {
-    this.groups = groups;
+  public void setBirthdate(String birthdate) {
+    this.birthdate = birthdate;
   }
 
-  public Set<AddressResource> getAddresses() {
-    return addresses;
+  public String getZoneinfo() {
+    return zoneinfo;
   }
 
-  public void setAddresses(Set<AddressResource> addresses) {
-    this.addresses = addresses;
+  public void setZoneinfo(String zoneinfo) {
+    this.zoneinfo = zoneinfo;
+  }
+
+  public String getLocale() {
+    return locale;
+  }
+
+  public void setLocale(String locale) {
+    this.locale = locale;
+  }
+
+  public String getPhone_number() {
+    return phone_number;
+  }
+
+  public void setPhone_number(String phone_number) {
+    this.phone_number = phone_number;
+  }
+
+  public boolean isPhone_number_verified() {
+    return phone_number_verified;
+  }
+
+  public void setPhone_number_verified(boolean phone_number_verified) {
+    this.phone_number_verified = phone_number_verified;
+  }
+
+  public AddressResource getAddress() {
+    return address;
+  }
+
+  public void setAddress(AddressResource address) {
+    this.address = address;
+  }
+
+  public String getUpdated_at() {
+    return updated_at;
+  }
+
+  public void setUpdated_at(String updated_at) {
+    this.updated_at = updated_at;
   }
 
   @Override
   public String toString() {
-    return "UserResource{" +
-            "identifier=" + identifier +
-            ", gender=" + gender +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
+    return "UserInfo{" +
+            "sub='" + sub + '\'' +
+            ", name='" + name + '\'' +
+            ", given_name='" + given_name + '\'' +
+            ", family_name='" + family_name + '\'' +
+            ", middle_name='" + middle_name + '\'' +
+            ", nickname='" + nickname + '\'' +
+            ", preferred_username='" + preferred_username + '\'' +
+            ", website='" + website + '\'' +
+            ", profile='" + profile + '\'' +
+            ", picture='" + picture + '\'' +
             ", email='" + email + '\'' +
-            ", username='" + username + '\'' +
-            ", phone='" + phone + '\'' +
-            ", groups=" + groups +
-            ", addresses=" + addresses +
+            ", email_verified=" + email_verified +
+            ", gender='" + gender + '\'' +
+            ", birthdate='" + birthdate + '\'' +
+            ", zoneinfo='" + zoneinfo + '\'' +
+            ", locale='" + locale + '\'' +
+            ", phone_number='" + phone_number + '\'' +
+            ", phone_number_verified=" + phone_number_verified +
+            ", address=" + address +
+            ", updated_at='" + updated_at + '\'' +
             '}';
   }
 }

@@ -36,5 +36,4 @@ public class AuthenticationService {
       throw new BadCredentialsException("User/Password not correct");
     }
   }
-
 }

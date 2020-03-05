@@ -6,11 +6,12 @@ import org.springframework.util.StringUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public final class BasicAuthenticationUtil {
+public final class AuthenticationUtil {
 
   private static final String AUTHENTICATION_SCHEME_BASIC = "Basic";
+  private static final String AUTHENTICATION_SCHEME_BEARER = "Bearer";
 
-  private BasicAuthenticationUtil() {}
+  private AuthenticationUtil() {}
 
   public static ClientCredentials fromBasicAuthHeader(String header) {
     if (header == null) {
@@ -40,5 +41,18 @@ public final class BasicAuthenticationUtil {
       throw new BadCredentialsException("Invalid basic authentication token");
     }
     return new ClientCredentials(token.substring(0, delim), token.substring(delim + 1));
+  }
+
+  public static String fromBearerAuthHeader(String header) {
+    if (header == null) {
+      return null;
+    }
+
+    header = header.trim();
+    if (!StringUtils.startsWithIgnoreCase(header, AUTHENTICATION_SCHEME_BEARER)) {
+      return null;
+    }
+
+    return header.substring(7);
   }
 }

@@ -69,4 +69,5 @@ public abstract class Token extends AbstractPersistable<Long> {
             ", referenceToken=" + isReferenceToken() +
             '}';
   }
+
 }

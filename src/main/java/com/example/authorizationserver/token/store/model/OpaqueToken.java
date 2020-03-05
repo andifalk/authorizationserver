@@ -1,9 +1,12 @@
 package com.example.authorizationserver.token.store.model;
 
+import org.springframework.security.authentication.BadCredentialsException;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Entity
 @DiscriminatorValue("opaque")
@@ -37,4 +40,11 @@ public class OpaqueToken extends Token {
   public boolean isReferenceToken() {
     return true;
   }
+
+  public void validate() {
+    if (LocalDateTime.now().isAfter(this.getExpiry())) {
+      throw new BadCredentialsException("Expired");
+    }
+  }
+
 }

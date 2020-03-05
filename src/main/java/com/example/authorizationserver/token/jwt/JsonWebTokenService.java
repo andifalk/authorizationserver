@@ -9,10 +9,12 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class JsonWebTokenService {
@@ -23,13 +25,19 @@ public class JsonWebTokenService {
     this.jwtPki = jwtPki;
   }
 
-  public String createToken(List<String> audiences, String jti, List<String> scopes, User user, String nonce, LocalDateTime expiryDateTime)
+  public JWTClaimsSet parseAndValidateToken(String token) throws ParseException, JOSEException {
+    SignedJWT signedJWT = SignedJWT.parse(token);
+    signedJWT.verify(jwtPki.getVerifier());
+    return signedJWT.getJWTClaimsSet();
+  }
+
+  public String createToken(String clientId, List<String> audiences, String jti, List<String> scopes, User user, String nonce, LocalDateTime expiryDateTime)
       throws JOSEException {
     JWTClaimsSet claimsSet =
         new JWTClaimsSet.Builder()
             .subject(user.getIdentifier().toString())
             .issuer(jwtPki.getIssuer())
-            .expirationTime(Date.from(expiryDateTime.atZone( ZoneId.systemDefault()).toInstant()))
+            .expirationTime(Date.from(expiryDateTime.atZone(ZoneId.systemDefault()).toInstant()))
             .audience(audiences)
             .issueTime(new Date())
             .notBeforeTime(new Date())
@@ -38,12 +46,13 @@ public class JsonWebTokenService {
             .claim("groups", user.getGroups())
             .claim("name", user.getUsername())
             .claim("email", user.getEmail())
-            .claim("email_verified", "true")
+            .claim("email_verified", Boolean.TRUE)
             .claim("family_name", user.getLastName())
             .claim("given_name", user.getFirstName())
             .claim("gender", user.getGender().name())
             .claim("phone", user.getPhone())
-            .claim("phone_verified", "true")
+            .claim("phone_verified", Boolean.TRUE)
+            .claim("client_id", clientId)
             .build();
 
     SignedJWT signedJWT =

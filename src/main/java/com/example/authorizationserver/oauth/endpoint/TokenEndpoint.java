@@ -1,6 +1,6 @@
 package com.example.authorizationserver.oauth.endpoint;
 
-import com.example.authorizationserver.oauth.common.BasicAuthenticationUtil;
+import com.example.authorizationserver.oauth.common.AuthenticationUtil;
 import com.example.authorizationserver.oauth.common.ClientCredentials;
 import com.example.authorizationserver.oauth.endpoint.resource.TokenRequest;
 import com.example.authorizationserver.oauth.endpoint.resource.TokenResponse;
@@ -89,7 +89,7 @@ public class TokenEndpoint {
       }
 
       if (authorizationHeader != null) {
-        ClientCredentials clientCredentials = BasicAuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
+        ClientCredentials clientCredentials = AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
         if (!authorizationState.getClientId().equals(clientCredentials.getClientId())) {
           // throw error
         }
