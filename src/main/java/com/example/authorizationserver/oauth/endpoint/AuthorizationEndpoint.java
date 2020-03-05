@@ -95,7 +95,7 @@ public class AuthorizationEndpoint {
   }
 
   @PostMapping("/authenticate")
-  public RedirectView authenticate(
+  public String authenticate(
       @RequestParam("scope") String scope,
       @RequestParam("client_id") String clientId,
       @RequestParam("redirect_uri") URI redirectUri,
@@ -106,7 +106,13 @@ public class AuthorizationEndpoint {
 
     LOG.info("Authenticating user {} for client id {} and scopes {}", user.getUsername(), clientId, scope);
 
-    User authenticatedUser = authenticationService.authenticate(user.getUsername(), user.getPassword());
+    User authenticatedUser;
+    try {
+      authenticatedUser = authenticationService.authenticate(user.getUsername(), user.getPassword());
+    } catch (BadCredentialsException ex) {
+      model.addAttribute("error", ex.getMessage());
+      return "loginform";
+    }
 
     List<String> scopes = Arrays.asList(scope.split(" "));
 
@@ -118,8 +124,9 @@ public class AuthorizationEndpoint {
     AuthorizationState authorizationState =
         authorizationStateStore.createAndStoreAuthorizationState(
             clientId, redirectUri, scopes, authenticatedUser.getIdentifier().toString(), nonce);
-    return new RedirectView(
-        redirectUri.toString() + "?code=" + authorizationState.getCode() + "&state=" + state);
+    return "redirect:" + redirectUri.toString() + "?code=" + authorizationState.getCode() + "&state=" + state;
+/*    return new RedirectView(
+        redirectUri.toString() + "?code=" + authorizationState.getCode() + "&state=" + state);*/
   }
 
   @ExceptionHandler(MissingServletRequestParameterException.class)

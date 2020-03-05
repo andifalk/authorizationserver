@@ -7,7 +7,7 @@ public class TokenResponse {
   private String access_token;
   private String token_type = BEARER_TOKEN_TYPE;
   private String refresh_token;
-  private int expires_in;
+  private long expires_in;
   private String id_token;
 
   public String getAccess_token() {
@@ -34,11 +34,11 @@ public class TokenResponse {
     this.refresh_token = refresh_token;
   }
 
-  public int getExpires_in() {
+  public long getExpires_in() {
     return expires_in;
   }
 
-  public void setExpires_in(int expires_in) {
+  public void setExpires_in(long expires_in) {
     this.expires_in = expires_in;
   }
 
@@ -50,7 +50,7 @@ public class TokenResponse {
     this.id_token = id_token;
   }
 
-  public TokenResponse(String access_token, String refresh_token, int expires_in, String id_token) {
+  public TokenResponse(String access_token, String refresh_token, long expires_in, String id_token) {
     this.access_token = access_token;
     this.refresh_token = refresh_token;
     this.expires_in = expires_in;

@@ -14,17 +14,23 @@
 <h1>Authentication</h1>
 
 <form action="#" th:action="@{'/authenticate?scope=' + ${scope} + '&client_id=' + ${client_id} + '&redirect_uri=' + ${redirect_uri} + '&state=' + ${state}}" th:object="${user}" method="post">
-    <div class="form-group">
-    <label for="username">Name</label>
-    <input type="text" class="form-control" th:field="*{username}" id="username" placeholder="Username">
-    <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
-    </div>
-    <div class="form-group">
-    <label for="password">Password</label>
-    <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="Password">
-    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-    </div>
-    <input type="submit" class="btn btn-primary" value="Authenticate">
+    <fieldset>
+        <legend>Please Login</legend>
+        <div th:if="${error}" class="alert alert-error">
+            Invalid username or password.
+        </div>
+        <div class="form-group">
+        <label for="username">Name</label>
+        <input type="text" class="form-control" th:field="*{username}" id="username" placeholder="Username">
+        <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+        </div>
+        <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="Password">
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Authenticate">
+    </fieldset>
 </form>
 
 </div>

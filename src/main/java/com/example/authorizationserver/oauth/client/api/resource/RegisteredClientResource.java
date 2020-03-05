@@ -1,13 +1,10 @@
-package com.example.authorizationserver.oauth.client.model;
+package com.example.authorizationserver.oauth.client.api.resource;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
+import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -16,15 +13,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
-public class RegisteredClient extends AbstractPersistable<Long> {
+public class RegisteredClientResource {
 
   @NotNull
   private UUID identifier;
 
   @NotBlank
   @Size(max = 100)
-  @Column(unique = true)
   private String clientId;
 
   @Size(max = 100)
@@ -44,14 +39,24 @@ public class RegisteredClient extends AbstractPersistable<Long> {
   private AccessTokenFormat accessTokenFormat;
 
   @NotEmpty
-  @ElementCollection(fetch = FetchType.EAGER)
   private Set<String> redirectUris = new HashSet<>();
 
   @NotEmpty
-  @ElementCollection(fetch = FetchType.EAGER)
   private Set<String> corsUris = new HashSet<>();
 
-  public RegisteredClient() {
+  public RegisteredClientResource() {
+  }
+
+  public RegisteredClientResource(RegisteredClient registeredClient) {
+    this.identifier = registeredClient.getIdentifier();
+    this.accessTokenFormat = registeredClient.getAccessTokenFormat();
+    this.clientId = registeredClient.getClientId();
+    this.clientSecret = registeredClient.getClientSecret();
+    this.confidential = registeredClient.isConfidential();
+    this.corsUris = registeredClient.getCorsUris();
+    this.directGrant = registeredClient.isDirectGrant();
+    this.offline = registeredClient.isOffline();
+    this.redirectUris = registeredClient.getRedirectUris();
   }
 
   public UUID getIdentifier() {
@@ -129,8 +134,7 @@ public class RegisteredClient extends AbstractPersistable<Long> {
   @Override
   public String toString() {
     return "RegisteredClient{" +
-            "identifier='" + identifier + '\'' +
-            ", clientId='" + clientId +
+            "clientId='" + clientId + '\'' +
             ", clientSecret='*****'" +
             ", confidential=" + confidential +
             ", accessTokenFormat=" + accessTokenFormat +

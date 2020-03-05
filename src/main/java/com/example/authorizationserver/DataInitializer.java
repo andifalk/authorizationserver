@@ -41,7 +41,16 @@ public class DataInitializer implements CommandLineRunner {
     Set<User> users = Stream.of(
             new User(UUID.randomUUID(), Gender.MALE, "Bruce", "Wayne", passwordEncoder.encode("wayne"),
                     "bruce.wayne@example.com", "bwayne", "0711-1234567",
-                    Collections.singleton("library_user"), Collections.singleton(new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA")))
+                    Collections.singleton("library_user"), Collections.singleton(new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"))),
+            new User(UUID.randomUUID(), Gender.MALE, "Clark", "Kent", passwordEncoder.encode("kent"),
+                    "clark.kent@example.com", "ckent", "0711-222222",
+                    Collections.singleton("library_user"), Collections.singleton(new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"))),
+            new User(UUID.randomUUID(), Gender.MALE, "Peter", "Parker", passwordEncoder.encode("parker"),
+                    "peter.parker@example.com", "pparker", "0711-1234567",
+                    Collections.singleton("library_user"), Collections.singleton(new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"))),
+            new User(UUID.randomUUID(), Gender.MALE, "Max", "Root", passwordEncoder.encode("admin"),
+                    "max.root@example.com", "admin", "0711-1234567",
+                    Collections.singleton("admin"), Collections.singleton(new Address("Batmanstr.1", "70159", "Stuttgart", "Baden-Württemberg", "Germany")))
     ).map(userRepository::save).collect(Collectors.toSet());
 
     LOG.info("Created {} users", users.size());

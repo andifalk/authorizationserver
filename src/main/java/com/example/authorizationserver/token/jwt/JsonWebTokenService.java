@@ -1,7 +1,6 @@
 package com.example.authorizationserver.token.jwt;
 
 import com.example.authorizationserver.jwks.JwtPki;
-import com.example.authorizationserver.oauth.common.Scope;
 import com.example.authorizationserver.user.model.User;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -10,6 +9,8 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -22,13 +23,13 @@ public class JsonWebTokenService {
     this.jwtPki = jwtPki;
   }
 
-  public String createToken(List<String> audiences, String jti, List<String> scopes, User user, String nonce)
+  public String createToken(List<String> audiences, String jti, List<String> scopes, User user, String nonce, LocalDateTime expiryDateTime)
       throws JOSEException {
     JWTClaimsSet claimsSet =
         new JWTClaimsSet.Builder()
             .subject(user.getIdentifier().toString())
             .issuer(jwtPki.getIssuer())
-            .expirationTime(new Date(new Date().getTime() + 60 * 1000))
+            .expirationTime(Date.from(expiryDateTime.atZone( ZoneId.systemDefault()).toInstant()))
             .audience(audiences)
             .issueTime(new Date())
             .notBeforeTime(new Date())

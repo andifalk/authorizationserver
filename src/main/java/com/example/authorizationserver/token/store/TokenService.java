@@ -11,6 +11,7 @@ import com.nimbusds.jose.JOSEException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -40,28 +41,31 @@ public class TokenService {
   }
 
   @Transactional
-  public JsonWebToken createIdToken(User user, String clientId, String nonce, List<String> scopes) throws JOSEException {
-    String token = jsonWebTokenService.createToken(Collections.singletonList(clientId), "test", scopes, user, nonce);
+  public JsonWebToken createIdToken(User user, String clientId, String nonce, List<String> scopes, Duration idTokenLifetime) throws JOSEException {
+    LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(idTokenLifetime.toMinutes());
+    String token = jsonWebTokenService.createToken(Collections.singletonList(clientId), "test", scopes, user, nonce, expiryDateTime);
     JsonWebToken jsonWebToken = new JsonWebToken();
-    jsonWebToken.setExpiry(LocalDateTime.now().plusMinutes(60));
+    jsonWebToken.setExpiry(expiryDateTime);
     jsonWebToken.setValue(token);
     return jsonWebTokenRepository.save(jsonWebToken);
   }
 
   @Transactional
-  public JsonWebToken createJwtAccessToken(User user, String clientId, String nonce) throws JOSEException {
-    String token = jsonWebTokenService.createToken(Collections.singletonList(clientId), "test", Collections.emptyList(), user, nonce);
+  public JsonWebToken createJwtAccessToken(User user, String clientId, String nonce, Duration accessTokenLifetime) throws JOSEException {
+    LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
+    String token = jsonWebTokenService.createToken(Collections.singletonList(clientId), "test", Collections.emptyList(), user, nonce, expiryDateTime);
     JsonWebToken jsonWebToken = new JsonWebToken();
-    jsonWebToken.setExpiry(LocalDateTime.now().plusMinutes(60));
+    jsonWebToken.setExpiry(expiryDateTime);
     jsonWebToken.setValue(token);
     return jsonWebTokenRepository.save(jsonWebToken);
   }
 
   @Transactional
-  public OpaqueToken createOpaqueAccessToken(User user, String clientId) throws JOSEException {
+  public OpaqueToken createOpaqueAccessToken(User user, String clientId, Duration accessTokenLifetime) {
+    LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
-    opaqueToken.setExpiry(LocalDateTime.now().plusMinutes(60));
+    opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setValue(token);
     opaqueToken.setClientId(clientId);
     opaqueToken.setSubject(user.getIdentifier().toString());
@@ -69,10 +73,11 @@ public class TokenService {
   }
 
   @Transactional
-  public OpaqueToken createRefreshToken(User user, String clientId) {
+  public OpaqueToken createRefreshToken(User user, String clientId, Duration refreshTokenLifetime) {
+    LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(refreshTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
-    opaqueToken.setExpiry(LocalDateTime.now().plusMinutes(60));
+    opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setValue(token);
     opaqueToken.setRefreshToken(true);
     opaqueToken.setClientId(clientId);

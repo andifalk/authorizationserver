@@ -12,6 +12,7 @@ import com.example.authorizationserver.user.service.UserService;
 import com.nimbusds.jose.JOSEException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,10 +40,22 @@ public class TokenEndpoint {
   private final UserService userService;
   private final TokenService tokenService;
 
-  public TokenEndpoint(AuthorizationStateStore authorizationStateStore, UserService userService, TokenService tokenService) {
+  private final Duration accessTokenLifetime;
+  private final Duration idTokenLifetime;
+  private final Duration refreshTokenLifetime;
+
+  public TokenEndpoint(AuthorizationStateStore authorizationStateStore,
+                       UserService userService,
+                       TokenService tokenService, @Value("${auth-server.access-token.lifetime}") Duration accessTokenLifetime,
+                       @Value("${auth-server.id-token.lifetime}") Duration idTokenLifetime,
+                       @Value("${auth-server.refresh-token.lifetime}") Duration refreshTokenLifetime,
+                       @Value("${auth-server.access-token.default-format}") String accessTokenFormat) {
     this.authorizationStateStore = authorizationStateStore;
     this.userService = userService;
     this.tokenService = tokenService;
+    this.accessTokenLifetime = accessTokenLifetime;
+    this.idTokenLifetime = idTokenLifetime;
+    this.refreshTokenLifetime = refreshTokenLifetime;
   }
 
   @PostMapping
@@ -57,9 +71,9 @@ public class TokenEndpoint {
       LOG.info("Creating token response for user {}, client id {} and scopes {}", user.get().getUsername(),
               authorizationState.getClientId(), authorizationState.getScopes());
 
-      return new TokenResponse(createAccessToken(user.get(), authorizationState.getClientId(), authorizationState.getNonce()),
-              createRefreshToken(user.get(), authorizationState.getClientId()), 3600,
-              createIdToken(user.get(), authorizationState.getClientId(), authorizationState.getNonce(), authorizationState.getScopes()));
+      return new TokenResponse(createAccessToken(user.get(), authorizationState.getClientId(), authorizationState.getNonce(), accessTokenLifetime),
+              createRefreshToken(user.get(), authorizationState.getClientId(), refreshTokenLifetime), accessTokenLifetime.toSeconds(),
+              createIdToken(user.get(), authorizationState.getClientId(), authorizationState.getNonce(), authorizationState.getScopes(), idTokenLifetime));
     } else {
       throw new BadCredentialsException("User not found");
     }
@@ -89,16 +103,16 @@ public class TokenEndpoint {
     }
   }
 
-  private String createIdToken(User user, String clientId, String nonce, List<String> scopes) throws JOSEException {
-    return tokenService.createIdToken(user, clientId, nonce, scopes).getValue();
+  private String createIdToken(User user, String clientId, String nonce, List<String> scopes, Duration idTokenLifetime) throws JOSEException {
+    return tokenService.createIdToken(user, clientId, nonce, scopes, idTokenLifetime).getValue();
   }
 
-  private String createAccessToken(User user, String clientId, String nonce) throws JOSEException {
-    return tokenService.createJwtAccessToken(user, clientId, nonce).getValue();
+  private String createAccessToken(User user, String clientId, String nonce, Duration accessTokenLifetime) throws JOSEException {
+    return tokenService.createJwtAccessToken(user, clientId, nonce, accessTokenLifetime).getValue();
   }
 
-  private String createRefreshToken(User user, String clientId) {
-    return tokenService.createRefreshToken(user, clientId).getValue();
+  private String createRefreshToken(User user, String clientId, Duration refreshTokenLifetime) {
+    return tokenService.createRefreshToken(user, clientId, refreshTokenLifetime).getValue();
   }
 
   @ExceptionHandler(MissingServletRequestParameterException.class)
