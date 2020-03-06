@@ -19,39 +19,67 @@ import java.util.UUID;
 @Entity
 public class RegisteredClient extends AbstractPersistable<Long> {
 
-  @NotNull
-  private UUID identifier;
+  /** Technical Identifier. */
+  @NotNull private UUID identifier;
 
+  /** Unique identifier for client. */
   @NotBlank
   @Size(max = 100)
   @Column(unique = true)
   private String clientId;
 
+  /** Client secret, only needed for confidential clients. */
   @Size(max = 100)
   private String clientSecret;
 
-  @NotNull
-  private boolean confidential;
+  /**
+   * Confidential or Public client? Public Client: Requires PKCE but no clientSecret Confidential
+   * Client: Requires clientSecret
+   */
+  @NotNull private boolean confidential;
 
-  @NotNull
-  private boolean offline;
+  /** Refresh tokens supported? */
+  @NotNull private boolean offline;
 
-  @NotNull
-  private boolean directGrant;
+  /** Direct grants like 'client_credentials' or 'password' allowed? */
+  @NotNull private boolean directGrant;
 
+  /** Specifies format for access tokens: JWt or Opaque */
   @NotNull
   @Enumerated(EnumType.STRING)
   private AccessTokenFormat accessTokenFormat;
 
+  /** List of valid redirect URIs. */
   @NotEmpty
   @ElementCollection(fetch = FetchType.EAGER)
   private Set<String> redirectUris = new HashSet<>();
 
+  /** List of CORS origins allowed. */
   @NotEmpty
   @ElementCollection(fetch = FetchType.EAGER)
   private Set<String> corsUris = new HashSet<>();
 
-  public RegisteredClient() {
+  public RegisteredClient() {}
+
+  public RegisteredClient(
+      UUID identifier,
+      String clientId,
+      String clientSecret,
+      boolean confidential,
+      boolean offline,
+      boolean directGrant,
+      AccessTokenFormat accessTokenFormat,
+      Set<String> redirectUris,
+      Set<String> corsUris) {
+    this.identifier = identifier;
+    this.accessTokenFormat = accessTokenFormat;
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.confidential = confidential;
+    this.directGrant = directGrant;
+    this.offline = offline;
+    this.corsUris = corsUris;
+    this.redirectUris = redirectUris;
   }
 
   public UUID getIdentifier() {
@@ -128,16 +156,25 @@ public class RegisteredClient extends AbstractPersistable<Long> {
 
   @Override
   public String toString() {
-    return "RegisteredClient{" +
-            "identifier='" + identifier + '\'' +
-            ", clientId='" + clientId +
-            ", clientSecret='*****'" +
-            ", confidential=" + confidential +
-            ", accessTokenFormat=" + accessTokenFormat +
-            ", offline=" + offline +
-            ", directGrant=" + directGrant +
-            ", redirectUris=" + redirectUris +
-            ", corsUris=" + corsUris +
-            '}';
+    return "RegisteredClient{"
+        + "identifier='"
+        + identifier
+        + '\''
+        + ", clientId='"
+        + clientId
+        + ", clientSecret='*****'"
+        + ", confidential="
+        + confidential
+        + ", accessTokenFormat="
+        + accessTokenFormat
+        + ", offline="
+        + offline
+        + ", directGrant="
+        + directGrant
+        + ", redirectUris="
+        + redirectUris
+        + ", corsUris="
+        + corsUris
+        + '}';
   }
 }

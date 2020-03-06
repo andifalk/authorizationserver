@@ -1,5 +1,11 @@
 package com.example.authorizationserver.oauth.endpoint.resource;
 
+/**
+ * Token Response as specified by:
+ *
+ * <p>OAuth 2.0 (https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.3) OpenID Connect 1.0
+ * (https://openid.net/specs/openid-connect-core-1_0.html#TokenRequest)
+ */
 public class TokenResponse {
 
   private static final String BEARER_TOKEN_TYPE = "Bearer";
@@ -9,6 +15,19 @@ public class TokenResponse {
   private String refresh_token;
   private long expires_in;
   private String id_token;
+  private String error;
+
+  public TokenResponse(
+      String access_token, String refresh_token, long expires_in, String id_token) {
+    this.access_token = access_token;
+    this.refresh_token = refresh_token;
+    this.expires_in = expires_in;
+    this.id_token = id_token;
+  }
+
+  public TokenResponse(String error) {
+    this.error = error;
+  }
 
   public String getAccess_token() {
     return access_token;
@@ -50,21 +69,31 @@ public class TokenResponse {
     this.id_token = id_token;
   }
 
-  public TokenResponse(String access_token, String refresh_token, long expires_in, String id_token) {
-    this.access_token = access_token;
-    this.refresh_token = refresh_token;
-    this.expires_in = expires_in;
-    this.id_token = id_token;
+  public String getError() {
+    return error;
+  }
+
+  public void setError(String error) {
+    this.error = error;
   }
 
   @Override
   public String toString() {
-    return "TokenResponse{" +
-            "access_token='" + access_token + '\'' +
-            ", token_type='" + token_type + '\'' +
-            ", refresh_token='" + refresh_token + '\'' +
-            ", expires_in=" + expires_in +
-            ", id_token='" + id_token + '\'' +
-            '}';
+    return "TokenResponse{"
+        + "access_token='"
+        + access_token
+        + '\''
+        + ", token_type='"
+        + token_type
+        + '\''
+        + ", refresh_token='"
+        + refresh_token
+        + '\''
+        + ", expires_in="
+        + expires_in
+        + ", id_token='"
+        + id_token
+        + '\''
+        + '}';
   }
 }

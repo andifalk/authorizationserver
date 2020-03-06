@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title th:text="#{client.list}">Userlist</title>
+    <title th:text="#{admin.ui}">Admin</title>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -10,35 +10,15 @@
 
 </head>
 <body>
-<div class="container">
-    <h2 th:text="#{client.list}">Admin</h2>
+<div class="container-fluid">
+    <h2 th:text="#{admin.ui}">Admin</h2>
 
-    <table class="table table-striped table-hover">
-        <thead>
-        <tr>
-            <th th:text="#{client.clientid}">Client-Id</th>
-            <th th:text="#{client.clientsecret}">Client-Secret</th>
-            <th th:text="#{client.confidential}">Confidential</th>
-            <th th:text="#{client.offline}">Refresh Tokens</th>
-            <th th:text="#{client.directgrant}">Direct Grant Supported</th>
-            <th th:text="#{client.accesstokenformat}">Accesstoken Format</th>
-            <th th:text="#{client.redirecturis}">Redirect-Uris</th>
-            <th th:text="#{client.corsuris}">CORS-Uris</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="client : ${allClients}">
-            <td th:text="${client.clientId}"></td>
-            <td th:text="${client.clientSecret}"></td>
-            <td th:text="${client.confidential}"></td>
-            <td th:text="${client.offline}"></td>
-            <td th:text="${client.directGrant}"></td>
-            <td th:text="${client.accessTokenFormat}"></td>
-            <td th:text="${client.redirectUris.get(0)}"></td>
-            <td th:text="${client.corsUris.get(0)}"></td>
-        </tr>
-        </tbody>
-    </table>
+    <ul>
+        <li><a th:href="@{/admin/userlist}" th:text="#{admin.userlist}"></a></li>
+        <li><a th:href="@{/admin/clientlist}" th:text="#{admin.clientlist}"></a></li>
+        <li><a th:href="@{/.well-known/openid-configuration}" target="_blank" th:text="#{openid.config}"></a></li>
+    </ul>
+
 </div>
 </body>
 </html>

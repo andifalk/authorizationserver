@@ -1,6 +1,5 @@
 package com.example.authorizationserver.user.api.resource;
 
-import com.example.authorizationserver.user.model.Address;
 import com.example.authorizationserver.user.model.Gender;
 import com.example.authorizationserver.user.model.User;
 
@@ -18,8 +17,7 @@ public class UserResource {
 
   private UUID identifier;
 
-  @NotNull
-  private Gender gender;
+  @NotNull private Gender gender;
 
   @NotBlank
   @Size(max = 100)
@@ -29,9 +27,7 @@ public class UserResource {
   @Size(max = 100)
   private String lastName;
 
-  @NotNull
-  @Email
-  private String email;
+  @NotNull @Email private String email;
 
   @NotBlank
   @Size(max = 50)
@@ -41,20 +37,16 @@ public class UserResource {
   @Size(max = 100)
   private String phone;
 
-  @NotNull
-  @NotEmpty
-  private Set<String> groups = new HashSet<>();
+  @NotNull @NotEmpty private Set<String> groups = new HashSet<>();
 
-  @NotNull
-  @NotEmpty
-  private Set<AddressResource> addresses = new HashSet<>();
+  @NotNull @NotEmpty private Set<AddressResource> addresses = new HashSet<>();
 
-  public UserResource() {
-  }
+  public UserResource() {}
 
   public UserResource(User user) {
     this.identifier = user.getIdentifier();
-    this.addresses = user.getAddresses().stream().map(AddressResource::new).collect(Collectors.toSet());
+    this.addresses =
+        user.getAddresses().stream().map(AddressResource::new).collect(Collectors.toSet());
     this.email = user.getEmail();
     this.firstName = user.getFirstName();
     this.lastName = user.getLastName();
@@ -138,16 +130,30 @@ public class UserResource {
 
   @Override
   public String toString() {
-    return "UserResource{" +
-            "identifier=" + identifier +
-            ", gender=" + gender +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", username='" + username + '\'' +
-            ", phone='" + phone + '\'' +
-            ", groups=" + groups +
-            ", addresses=" + addresses +
-            '}';
+    return "UserResource{"
+        + "identifier="
+        + identifier
+        + ", gender="
+        + gender
+        + ", firstName='"
+        + firstName
+        + '\''
+        + ", lastName='"
+        + lastName
+        + '\''
+        + ", email='"
+        + email
+        + '\''
+        + ", username='"
+        + username
+        + '\''
+        + ", phone='"
+        + phone
+        + '\''
+        + ", groups="
+        + groups
+        + ", addresses="
+        + addresses
+        + '}';
   }
 }

@@ -21,7 +21,8 @@ public class RegisteredClientApiController {
 
   @GetMapping
   public List<RegisteredClientResource> clients() {
-    return registeredClientService.findAll().stream().map(RegisteredClientResource::new).collect(Collectors.toList());
+    return registeredClientService.findAll().stream()
+        .map(RegisteredClientResource::new)
+        .collect(Collectors.toList());
   }
-
 }

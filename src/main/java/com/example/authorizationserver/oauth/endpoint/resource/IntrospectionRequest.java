@@ -5,15 +5,12 @@ import javax.validation.constraints.NotBlank;
 public class IntrospectionRequest {
 
   /**
-   * REQUIRED.  The string value of the token.  For access tokens, this
-   *   is the "access_token" value returned from the token endpoint
-   *   defined in OAuth 2.0 [RFC6749], Section 5.1.  For refresh tokens,
-   *           this is the "refresh_token" value returned from the token endpoint
-   *   as defined in OAuth 2.0 [RFC6749], Section 5.1.  Other token types
-   *   are outside the scope of this specification.
+   * REQUIRED. The string value of the token. For access tokens, this is the "access_token" value
+   * returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. For refresh
+   * tokens, this is the "refresh_token" value returned from the token endpoint as defined in OAuth
+   * 2.0 [RFC6749], Section 5.1. Other token types are outside the scope of this specification.
    */
-  @NotBlank
-  private String token;
+  @NotBlank private String token;
 
   /**
    * OPTIONAL. A hint about the type of the token submitted for introspection. The protected
@@ -43,9 +40,13 @@ public class IntrospectionRequest {
 
   @Override
   public String toString() {
-    return "IntrospectionRequest{" +
-            "token='" + token + '\'' +
-            ", token_type_hint='" + token_type_hint + '\'' +
-            '}';
+    return "IntrospectionRequest{"
+        + "token='"
+        + token
+        + '\''
+        + ", token_type_hint='"
+        + token_type_hint
+        + '\''
+        + '}';
   }
 }

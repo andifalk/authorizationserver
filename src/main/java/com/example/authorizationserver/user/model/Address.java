@@ -29,8 +29,7 @@ public class Address extends AbstractPersistable<Long> {
   @Size(max = 100)
   private String country;
 
-  public Address() {
-  }
+  public Address() {}
 
   public Address(String street, String zip, String city, String state, String country) {
     this.street = street;

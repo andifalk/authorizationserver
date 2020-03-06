@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class JsonWebTokenService {
@@ -31,7 +30,14 @@ public class JsonWebTokenService {
     return signedJWT.getJWTClaimsSet();
   }
 
-  public String createToken(String clientId, List<String> audiences, String jti, List<String> scopes, User user, String nonce, LocalDateTime expiryDateTime)
+  public String createPersonalizedToken(
+      String clientId,
+      List<String> audiences,
+      String jti,
+      List<String> scopes,
+      User user,
+      String nonce,
+      LocalDateTime expiryDateTime)
       throws JOSEException {
     JWTClaimsSet claimsSet =
         new JWTClaimsSet.Builder()
@@ -52,6 +58,37 @@ public class JsonWebTokenService {
             .claim("gender", user.getGender().name())
             .claim("phone", user.getPhone())
             .claim("phone_verified", Boolean.TRUE)
+            .claim("client_id", clientId)
+            .build();
+
+    SignedJWT signedJWT =
+        new SignedJWT(
+            new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .keyID(jwtPki.getPublicKey().getKeyID())
+                .build(),
+            claimsSet);
+
+    signedJWT.sign(jwtPki.getSigner());
+
+    return signedJWT.serialize();
+  }
+
+  public String createAnonymousToken(
+      String clientId,
+      List<String> audiences,
+      String jti,
+      List<String> scopes,
+      LocalDateTime expiryDateTime)
+      throws JOSEException {
+    JWTClaimsSet claimsSet =
+        new JWTClaimsSet.Builder()
+            .subject("anonymous")
+            .issuer(jwtPki.getIssuer())
+            .expirationTime(Date.from(expiryDateTime.atZone(ZoneId.systemDefault()).toInstant()))
+            .audience(audiences)
+            .issueTime(new Date())
+            .notBeforeTime(new Date())
+            .jwtID(jti)
             .claim("client_id", clientId)
             .build();
 

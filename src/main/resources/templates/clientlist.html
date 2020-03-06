@@ -10,7 +10,7 @@
 
 </head>
 <body>
-<div class="container">
+<div class="container-fluid">
     <h2 th:text="#{client.list}">List of Clients</h2>
 
     <table class="table table-striped table-hover">
@@ -34,8 +34,8 @@
             <td th:text="${client.offline}"></td>
             <td th:text="${client.directGrant}"></td>
             <td th:text="${client.accessTokenFormat}"></td>
-            <td th:text="${client.redirectUris.get(0)}"></td>
-            <td th:text="${client.corsUris.get(0)}"></td>
+            <td th:text="${client.redirectUris.iterator().next()}"></td>
+            <td th:text="${client.corsUris.iterator().next()}"></td>
         </tr>
         </tbody>
     </table>

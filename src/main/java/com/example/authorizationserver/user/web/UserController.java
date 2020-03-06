@@ -1,7 +1,6 @@
 package com.example.authorizationserver.user.web;
 
 import com.example.authorizationserver.user.api.resource.UserResource;
-import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

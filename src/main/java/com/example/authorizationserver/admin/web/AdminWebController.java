@@ -10,5 +10,4 @@ public class AdminWebController {
   public String admin() {
     return "index";
   }
-
 }

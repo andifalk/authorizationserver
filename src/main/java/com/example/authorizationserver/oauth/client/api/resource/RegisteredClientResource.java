@@ -15,8 +15,7 @@ import java.util.UUID;
 
 public class RegisteredClientResource {
 
-  @NotNull
-  private UUID identifier;
+  @NotNull private UUID identifier;
 
   @NotBlank
   @Size(max = 100)
@@ -25,27 +24,21 @@ public class RegisteredClientResource {
   @Size(max = 100)
   private String clientSecret;
 
-  @NotNull
-  private boolean confidential;
+  @NotNull private boolean confidential;
 
-  @NotNull
-  private boolean offline;
+  @NotNull private boolean offline;
 
-  @NotNull
-  private boolean directGrant;
+  @NotNull private boolean directGrant;
 
   @NotNull
   @Enumerated(EnumType.STRING)
   private AccessTokenFormat accessTokenFormat;
 
-  @NotEmpty
-  private Set<String> redirectUris = new HashSet<>();
+  @NotEmpty private Set<String> redirectUris = new HashSet<>();
 
-  @NotEmpty
-  private Set<String> corsUris = new HashSet<>();
+  @NotEmpty private Set<String> corsUris = new HashSet<>();
 
-  public RegisteredClientResource() {
-  }
+  public RegisteredClientResource() {}
 
   public RegisteredClientResource(RegisteredClient registeredClient) {
     this.identifier = registeredClient.getIdentifier();
@@ -133,15 +126,23 @@ public class RegisteredClientResource {
 
   @Override
   public String toString() {
-    return "RegisteredClient{" +
-            "clientId='" + clientId + '\'' +
-            ", clientSecret='*****'" +
-            ", confidential=" + confidential +
-            ", accessTokenFormat=" + accessTokenFormat +
-            ", offline=" + offline +
-            ", directGrant=" + directGrant +
-            ", redirectUris=" + redirectUris +
-            ", corsUris=" + corsUris +
-            '}';
+    return "RegisteredClient{"
+        + "clientId='"
+        + clientId
+        + '\''
+        + ", clientSecret='*****'"
+        + ", confidential="
+        + confidential
+        + ", accessTokenFormat="
+        + accessTokenFormat
+        + ", offline="
+        + offline
+        + ", directGrant="
+        + directGrant
+        + ", redirectUris="
+        + redirectUris
+        + ", corsUris="
+        + corsUris
+        + '}';
   }
 }

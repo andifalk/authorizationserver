@@ -26,8 +26,7 @@ public class AddressResource {
   @Size(max = 100)
   private String country;
 
-  public AddressResource() {
-  }
+  public AddressResource() {}
 
   public AddressResource(Address address) {
     this.city = address.getCity();

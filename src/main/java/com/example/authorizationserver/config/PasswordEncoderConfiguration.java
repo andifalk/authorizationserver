@@ -12,5 +12,4 @@ public class PasswordEncoderConfiguration {
   public PasswordEncoder passwordEncoder() {
     return PasswordEncoderFactories.createDelegatingPasswordEncoder();
   }
-
 }

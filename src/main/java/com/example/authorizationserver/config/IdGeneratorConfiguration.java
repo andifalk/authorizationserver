@@ -12,5 +12,4 @@ public class IdGeneratorConfiguration {
   public IdGenerator idGenerator() {
     return new JdkIdGenerator();
   }
-
 }

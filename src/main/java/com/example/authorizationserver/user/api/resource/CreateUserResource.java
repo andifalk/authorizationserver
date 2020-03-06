@@ -9,8 +9,7 @@ public class CreateUserResource extends UserResource {
   @Size(max = 200)
   private String password;
 
-  public CreateUserResource() {
-  }
+  public CreateUserResource() {}
 
   public String getPassword() {
     return password;
@@ -19,5 +18,4 @@ public class CreateUserResource extends UserResource {
   public void setPassword(String password) {
     this.password = password;
   }
-
 }

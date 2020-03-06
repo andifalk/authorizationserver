@@ -46,5 +46,4 @@ public class OpaqueToken extends Token {
       throw new BadCredentialsException("Expired");
     }
   }
-
 }

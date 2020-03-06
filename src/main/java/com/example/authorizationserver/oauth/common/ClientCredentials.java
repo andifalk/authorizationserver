@@ -20,9 +20,6 @@ public class ClientCredentials {
 
   @Override
   public String toString() {
-    return "ClientCredentials{" +
-            "clientId='" + clientId + '\'' +
-            ", clientSecret='*****'" +
-            '}';
+    return "ClientCredentials{" + "clientId='" + clientId + '\'' + ", clientSecret='*****'" + '}';
   }
 }

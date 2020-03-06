@@ -19,5 +19,4 @@ public class JwksRestController {
   public JSONObject jwksEndpoint() {
     return jwtPki.getJwkSet().toJSONObject();
   }
-
 }

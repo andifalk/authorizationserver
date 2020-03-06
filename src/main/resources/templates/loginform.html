@@ -13,7 +13,7 @@
 
 <h1>Authentication</h1>
 
-<form action="#" th:action="@{'/authenticate?scope=' + ${scope} + '&client_id=' + ${client_id} + '&redirect_uri=' + ${redirect_uri} + '&state=' + ${state}}" th:object="${user}" method="post">
+<form action="#" th:action="@{'/authenticate?auth_state=' + ${auth_state}}" th:object="${user}" method="post">
     <fieldset>
         <legend>Please Login</legend>
         <div th:if="${error}" class="alert alert-error">
@@ -32,7 +32,6 @@
         <input type="submit" class="btn btn-primary" value="Authenticate">
     </fieldset>
 </form>
-
 </div>
 
 </body>

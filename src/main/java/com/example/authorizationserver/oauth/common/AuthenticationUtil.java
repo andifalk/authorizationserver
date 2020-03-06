@@ -27,10 +27,8 @@ public final class AuthenticationUtil {
     byte[] decoded;
     try {
       decoded = Base64.getDecoder().decode(base64Token);
-    }
-    catch (IllegalArgumentException e) {
-      throw new BadCredentialsException(
-              "Failed to decode basic authentication token");
+    } catch (IllegalArgumentException e) {
+      throw new BadCredentialsException("Failed to decode basic authentication token");
     }
 
     String token = new String(decoded, StandardCharsets.UTF_8);

@@ -1,7 +1,6 @@
 package com.example.authorizationserver.oauth.common;
 
 public enum GrantType {
-
   AUTHORIZATION_CODE("authorization_code"),
   PASSWORD("password"),
   CLIENT_CREDENTIALS("client_credentials"),

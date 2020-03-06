@@ -73,5 +73,4 @@ public class DiscoveryRestController {
 
     return discovery;
   }
-
 }

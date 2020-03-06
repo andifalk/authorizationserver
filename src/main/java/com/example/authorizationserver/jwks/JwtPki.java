@@ -32,14 +32,11 @@ public class JwtPki {
 
   @PostConstruct
   public void initPki() throws JOSEException {
-    RSAKey rsaJWK = new RSAKeyGenerator(2048)
-            .keyID("1")
-            .generate();
+    RSAKey rsaJWK = new RSAKeyGenerator(2048).keyID("1").generate();
     this.publicKey = rsaJWK.toPublicJWK();
     this.signer = new RSASSASigner(rsaJWK);
     this.jwkSet = new JWKSet(this.publicKey);
     this.verifier = new RSASSAVerifier(this.publicKey);
-
   }
 
   public JWSSigner getSigner() {

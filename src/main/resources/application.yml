@@ -10,6 +10,7 @@ server:
   servlet:
     context-path: /auth
 
+
 auth-server:
   issuer: http://localhost:${server.port}${server.servlet.context-path}
   access-token:
@@ -20,3 +21,9 @@ auth-server:
   refresh-token:
     lifetime: 8h
     max-lifetime: 8h
+
+logging:
+  level:
+    com:
+      example:
+        authorizationserver: trace

@@ -15,15 +15,13 @@ public abstract class Token extends AbstractPersistable<Long> {
   @Size(max = 2000)
   private String value;
 
-  @NotNull
-  private LocalDateTime expiry;
+  @NotNull private LocalDateTime expiry;
 
   private boolean revoked;
 
   private boolean refreshToken;
 
-  public Token() {
-  }
+  public Token() {}
 
   public String getValue() {
     return value;
@@ -61,13 +59,18 @@ public abstract class Token extends AbstractPersistable<Long> {
 
   @Override
   public String toString() {
-    return "Token{" +
-            "value='" + value + '\'' +
-            ", expiry=" + expiry +
-            ", revoked=" + revoked +
-            ", refreshToken=" + refreshToken +
-            ", referenceToken=" + isReferenceToken() +
-            '}';
+    return "Token{"
+        + "value='"
+        + value
+        + '\''
+        + ", expiry="
+        + expiry
+        + ", revoked="
+        + revoked
+        + ", refreshToken="
+        + refreshToken
+        + ", referenceToken="
+        + isReferenceToken()
+        + '}';
   }
-
 }

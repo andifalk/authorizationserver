@@ -5,7 +5,4 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/revocate")
-public class RevocationEndpoint {
-
-
-}
+public class RevocationEndpoint {}

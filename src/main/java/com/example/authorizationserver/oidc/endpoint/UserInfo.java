@@ -47,11 +47,15 @@ public class UserInfo {
 
   private String updated_at;
 
-  public UserInfo() {
-  }
+  public UserInfo() {}
 
   public UserInfo(User user) {
-    this.address = user.getAddresses().stream().map(AddressResource::new).collect(Collectors.toSet()).iterator().next();
+    this.address =
+        user.getAddresses().stream()
+            .map(AddressResource::new)
+            .collect(Collectors.toSet())
+            .iterator()
+            .next();
     this.email = user.getEmail();
     this.given_name = user.getFirstName();
     this.family_name = user.getLastName();
@@ -227,27 +231,64 @@ public class UserInfo {
 
   @Override
   public String toString() {
-    return "UserInfo{" +
-            "sub='" + sub + '\'' +
-            ", name='" + name + '\'' +
-            ", given_name='" + given_name + '\'' +
-            ", family_name='" + family_name + '\'' +
-            ", middle_name='" + middle_name + '\'' +
-            ", nickname='" + nickname + '\'' +
-            ", preferred_username='" + preferred_username + '\'' +
-            ", website='" + website + '\'' +
-            ", profile='" + profile + '\'' +
-            ", picture='" + picture + '\'' +
-            ", email='" + email + '\'' +
-            ", email_verified=" + email_verified +
-            ", gender='" + gender + '\'' +
-            ", birthdate='" + birthdate + '\'' +
-            ", zoneinfo='" + zoneinfo + '\'' +
-            ", locale='" + locale + '\'' +
-            ", phone_number='" + phone_number + '\'' +
-            ", phone_number_verified=" + phone_number_verified +
-            ", address=" + address +
-            ", updated_at='" + updated_at + '\'' +
-            '}';
+    return "UserInfo{"
+        + "sub='"
+        + sub
+        + '\''
+        + ", name='"
+        + name
+        + '\''
+        + ", given_name='"
+        + given_name
+        + '\''
+        + ", family_name='"
+        + family_name
+        + '\''
+        + ", middle_name='"
+        + middle_name
+        + '\''
+        + ", nickname='"
+        + nickname
+        + '\''
+        + ", preferred_username='"
+        + preferred_username
+        + '\''
+        + ", website='"
+        + website
+        + '\''
+        + ", profile='"
+        + profile
+        + '\''
+        + ", picture='"
+        + picture
+        + '\''
+        + ", email='"
+        + email
+        + '\''
+        + ", email_verified="
+        + email_verified
+        + ", gender='"
+        + gender
+        + '\''
+        + ", birthdate='"
+        + birthdate
+        + '\''
+        + ", zoneinfo='"
+        + zoneinfo
+        + '\''
+        + ", locale='"
+        + locale
+        + '\''
+        + ", phone_number='"
+        + phone_number
+        + '\''
+        + ", phone_number_verified="
+        + phone_number_verified
+        + ", address="
+        + address
+        + ", updated_at='"
+        + updated_at
+        + '\''
+        + '}';
   }
 }

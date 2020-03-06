@@ -2,8 +2,6 @@ package com.example.authorizationserver.oauth.client.web;
 
 import com.example.authorizationserver.oauth.client.RegisteredClientService;
 import com.example.authorizationserver.oauth.client.api.resource.RegisteredClientResource;
-import com.example.authorizationserver.user.api.resource.UserResource;
-import com.example.authorizationserver.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +22,9 @@ public class RegisteredClientController {
 
   @ModelAttribute("allClients")
   public List<RegisteredClientResource> populateUsers() {
-    return this.registeredClientService.findAll().stream().map(RegisteredClientResource::new).collect(Collectors.toList());
+    return this.registeredClientService.findAll().stream()
+        .map(RegisteredClientResource::new)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("/admin/clientlist")

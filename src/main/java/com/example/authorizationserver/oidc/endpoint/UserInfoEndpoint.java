@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MissingRequestHeaderException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,7 +31,8 @@ public class UserInfoEndpoint {
   private final UserService userService;
   private final JsonWebTokenService jsonWebTokenService;
 
-  public UserInfoEndpoint(TokenService tokenService, UserService userService, JsonWebTokenService jsonWebTokenService) {
+  public UserInfoEndpoint(
+      TokenService tokenService, UserService userService, JsonWebTokenService jsonWebTokenService) {
     this.tokenService = tokenService;
     this.userService = userService;
     this.jsonWebTokenService = jsonWebTokenService;
@@ -45,7 +45,8 @@ public class UserInfoEndpoint {
     Optional<User> user = Optional.empty();
     if (jsonWebToken != null) {
       try {
-        JWTClaimsSet jwtClaimsSet = jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
+        JWTClaimsSet jwtClaimsSet =
+            jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
         user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
       } catch (ParseException | JOSEException e) {
         e.printStackTrace();

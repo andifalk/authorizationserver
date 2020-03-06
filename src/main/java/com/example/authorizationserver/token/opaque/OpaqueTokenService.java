@@ -9,5 +9,4 @@ public class OpaqueTokenService {
   public String createToken() {
     return RandomStringUtils.random(48, true, true);
   }
-
 }
