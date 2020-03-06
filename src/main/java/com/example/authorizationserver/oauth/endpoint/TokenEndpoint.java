@@ -1,6 +1,8 @@
 package com.example.authorizationserver.oauth.endpoint;
 
+import com.example.authorizationserver.authentication.AuthenticationService;
 import com.example.authorizationserver.oauth.client.RegisteredClientService;
+import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 import com.example.authorizationserver.oauth.common.AuthenticationUtil;
 import com.example.authorizationserver.oauth.common.ClientCredentials;
@@ -10,6 +12,7 @@ import com.example.authorizationserver.oauth.endpoint.resource.TokenResponse;
 import com.example.authorizationserver.oauth.store.AuthorizationCode;
 import com.example.authorizationserver.oauth.store.AuthorizationCodeService;
 import com.example.authorizationserver.token.store.TokenService;
+import com.example.authorizationserver.token.store.model.OpaqueToken;
 import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
 import com.nimbusds.jose.JOSEException;
@@ -20,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -37,14 +39,12 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
-import static javax.xml.crypto.dsig.DigestMethod.SHA256;
-import static javax.xml.crypto.dsig.DigestMethod.SHA3_256;
-
 @RequestMapping("/token")
 @RestController
 public class TokenEndpoint {
   private static final Logger LOG = LoggerFactory.getLogger(TokenEndpoint.class);
 
+  private final AuthenticationService authenticationService;
   private final AuthorizationCodeService authorizationCodeService;
   private final RegisteredClientService registeredClientService;
   private final UserService userService;
@@ -55,14 +55,15 @@ public class TokenEndpoint {
   private final Duration refreshTokenLifetime;
 
   public TokenEndpoint(
+      AuthenticationService authenticationService,
       AuthorizationCodeService authorizationCodeService,
       UserService userService,
       TokenService tokenService,
       @Value("${auth-server.access-token.lifetime}") Duration accessTokenLifetime,
       @Value("${auth-server.id-token.lifetime}") Duration idTokenLifetime,
       @Value("${auth-server.refresh-token.lifetime}") Duration refreshTokenLifetime,
-      @Value("${auth-server.access-token.default-format}") String accessTokenFormat,
       RegisteredClientService registeredClientService) {
+    this.authenticationService = authenticationService;
     this.authorizationCodeService = authorizationCodeService;
     this.userService = userService;
     this.tokenService = tokenService;
@@ -75,63 +76,74 @@ public class TokenEndpoint {
   @PostMapping
   public ResponseEntity<TokenResponse> getToken(
       @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
-      @ModelAttribute("token_request") TokenRequest tokenRequest,
-      BindingResult result)
+      @ModelAttribute("token_request") TokenRequest tokenRequest)
       throws JOSEException {
-
 
     if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.CLIENT_CREDENTIALS.getGrant())) {
       return getTokenResponseForClientCredentials(authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.PASSWORD.getGrant())) {
-      return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));
+      return getTokenResponseForPassword(authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.TOKEN_EXCHANGE.getGrant())) {
       return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));
     } else if (tokenRequest
         .getGrant_type()
         .equalsIgnoreCase(GrantType.AUTHORIZATION_CODE.getGrant())) {
       return getTokenResponseForAuthorizationCode(authorizationHeader, tokenRequest);
+    } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.REFRESH_TOKEN.getGrant())) {
+      return getTokenResponseForRefreshToken(authorizationHeader, tokenRequest);
     } else {
       return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));
     }
   }
 
-  /*
-   * Create token response for 'authorization code'.
+  /* ---------------------
+   Access Token Request
+
+   The client makes a request to the token endpoint by sending the
+   following parameters using the "application/x-www-form-urlencoded"
+   format per Appendix B with a character encoding of UTF-8 in the HTTP
+   request entity-body:
+
+   grant_type
+         REQUIRED.  Value MUST be set to "authorization_code".
+
+   code
+         REQUIRED.  The authorization code received from the
+         authorization server.
+
+   redirect_uri
+         REQUIRED, if the "redirect_uri" parameter was included in the
+         authorization request as described in Section 4.1.1, and their
+         values MUST be identical.
+
+   client_id
+         REQUIRED, if the client is not authenticating with the
+         authorization server as described in Section 3.2.1.
+
+   If the client type is confidential or the client was issued client
+   credentials (or assigned other authentication requirements), the
+   client MUST authenticate with the authorization server.
    */
   private ResponseEntity<TokenResponse> getTokenResponseForAuthorizationCode(
       String authorizationHeader, TokenRequest tokenRequest) throws JOSEException {
 
-    String clientId;
-    String clientSecret;
+    ClientCredentials clientCredentials = retrieveClientCredentials(authorizationHeader, tokenRequest);
 
-    if (authorizationHeader != null) {
-      ClientCredentials clientCredentials =
-          AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
-      clientId = clientCredentials.getClientId();
-      clientSecret = clientCredentials.getClientSecret();
-    } else if (StringUtils.isNotBlank(tokenRequest.getClient_id())) {
-      clientId = tokenRequest.getClient_id();
-      clientSecret = tokenRequest.getClient_secret();
-    } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .header("WWW-Authenticate", "Basic")
-          .body(new TokenResponse("invalid_client"));
+    if (clientCredentials == null) {
+      return reportInvalidClientError();
     }
 
     AuthorizationCode authorizationCode = authorizationCodeService.getCode(tokenRequest.getCode());
-    if (authorizationCode == null || !clientId.equals(authorizationCode.getClientId())) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .header("WWW-Authenticate", "Basic")
-          .body(new TokenResponse("invalid_client"));
+    if (authorizationCode == null || !clientCredentials.getClientId().equals(authorizationCode.getClientId())) {
+      return reportInvalidClientError();
     }
 
-    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientId);
+    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
+
     if (registeredClient.isConfidential()) {
-      if (StringUtils.isBlank(clientSecret)
-          || !registeredClient.getClientSecret().equals(clientSecret)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .header("WWW-Authenticate", "Basic")
-            .body(new TokenResponse("invalid_client"));
+      if (StringUtils.isBlank(clientCredentials.getClientSecret())
+          || !registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
+        return reportInvalidClientError();
       }
     } else {
       if (StringUtils.isNotBlank(tokenRequest.getCode_verifier())) {
@@ -141,18 +153,18 @@ public class TokenEndpoint {
           try {
             String rehashedChallenge = rehashCodeVerifier(tokenRequest.getCode_verifier());
             if (!authorizationCode.getCode_challenge().equals(rehashedChallenge)) {
-              return ResponseEntity.badRequest().body(new TokenResponse("invalid_grant"));
+              return reportInvalidGrantError();
             }
           } catch (NoSuchAlgorithmException e) {
             return ResponseEntity.badRequest().body(new TokenResponse("server_error"));
           }
         } else if ("plain".equalsIgnoreCase(authorizationCode.getCode_challenge_method())) {
           if (!authorizationCode.getCode_challenge().equals(tokenRequest.getCode_verifier())) {
-            return ResponseEntity.badRequest().body(new TokenResponse("invalid_grant"));
+            return reportInvalidGrantError();
           }
         }
       } else {
-        return ResponseEntity.badRequest().body(new TokenResponse("invalid_grant"));
+        return reportInvalidGrantError();
       }
     }
 
@@ -168,13 +180,18 @@ public class TokenEndpoint {
 
       return ResponseEntity.ok(
           new TokenResponse(
-              tokenService
-                  .createPersonalizedJwtAccessToken(
-                      user.get(),
-                      authorizationCode.getClientId(),
-                      authorizationCode.getNonce(),
-                      accessTokenLifetime)
-                  .getValue(),
+              AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                  ? tokenService
+                      .createPersonalizedJwtAccessToken(
+                          user.get(),
+                          authorizationCode.getClientId(),
+                          authorizationCode.getNonce(),
+                          accessTokenLifetime)
+                      .getValue()
+                  : tokenService
+                      .createPersonalizedOpaqueAccessToken(
+                          user.get(), authorizationCode.getClientId(), accessTokenLifetime)
+                      .getValue(),
               tokenService
                   .createRefreshToken(authorizationCode.getClientId(), refreshTokenLifetime)
                   .getValue(),
@@ -188,69 +205,218 @@ public class TokenEndpoint {
                       idTokenLifetime)
                   .getValue()));
     } else {
-      return ResponseEntity.badRequest().body(new TokenResponse("invalid_grant"));
+      return reportInvalidGrantError();
     }
   }
 
-  /*
-   * Create token response for 'client_credentials'.
+  /* -------------------
+   Access Token Request
+
+   The client makes a request to the token endpoint by adding the
+   following parameters using the "application/x-www-form-urlencoded"
+   format per Appendix B with a character encoding of UTF-8 in the HTTP
+   request entity-body:
+
+   grant_type
+         REQUIRED.  Value MUST be set to "client_credentials".
+
+   scope
+         OPTIONAL.  The scope of the access request as described by
+         Section 3.3.
+
+   The client MUST authenticate with the authorization server
    */
   private ResponseEntity<TokenResponse> getTokenResponseForClientCredentials(
       String authorizationHeader, TokenRequest tokenRequest) throws JOSEException {
 
-    String clientId;
-    String clientSecret;
+    ClientCredentials clientCredentials = retrieveClientCredentials(authorizationHeader, tokenRequest);
 
-    if (authorizationHeader != null) {
-      ClientCredentials clientCredentials =
-          AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
-      clientId = clientCredentials.getClientId();
-      clientSecret = clientCredentials.getClientSecret();
-    } else if (StringUtils.isNotBlank(tokenRequest.getClient_id())
-        && StringUtils.isNotBlank(tokenRequest.getClient_secret())) {
-      clientId = tokenRequest.getClient_id();
-      clientSecret = tokenRequest.getClient_secret();
-    } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .header("WWW-Authenticate", "Basic")
-          .body(new TokenResponse("invalid_client"));
+    if (clientCredentials == null) {
+      return reportInvalidClientError();
     }
 
-    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientId);
-    if (registeredClient != null && registeredClient.getClientSecret().equals(clientSecret)) {
+    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
+    if (registeredClient != null && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
       if (registeredClient.isDirectGrant()) {
         return ResponseEntity.ok(
             new TokenResponse(
-                tokenService
-                    .createAnonymousJwtAccessToken(clientId, accessTokenLifetime)
-                    .getValue(),
-                tokenService.createRefreshToken(clientId, refreshTokenLifetime).getValue(),
+                AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                    ? tokenService
+                        .createAnonymousJwtAccessToken(clientCredentials.getClientId(), accessTokenLifetime)
+                        .getValue()
+                    : tokenService
+                        .createAnonymousOpaqueAccessToken(clientCredentials.getClientId(), accessTokenLifetime)
+                        .getValue(),
+                tokenService.createRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime).getValue(),
                 accessTokenLifetime.toSeconds(),
                 null));
       } else {
-        return ResponseEntity.badRequest().body(new TokenResponse("unauthorized_client"));
+        return reportUnauthorizedClientError();
       }
     } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .header("WWW-Authenticate", "Basic")
-          .body(new TokenResponse("invalid_client"));
+      return reportInvalidClientError();
     }
+  }
+
+  /* ------------------
+   Access Token Request
+
+   The client makes a request to the token endpoint by adding the
+   following parameters using the "application/x-www-form-urlencoded"
+   format per Appendix B with a character encoding of UTF-8 in the HTTP
+   request entity-body:
+
+   grant_type
+         REQUIRED.  Value MUST be set to "password".
+
+   username
+         REQUIRED.  The resource owner username.
+
+   password
+         REQUIRED.  The resource owner password.
+
+   scope
+         OPTIONAL.  The scope of the access request as described by
+         Section 3.3.
+
+   If the client type is confidential or the client was issued client
+   credentials (or assigned other authentication requirements), the
+   client MUST authenticate with the authorization server
+   */
+  private ResponseEntity<TokenResponse> getTokenResponseForPassword(
+      String authorizationHeader, TokenRequest tokenRequest) throws JOSEException {
+
+    ClientCredentials clientCredentials = retrieveClientCredentials(authorizationHeader, tokenRequest);
+
+    if (clientCredentials == null) {
+      return reportInvalidClientError();
+    }
+
+    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
+    if (registeredClient != null && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
+      if (registeredClient.isDirectGrant()) {
+
+        User authenticatedUser;
+        try {
+          authenticatedUser =
+              authenticationService.authenticate(
+                  tokenRequest.getUsername(), tokenRequest.getPassword());
+        } catch (BadCredentialsException ex) {
+          return reportUnauthorizedClientError();
+        }
+
+        return ResponseEntity.ok(
+            new TokenResponse(
+                AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                    ? tokenService
+                        .createPersonalizedJwtAccessToken(
+                            authenticatedUser, clientCredentials.getClientId(), null, accessTokenLifetime)
+                        .getValue()
+                    : tokenService
+                        .createPersonalizedOpaqueAccessToken(
+                            authenticatedUser, clientCredentials.getClientId(), accessTokenLifetime)
+                        .getValue(),
+                tokenService.createRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime).getValue(),
+                accessTokenLifetime.toSeconds(),
+                null));
+      } else {
+        return reportUnauthorizedClientError();
+      }
+    } else {
+      return reportInvalidClientError();
+    }
+  }
+
+  /* -------------------------
+   Refreshing an Access Token
+
+   If the authorization server issued a refresh token to the client, the
+   client makes a refresh request to the token endpoint by adding the
+   following parameters using the "application/x-www-form-urlencoded"
+   format per Appendix B with a character encoding of UTF-8 in the HTTP
+   request entity-body:
+
+   grant_type
+         REQUIRED.  Value MUST be set to "refresh_token".
+   refresh_token
+         REQUIRED.  The refresh token issued to the client.
+   scope
+         OPTIONAL.  The scope of the access request as described by
+         Section 3.3.  The requested scope MUST NOT include any scope
+         not originally granted by the resource owner, and if omitted is
+         treated as equal to the scope originally granted by the
+         resource owner.
+   */
+  private ResponseEntity<TokenResponse> getTokenResponseForRefreshToken(
+          String authorizationHeader, TokenRequest tokenRequest) throws JOSEException {
+
+    ClientCredentials clientCredentials = retrieveClientCredentials(authorizationHeader, tokenRequest);
+
+    if (clientCredentials == null) {
+      return reportInvalidClientError();
+    }
+
+    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
+    if (registeredClient != null && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
+      if (registeredClient.isOffline()) {
+        OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenRequest.getRefresh_token());
+        if (opaqueWebToken != null && opaqueWebToken.isRefreshToken()) {
+          Optional<User> authenticatedUser = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+          if (authenticatedUser.isPresent()) {
+            //TODO: Remove refresh token
+            return ResponseEntity.ok(
+                new TokenResponse(
+                    AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                        ? tokenService
+                            .createPersonalizedJwtAccessToken(authenticatedUser.get(), clientCredentials.getClientId(), null, accessTokenLifetime)
+                            .getValue()
+                        : tokenService
+                            .createAnonymousOpaqueAccessToken(clientCredentials.getClientId(), accessTokenLifetime)
+                            .getValue(),
+                    tokenService.createRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime).getValue(),
+                    accessTokenLifetime.toSeconds(),
+                    null));
+          }
+        }
+        return reportInvalidClientError();
+      } else {
+        return reportUnauthorizedClientError();
+      }
+    } else {
+      return reportInvalidClientError();
+    }
+  }
+
+  private ClientCredentials retrieveClientCredentials(String authorizationHeader, TokenRequest tokenRequest) {
+    ClientCredentials clientCredentials = null;
+    if (authorizationHeader != null) {
+      clientCredentials =
+              AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
+    } else if (StringUtils.isNotBlank(tokenRequest.getClient_id())
+            && StringUtils.isNotBlank(tokenRequest.getClient_secret())) {
+      clientCredentials = new ClientCredentials(tokenRequest.getClient_id(), tokenRequest.getClient_secret());
+    }
+    return clientCredentials;
+  }
+
+  private ResponseEntity<TokenResponse> reportUnauthorizedClientError() {
+    return ResponseEntity.badRequest().body(new TokenResponse("unauthorized_client"));
   }
 
   private String rehashCodeVerifier(String codeVerifier) throws NoSuchAlgorithmException {
     final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    final byte[] hashbytes = digest.digest(codeVerifier.getBytes(StandardCharsets.UTF_8));
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(hashbytes);
+    final byte[] hashedBytes = digest.digest(codeVerifier.getBytes(StandardCharsets.UTF_8));
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(hashedBytes);
   }
 
-  private String bytesToHex(byte[] hash) {
-    StringBuffer hexString = new StringBuffer();
-    for (int i = 0; i < hash.length; i++) {
-      String hex = Integer.toHexString(0xff & hash[i]);
-      if (hex.length() == 1) hexString.append('0');
-      hexString.append(hex);
-    }
-    return hexString.toString();
+  private ResponseEntity<TokenResponse> reportInvalidClientError() {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .header("WWW-Authenticate", "Basic")
+        .body(new TokenResponse("invalid_client"));
+  }
+
+  private ResponseEntity<TokenResponse> reportInvalidGrantError() {
+    return ResponseEntity.badRequest().body(new TokenResponse("invalid_grant"));
   }
 
   @ExceptionHandler(MissingServletRequestParameterException.class)

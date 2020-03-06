@@ -6,15 +6,15 @@ import java.util.List;
 
 public class AuthorizationCode {
 
-  private String clientId;
-  private URI redirectUri;
-  private List<String> scopes;
-  private String code;
-  private LocalDateTime expiry;
-  private String subject;
-  private String nonce;
-  private String code_challenge;
-  private String code_challenge_method;
+  private final String clientId;
+  private final URI redirectUri;
+  private final List<String> scopes;
+  private final String code;
+  private final LocalDateTime expiry;
+  private final String subject;
+  private final String nonce;
+  private final String code_challenge;
+  private final String code_challenge_method;
 
   public AuthorizationCode(
       String clientId,

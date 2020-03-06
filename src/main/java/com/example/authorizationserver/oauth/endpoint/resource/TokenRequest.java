@@ -16,22 +16,22 @@ public class TokenRequest {
    * Authorization Grant Type. REQUIRED One of {@link
    * com.example.authorizationserver.oauth.common.GrantType}
    */
-  @NotBlank private String grant_type;
+  @NotBlank private final String grant_type;
 
   /**
    * Authorization code. REQUIRED if grant type is {@link
    * com.example.authorizationserver.oauth.common.GrantType#AUTHORIZATION_CODE}
    */
-  private String code;
+  private final String code;
 
   /**
    * Redirect URI. REQUIRED if grant type is {@link
    * com.example.authorizationserver.oauth.common.GrantType#AUTHORIZATION_CODE}
    */
-  private URI redirect_uri;
+  private final URI redirect_uri;
 
   /** Client Id. REQUIRED if not given by authorization header */
-  private String client_id;
+  private final String client_id;
 
   /**
    * Client Secret. REQUIRED for confidential client if not given by authorization header Applicable
@@ -39,22 +39,29 @@ public class TokenRequest {
    * com.example.authorizationserver.oauth.common.GrantType#AUTHORIZATION_CODE} or {@link
    * com.example.authorizationserver.oauth.common.GrantType#CLIENT_CREDENTIALS}
    */
-  private String client_secret;
+  private final String client_secret;
 
   /** Unhashed Code Verifier. REQUIRED for PKCE. */
-  private String code_verifier;
+  private final String code_verifier;
 
   /**
    * The resource owner username REQUIRED if grant type is {@link
    * com.example.authorizationserver.oauth.common.GrantType#PASSWORD}
    */
-  private String username;
+  private final String username;
 
   /**
    * The resource owner password. REQUIRED if grant type is {@link
    * com.example.authorizationserver.oauth.common.GrantType#PASSWORD}
    */
-  private String password;
+  private final String password;
+
+  /**
+   * The refresh token issued to the client. REQUIRED if grant type is {@link
+   * com.example.authorizationserver.oauth.common.GrantType#REFRESH_TOKEN}
+   */
+  private final String refresh_token;
+
 
   public TokenRequest(
       @NotBlank String grant_type,
@@ -62,13 +69,19 @@ public class TokenRequest {
       @NotNull URI redirect_uri,
       String client_id,
       String client_secret,
-      String code_verifier) {
+      String code_verifier,
+      String username,
+      String password,
+      String refresh_token) {
     this.grant_type = grant_type;
     this.code = code;
     this.redirect_uri = redirect_uri;
     this.client_id = client_id;
     this.client_secret = client_secret;
     this.code_verifier = code_verifier;
+    this.username = username;
+    this.password = password;
+    this.refresh_token = refresh_token;
   }
 
   public String getGrant_type() {
@@ -95,24 +108,30 @@ public class TokenRequest {
     return code_verifier;
   }
 
+  public String getUsername() {
+    return username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public String getRefresh_token() {
+    return refresh_token;
+  }
+
   @Override
   public String toString() {
-    return "TokenRequest{"
-        + "grant_type='"
-        + grant_type
-        + '\''
-        + ", code='"
-        + code
-        + '\''
-        + ", redirect_uri="
-        + redirect_uri
-        + ", client_id='"
-        + client_id
-        + '\''
-        + ", client_secret='*****'"
-        + ", code_verifier='"
-        + code_verifier
-        + '\''
-        + '}';
+    return "TokenRequest{" +
+            "grant_type='" + grant_type + '\'' +
+            ", code='" + code + '\'' +
+            ", redirect_uri=" + redirect_uri +
+            ", client_id='" + client_id + '\'' +
+            ", client_secret='*****'" +
+            ", code_verifier='" + code_verifier + '\'' +
+            ", refresh_token='" + refresh_token + '\'' +
+            ", username='" + username + '\'' +
+            ", password='*****'" +
+            '}';
   }
 }

@@ -7,25 +7,25 @@ import java.util.UUID;
 
 public class AuthenticationState {
 
-  private String responseType;
-  private String scope;
-  private String clientId;
-  private URI redirectUri;
-  private String state;
-  private String responseMode;
-  private String nonce;
-  private String prompt;
-  private String display;
-  private Long max_age;
-  private String ui_locales;
-  private String id_token_hint;
-  private String login_hint;
-  private String acr_values;
-  private String code_challenge;
-  private String code_challenge_method;
-  private URI resource;
+  private final String responseType;
+  private final String scope;
+  private final String clientId;
+  private final URI redirectUri;
+  private final String state;
+  private final String responseMode;
+  private final String nonce;
+  private final String prompt;
+  private final String display;
+  private final Long max_age;
+  private final String ui_locales;
+  private final String id_token_hint;
+  private final String login_hint;
+  private final String acr_values;
+  private final String code_challenge;
+  private final String code_challenge_method;
+  private final URI resource;
   private UUID userIdentifier;
-  private LocalDateTime expiry;
+  private final LocalDateTime expiry;
 
   public AuthenticationState(
       String responseType,

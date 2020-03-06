@@ -2,8 +2,8 @@ package com.example.authorizationserver.oauth.common;
 
 public class ClientCredentials {
 
-  private String clientId;
-  private String clientSecret;
+  private final String clientId;
+  private final String clientSecret;
 
   public ClientCredentials(String clientId, String clientSecret) {
     this.clientId = clientId;

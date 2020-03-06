@@ -24,7 +24,7 @@ public class JwtPki {
 
   private JWSVerifier verifier;
 
-  private String issuer;
+  private final String issuer;
 
   public JwtPki(@Value("${auth-server.issuer}") String issuer) {
     this.issuer = issuer;

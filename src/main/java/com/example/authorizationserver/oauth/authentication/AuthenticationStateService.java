@@ -10,7 +10,7 @@ import java.util.Map;
 @Service
 public class AuthenticationStateService {
 
-  private Map<String, AuthenticationState> authenticationStateMap = new HashMap<>();
+  private final Map<String, AuthenticationState> authenticationStateMap = new HashMap<>();
 
   public AuthenticationState getState(String key) {
     return authenticationStateMap.get(key);

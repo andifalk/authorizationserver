@@ -15,7 +15,7 @@ public class AuthenticationService {
 
   private final UserService userService;
   private final PasswordEncoder passwordEncoder;
-  private String encodedDefaultPassword;
+  private final String encodedDefaultPassword;
 
   public AuthenticationService(UserService userService, PasswordEncoder passwordEncoder) {
     this.userService = userService;

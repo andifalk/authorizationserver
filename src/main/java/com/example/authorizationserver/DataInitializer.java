@@ -128,6 +128,17 @@ public class DataInitializer implements CommandLineRunner {
                     AccessTokenFormat.JWT,
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
+                    Collections.singleton("*")),
+                new RegisteredClient(
+                    UUID.randomUUID(),
+                    "opaque-demo",
+                    null,
+                    false,
+                    false,
+                    false,
+                    AccessTokenFormat.OPAQUE,
+                    Collections.singleton(
+                        "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")))
             .map(registeredClientRepository::save)
             .collect(Collectors.toSet());

@@ -11,7 +11,7 @@ import java.util.Map;
 @Service
 public class AuthorizationCodeService {
 
-  private Map<String, AuthorizationCode> codeMap = new HashMap<>();
+  private final Map<String, AuthorizationCode> codeMap = new HashMap<>();
 
   public AuthorizationCode getCode(String code) {
     return codeMap.get(code);
