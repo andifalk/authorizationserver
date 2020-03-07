@@ -13,9 +13,9 @@ This authorization server should
 * support latest specs and drafts for OAuth 2.x and OpenID Connect 1.0
 * available as docker container / [testcontainers](https://www.testcontainers.org/)
 
-__IMPORTANT:__ This project is __NOT__ intended for production use!!
+__IMPORTANT:__ This project initially is intended to be used for demos and as part of trainings/workshops. It is __NOT__ ready for production use!!
 
-## Features
+## Features (Planned)
 
 * [RFC 6749: OAuth 2.0](https://www.rfc-editor.org/rfc/rfc6749.html) compliant
 * [OpenID Connect 1.0](https://openid.net/specs/openid-connect-core-1_0.html) compliant
@@ -30,6 +30,8 @@ __IMPORTANT:__ This project is __NOT__ intended for production use!!
 * [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html)
 * [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
 * [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
+* Simple User Access Management (API & Web UI)
+* Management of OAuth2/OIDC Clients (API & Web UI)
 
 ## Feedback
 
