@@ -12,12 +12,13 @@ import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
@@ -25,7 +26,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/introspect")
 public class IntrospectionEndpoint {
 
   private final TokenService tokenService;
@@ -39,27 +39,36 @@ public class IntrospectionEndpoint {
     this.jsonWebTokenService = jsonWebTokenService;
   }
 
-  @PostMapping
-  public IntrospectionResponse getToken(
+  @PostMapping("/introspect")
+  public ResponseEntity<IntrospectionResponse> introspect(
       @RequestHeader("Authorization") String authorizationHeader,
       @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest,
       BindingResult result) {
 
-    ClientCredentials clientCredentials =
-        AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
+    ClientCredentials clientCredentials;
+
+    try {
+
+      clientCredentials = AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
+      if (clientCredentials == null) {
+        return reportInvalidClientError();
+      }
 
     String tokenValue = introspectionRequest.getToken();
 
     JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
     if (jsonWebToken != null) {
-      return getIntrospectionResponse(jsonWebToken);
+      return ResponseEntity.ok(getIntrospectionResponse(jsonWebToken));
     } else {
       OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenValue);
       if (opaqueWebToken != null) {
-        return getIntrospectionResponse(opaqueWebToken);
+        return ResponseEntity.ok(getIntrospectionResponse(opaqueWebToken));
       } else {
-        return new IntrospectionResponse(false);
+        return ResponseEntity.ok(new IntrospectionResponse(false));
       }
+    }
+    } catch (BadCredentialsException ex) {
+      return reportInvalidClientError();
     }
   }
 
@@ -114,4 +123,10 @@ public class IntrospectionEndpoint {
       return new IntrospectionResponse(false);
     }
   }
+
+    private ResponseEntity<IntrospectionResponse> reportInvalidClientError() {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+              .header("WWW-Authenticate", "Basic")
+              .body(new IntrospectionResponse("invalid_client"));
+    }
 }

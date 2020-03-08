@@ -2,7 +2,9 @@ package com.example.authorizationserver.oauth.client.api.resource;
 
 import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
+import com.example.authorizationserver.oauth.common.GrantType;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
@@ -26,13 +28,14 @@ public class RegisteredClientResource {
 
   @NotNull private boolean confidential;
 
-  @NotNull private boolean offline;
-
-  @NotNull private boolean directGrant;
-
   @NotNull
   @Enumerated(EnumType.STRING)
   private AccessTokenFormat accessTokenFormat;
+
+  /** Grants like 'client_credentials' or 'authorization_code' */
+  @NotEmpty
+  @ElementCollection
+  private Set<GrantType> grantTypes = new HashSet<>();
 
   @NotEmpty private Set<String> redirectUris = new HashSet<>();
 
@@ -47,8 +50,7 @@ public class RegisteredClientResource {
     this.clientSecret = registeredClient.getClientSecret();
     this.confidential = registeredClient.isConfidential();
     this.corsUris = registeredClient.getCorsUris();
-    this.directGrant = registeredClient.isDirectGrant();
-    this.offline = registeredClient.isOffline();
+    this.grantTypes = registeredClient.getGrantTypes();
     this.redirectUris = registeredClient.getRedirectUris();
   }
 
@@ -84,20 +86,12 @@ public class RegisteredClientResource {
     this.confidential = confidential;
   }
 
-  public boolean isOffline() {
-    return offline;
+  public Set<GrantType> getGrantTypes() {
+    return grantTypes;
   }
 
-  public void setOffline(boolean offline) {
-    this.offline = offline;
-  }
-
-  public boolean isDirectGrant() {
-    return directGrant;
-  }
-
-  public void setDirectGrant(boolean directGrant) {
-    this.directGrant = directGrant;
+  public void setGrantTypes(Set<GrantType> grantTypes) {
+    this.grantTypes = grantTypes;
   }
 
   public Set<String> getRedirectUris() {
@@ -135,10 +129,8 @@ public class RegisteredClientResource {
         + confidential
         + ", accessTokenFormat="
         + accessTokenFormat
-        + ", offline="
-        + offline
-        + ", directGrant="
-        + directGrant
+        + ", grantTypes="
+        + grantTypes
         + ", redirectUris="
         + redirectUris
         + ", corsUris="

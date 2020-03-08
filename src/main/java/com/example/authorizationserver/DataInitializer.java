@@ -3,6 +3,7 @@ package com.example.authorizationserver;
 import com.example.authorizationserver.oauth.client.dao.RegisteredClientRepository;
 import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
+import com.example.authorizationserver.oauth.common.GrantType;
 import com.example.authorizationserver.user.dao.UserRepository;
 import com.example.authorizationserver.user.model.Address;
 import com.example.authorizationserver.user.model.Gender;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -59,8 +61,8 @@ public class DataInitializer implements CommandLineRunner {
                     "bwayne",
                     "0711-1234567",
                     Collections.singleton("library_user"),
-                    Collections.singleton(
-                        new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"))),
+                    new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
+                    LocalDateTime.now()),
                 new User(
                     UUID.randomUUID(),
                     Gender.MALE,
@@ -71,8 +73,8 @@ public class DataInitializer implements CommandLineRunner {
                     "ckent",
                     "0711-222222",
                     Collections.singleton("library_user"),
-                    Collections.singleton(
-                        new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"))),
+                    new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
+                    LocalDateTime.now()),
                 new User(
                     UUID.randomUUID(),
                     Gender.MALE,
@@ -83,8 +85,8 @@ public class DataInitializer implements CommandLineRunner {
                     "pparker",
                     "0711-1234567",
                     Collections.singleton("library_user"),
-                    Collections.singleton(
-                        new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"))),
+                    new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
+                    LocalDateTime.now()),
                 new User(
                     UUID.randomUUID(),
                     Gender.MALE,
@@ -95,9 +97,9 @@ public class DataInitializer implements CommandLineRunner {
                     "admin",
                     "0711-1234567",
                     Collections.singleton("admin"),
-                    Collections.singleton(
-                        new Address(
-                            "Batmanstr.1", "70159", "Stuttgart", "Baden-Württemberg", "Germany"))))
+                    new Address(
+                        "Batmanstr.1", "70159", "Stuttgart", "Baden-Württemberg", "Germany"),
+                    LocalDateTime.now()))
             .map(userRepository::save)
             .collect(Collectors.toSet());
 
@@ -112,9 +114,8 @@ public class DataInitializer implements CommandLineRunner {
                     "confidential-demo",
                     "demo",
                     true,
-                    true,
-                    true,
                     AccessTokenFormat.JWT,
+                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS),
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")),
@@ -123,9 +124,8 @@ public class DataInitializer implements CommandLineRunner {
                     "public-demo",
                     null,
                     false,
-                    false,
-                    false,
                     AccessTokenFormat.JWT,
+                    Set.of(GrantType.AUTHORIZATION_CODE),
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")),
@@ -134,9 +134,8 @@ public class DataInitializer implements CommandLineRunner {
                     "opaque-demo",
                     null,
                     false,
-                    false,
-                    false,
                     AccessTokenFormat.OPAQUE,
+                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS),
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")))

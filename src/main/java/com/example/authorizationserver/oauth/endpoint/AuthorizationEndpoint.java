@@ -1,39 +1,29 @@
 package com.example.authorizationserver.oauth.endpoint;
 
-import com.example.authorizationserver.authentication.AuthenticationService;
-import com.example.authorizationserver.oauth.authentication.AuthenticationState;
-import com.example.authorizationserver.oauth.authentication.AuthenticationStateService;
 import com.example.authorizationserver.oauth.client.RegisteredClientService;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
-import com.example.authorizationserver.oauth.endpoint.resource.UserForm;
 import com.example.authorizationserver.oauth.store.AuthorizationCode;
 import com.example.authorizationserver.oauth.store.AuthorizationCodeService;
-import com.example.authorizationserver.user.model.User;
-import com.example.authorizationserver.user.service.UserService;
+import com.example.authorizationserver.security.user.EndUserDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Authorization endpoint as specified in RFC 6749: The OAuth 2.0 Authorization Framework
@@ -45,24 +35,14 @@ import java.util.Optional;
 @Controller
 public class AuthorizationEndpoint {
 
-  public static final String OAUTH_SESSION_COOKIE = "OAUTH_SESSION";
   private static final Logger LOG = LoggerFactory.getLogger(AuthorizationEndpoint.class);
   private final AuthorizationCodeService authorizationCodeService;
-  private final AuthenticationService authenticationService;
-  private final AuthenticationStateService authenticationStateService;
-  private final UserService userService;
   private final RegisteredClientService registeredClientService;
 
   public AuthorizationEndpoint(
       AuthorizationCodeService authorizationCodeService,
-      AuthenticationService authenticationService,
-      AuthenticationStateService authenticationStateService,
-      UserService userService,
       RegisteredClientService registeredClientService) {
     this.authorizationCodeService = authorizationCodeService;
-    this.authenticationService = authenticationService;
-    this.authenticationStateService = authenticationStateService;
-    this.userService = userService;
     this.registeredClientService = registeredClientService;
   }
 
@@ -184,40 +164,38 @@ public class AuthorizationEndpoint {
    */
   @GetMapping("/authorize")
   public String authorizationRequest(
-      @RequestParam("response_type") @Pattern(regexp = "code") String responseType,
-      @RequestParam("scope") String scope,
-      @RequestParam("client_id") String clientId,
-      @RequestParam("redirect_uri") URI redirectUri,
-      @RequestParam(name = "state", required = false) String state,
-      @RequestParam(name = "response_mode", required = false) @Pattern(regexp = "query|form_post")
+          @RequestParam("response_type") @Pattern(regexp = "code") String responseType,
+          @RequestParam("scope") String scope,
+          @RequestParam("client_id") String clientId,
+          @RequestParam("redirect_uri") URI redirectUri,
+          @RequestParam(name = "state", required = false) String state,
+          @RequestParam(name = "response_mode", required = false) @Pattern(regexp = "query|form_post")
           String responseMode,
-      @RequestParam(name = "nonce", required = false) String nonce,
-      @RequestParam(name = "prompt", required = false)
+          @RequestParam(name = "nonce", required = false) String nonce,
+          @RequestParam(name = "prompt", required = false)
           @Pattern(regexp = "none|login|consent|select_account")
           String prompt,
-      @RequestParam(name = "display", required = false) @Pattern(regexp = "page|popup|touch|wap")
+          @RequestParam(name = "display", required = false) @Pattern(regexp = "page|popup|touch|wap")
           String display,
-      @RequestParam(name = "max_age", required = false) Long max_age,
-      @RequestParam(name = "ui_locales", required = false) String ui_locales,
-      @RequestParam(name = "id_token_hint", required = false) String id_token_hint,
-      @RequestParam(name = "login_hint", required = false) String login_hint,
-      @RequestParam(name = "acr_values", required = false) String acr_values,
-      @RequestParam(name = "code_challenge", required = false) String code_challenge,
-      @RequestParam(name = "code_challenge_method", required = false)
+          @RequestParam(name = "max_age", required = false) Long max_age,
+          @RequestParam(name = "ui_locales", required = false) String ui_locales,
+          @RequestParam(name = "id_token_hint", required = false) String id_token_hint,
+          @RequestParam(name = "login_hint", required = false) String login_hint,
+          @RequestParam(name = "acr_values", required = false) String acr_values,
+          @RequestParam(name = "code_challenge", required = false) String code_challenge,
+          @RequestParam(name = "code_challenge_method", required = false)
           @Pattern(regexp = "plain|S256")
           String code_challenge_method,
-      @RequestParam(name = "resource", required = false) URI resource,
-      @CookieValue(name = OAUTH_SESSION_COOKIE, required = false) String sessionCookie,
-      HttpServletResponse response,
-      Model model) {
+          @RequestParam(name = "resource", required = false) URI resource,
+          @AuthenticationPrincipal(errorOnInvalidType = true) EndUserDetails endUserDetails) {
 
     LOG.trace(
-        "Authorization Request: client_id={}, response_type = {}, scope={}, redirectUri={}, sessionCookie={}",
+        "Authorization Request: client_id={}, response_type = {}, scope={}, redirectUri={}, endUser={}",
         clientId,
         responseType,
         scope,
         redirectUri,
-        sessionCookie);
+        endUserDetails.getUsername());
 
     if (StringUtils.isBlank(clientId)) {
       return redirectError(redirectUri, "invalid_request", "client_id is required", state);
@@ -241,152 +219,29 @@ public class AuthorizationEndpoint {
       }
     }
 
-    // Check for session cookie
-    if (StringUtils.isNotBlank(sessionCookie)) {
-      AuthenticationState authenticationState = authenticationStateService.getState(sessionCookie);
-
-      if (authenticationState != null && !authenticationState.isExpired()) {
-
-        List<String> scopes = Arrays.asList(authenticationState.getScope().split(" "));
-        Optional<User> authenticatedUser =
-            userService.findOneByIdentifier(authenticationState.getUserIdentifier());
-        if (authenticatedUser.isPresent()) {
-          LOG.info(
-              "Authenticated user {} for client id {} and scopes {}",
-              authenticatedUser.get().getIdentifier(),
-              clientId,
-              scopes);
-
-          AuthorizationCode authorizationCode =
-              authorizationCodeService.createAndStoreAuthorizationState(
-                  clientId,
-                  redirectUri,
-                  scopes,
-                  authenticatedUser.get().getIdentifier().toString(),
-                  nonce,
-                  code_challenge,
-                  code_challenge_method);
-
-          return "redirect:"
-              + redirectUri.toString()
-              + "?code="
-              + authorizationCode.getCode()
-              + "&state="
-              + state;
-        }
-      } else {
-        if (authenticationState != null && authenticationState.isExpired()) {
-          authenticationStateService.removeAuthenticationState(sessionCookie);
-          Cookie cookie = new Cookie(OAUTH_SESSION_COOKIE, sessionCookie);
-          cookie.setHttpOnly(true);
-          cookie.setMaxAge(0);
-          response.addCookie(cookie);
-        }
-        if ((authenticationState == null || authenticationState.isExpired())
-            && StringUtils.isNotBlank(prompt)
-            && prompt.equals("none")) {
-          return redirectError(redirectUri, "login_required", "", state);
-        }
-      }
-    }
-
-    String authenticationStateKey =
-        authenticationStateService.createState(
-            responseType,
-            scope,
-            clientId,
-            redirectUri,
-            state,
-            responseMode,
-            nonce,
-            prompt,
-            display,
-            max_age,
-            ui_locales,
-            id_token_hint,
-            login_hint,
-            acr_values,
-            code_challenge,
-            code_challenge_method,
-            resource);
-
-    model.addAttribute("user", new UserForm());
-    model.addAttribute("auth_state", authenticationStateKey);
-
-    LOG.trace(
-        "Redirect Authorization Request: client_id={}, response_type = {}, scope={}, redirectUri={}, state={}",
-        clientId,
-        responseType,
-        scope,
-        redirectUri,
-        state);
-
-    return "loginform";
-  }
-
-  @PostMapping("/authenticate")
-  public String authenticate(
-      @RequestParam("auth_state") String auth_state,
-      UserForm user,
-      Model model,
-      HttpServletResponse response) {
-
-    LOG.trace("Authenticate auth_state {}", auth_state);
-
-    AuthenticationState authenticationState = authenticationStateService.getState(auth_state);
-
-    String scope = authenticationState.getScope();
-    String clientId = authenticationState.getClientId();
-    URI redirectUri = authenticationState.getRedirectUri();
-    String nonce = authenticationState.getNonce();
-    String state = authenticationState.getState();
-    String code_challenge = authenticationState.getCode_challenge();
-    String code_challenge_method = authenticationState.getCode_challenge_method();
-
-    LOG.trace("Authenticating user {} for client id {} and scopes {}", user, clientId, scope);
-
-    User authenticatedUser;
-    try {
-      authenticatedUser =
-          authenticationService.authenticate(user.getUsername(), user.getPassword());
-      authenticationState.setUserIdentifier(authenticatedUser.getIdentifier());
-    } catch (BadCredentialsException ex) {
-      model.addAttribute("error", ex.getMessage());
-      return "loginform";
-    }
-
     List<String> scopes = Arrays.asList(scope.split(" "));
-
-    model.addAttribute("scopes", scopes);
-    model.addAttribute("client_id", clientId);
-
     LOG.info(
-        "Authenticated user {} for client id {} and scopes {}",
-        authenticatedUser.getIdentifier(),
-        clientId,
-        scopes);
+          "Authenticated user {} for client id {} and scopes {}",
+          endUserDetails.getIdentifier(),
+          clientId,
+          scopes);
 
-    AuthorizationCode authorizationCode =
-        authorizationCodeService.createAndStoreAuthorizationState(
-            clientId,
-            redirectUri,
-            scopes,
-            authenticatedUser.getIdentifier().toString(),
-            nonce,
-            code_challenge,
-            code_challenge_method);
+      AuthorizationCode authorizationCode =
+          authorizationCodeService.createAndStoreAuthorizationState(
+              clientId,
+              redirectUri,
+              scopes,
+                  endUserDetails.getIdentifier().toString(),
+              nonce,
+              code_challenge,
+              code_challenge_method);
 
-    Cookie cookie = new Cookie(OAUTH_SESSION_COOKIE, auth_state);
-    cookie.setHttpOnly(true);
-    cookie.setMaxAge(28800);
-    response.addCookie(cookie);
-
-    return "redirect:"
-        + redirectUri.toString()
-        + "?code="
-        + authorizationCode.getCode()
-        + "&state="
-        + state;
+      return "redirect:"
+          + redirectUri.toString()
+          + "?code="
+          + authorizationCode.getCode()
+          + "&state="
+          + state;
   }
 
   private String redirectError(

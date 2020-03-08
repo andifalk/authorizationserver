@@ -4,12 +4,12 @@ spring:
   jackson:
     date-format: com.fasterxml.jackson.databind.util.StdDateFormat
     default-property-inclusion: non_null
-
 server:
   port: 8080
   servlet:
     context-path: /auth
-
+  error:
+    include-stacktrace: never
 
 auth-server:
   issuer: http://localhost:${server.port}${server.servlet.context-path}

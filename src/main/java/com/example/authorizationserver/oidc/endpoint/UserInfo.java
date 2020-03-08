@@ -50,12 +50,7 @@ public class UserInfo {
   public UserInfo() {}
 
   public UserInfo(User user) {
-    this.address =
-        user.getAddresses().stream()
-            .map(AddressResource::new)
-            .collect(Collectors.toSet())
-            .iterator()
-            .next();
+    this.address = new AddressResource(user.getAddress());
     this.email = user.getEmail();
     this.given_name = user.getFirstName();
     this.family_name = user.getLastName();

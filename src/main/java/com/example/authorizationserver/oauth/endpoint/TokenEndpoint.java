@@ -140,6 +140,10 @@ public class TokenEndpoint {
 
     RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
 
+    if (!registeredClient.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE)) {
+      return reportInvalidGrantError();
+    }
+
     if (registeredClient.isConfidential()) {
       if (StringUtils.isBlank(clientCredentials.getClientSecret())
           || !registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
@@ -237,7 +241,7 @@ public class TokenEndpoint {
 
     RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
     if (registeredClient != null && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
-      if (registeredClient.isDirectGrant()) {
+      if (registeredClient.getGrantTypes().contains(GrantType.CLIENT_CREDENTIALS)) {
         return ResponseEntity.ok(
             new TokenResponse(
                 AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
@@ -294,7 +298,7 @@ public class TokenEndpoint {
 
     RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
     if (registeredClient != null && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
-      if (registeredClient.isDirectGrant()) {
+      if (registeredClient.getGrantTypes().contains(GrantType.PASSWORD)) {
 
         User authenticatedUser;
         try {
@@ -358,7 +362,7 @@ public class TokenEndpoint {
 
     RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientCredentials.getClientId());
     if (registeredClient != null && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
-      if (registeredClient.isOffline()) {
+      if (registeredClient.getGrantTypes().contains(GrantType.REFRESH_TOKEN)) {
         OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenRequest.getRefresh_token());
         if (opaqueWebToken != null && opaqueWebToken.isRefreshToken()) {
           Optional<User> authenticatedUser = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
@@ -392,8 +396,7 @@ public class TokenEndpoint {
     if (authorizationHeader != null) {
       clientCredentials =
               AuthenticationUtil.fromBasicAuthHeader(authorizationHeader);
-    } else if (StringUtils.isNotBlank(tokenRequest.getClient_id())
-            && StringUtils.isNotBlank(tokenRequest.getClient_secret())) {
+    } else if (StringUtils.isNotBlank(tokenRequest.getClient_id())) {
       clientCredentials = new ClientCredentials(tokenRequest.getClient_id(), tokenRequest.getClient_secret());
     }
     return clientCredentials;

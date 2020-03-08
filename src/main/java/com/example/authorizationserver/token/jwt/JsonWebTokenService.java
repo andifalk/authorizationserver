@@ -39,6 +39,7 @@ public class JsonWebTokenService {
       String nonce,
       LocalDateTime expiryDateTime)
       throws JOSEException {
+
     JWTClaimsSet claimsSet =
         new JWTClaimsSet.Builder()
             .subject(user.getIdentifier().toString())
@@ -51,6 +52,8 @@ public class JsonWebTokenService {
             .claim("nonce", nonce)
             .claim("groups", user.getGroups())
             .claim("name", user.getUsername())
+            .claim("nickname", user.getUsername())
+            .claim("preferred_username", user.getUsername())
             .claim("email", user.getEmail())
             .claim("email_verified", Boolean.TRUE)
             .claim("family_name", user.getLastName())
@@ -58,7 +61,10 @@ public class JsonWebTokenService {
             .claim("gender", user.getGender().name())
             .claim("phone", user.getPhone())
             .claim("phone_verified", Boolean.TRUE)
+            .claim("phone_number", user.getPhone())
+            .claim("phone_number_verified", Boolean.TRUE)
             .claim("client_id", clientId)
+            .claim("locale", "de")
             .build();
 
     SignedJWT signedJWT =

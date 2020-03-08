@@ -139,4 +139,14 @@ public class TokenService {
     opaqueToken.setSubject("refresh");
     return opaqueTokenRepository.save(opaqueToken);
   }
+
+  @Transactional
+  public void remove(OpaqueToken entity) {
+    opaqueTokenRepository.delete(entity);
+  }
+
+  @Transactional
+  public void remove(JsonWebToken entity) {
+    jsonWebTokenRepository.delete(entity);
+  }
 }

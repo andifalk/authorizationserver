@@ -9,22 +9,30 @@ import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.id.Audience;
+import com.nimbusds.oauth2.sdk.id.Subject;
+import com.nimbusds.oauth2.sdk.token.BearerTokenError;
+import com.nimbusds.openid.connect.sdk.UserInfoErrorResponse;
+import com.nimbusds.openid.connect.sdk.UserInfoResponse;
+import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/userinfo")
+@Controller
 public class UserInfoEndpoint {
 
   private final TokenService tokenService;
@@ -38,34 +46,60 @@ public class UserInfoEndpoint {
     this.jsonWebTokenService = jsonWebTokenService;
   }
 
-  @GetMapping
-  public UserInfo userInfo(@RequestHeader("Authorization") String authorizationHeader) {
+  @GetMapping("/userinfo")
+  public HTTPResponse userInfo(@RequestHeader("Authorization") String authorizationHeader) {
     String tokenValue = AuthenticationUtil.fromBearerAuthHeader(authorizationHeader);
     JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
-    Optional<User> user = Optional.empty();
+    UserInfoResponse userInfoResponse;
     if (jsonWebToken != null) {
       try {
         JWTClaimsSet jwtClaimsSet =
             jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
-        user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
+        Optional<User> user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
+        if (user.isPresent()) {
+          UserInfo userInfo = new UserInfo(jwtClaimsSet);
+          userInfo.setUpdatedTime(Date.from(user.get().getUpdatedAt().atZone( ZoneId.systemDefault()).toInstant()));
+          userInfo.setClaim("address", user.get().getAddress());
+          userInfoResponse =
+              new UserInfoSuccessResponse(userInfo);
+        } else {
+          userInfoResponse = new UserInfoErrorResponse(BearerTokenError.INVALID_TOKEN);
+        }
       } catch (ParseException | JOSEException e) {
-        e.printStackTrace();
+        userInfoResponse = new UserInfoErrorResponse(BearerTokenError.INVALID_TOKEN);
       }
     } else {
       OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenValue);
       if (opaqueWebToken != null) {
         opaqueWebToken.validate();
-        user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+        Optional<User> user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+        if (user.isPresent()) {
+          User authenticatedUser = user.get();
+          com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo =
+              new com.nimbusds.openid.connect.sdk.claims.UserInfo(
+                  new Subject(opaqueWebToken.getSubject()));
+          userInfo.setAudience(new Audience(opaqueWebToken.getClientId()));
+          userInfo.setFamilyName(authenticatedUser.getLastName());
+          userInfo.setGivenName(authenticatedUser.getFirstName());
+          userInfo.setEmailAddress(authenticatedUser.getEmail());
+          userInfo.setName(authenticatedUser.getUsername());
+          userInfo.setPhoneNumber(authenticatedUser.getPhone());
+          userInfo.setClaim("groups", authenticatedUser.getGroups());
+          userInfo.setUpdatedTime(Date.from(user.get().getUpdatedAt().atZone( ZoneId.systemDefault()).toInstant()));
+          userInfoResponse = new UserInfoSuccessResponse(userInfo);
+        } else {
+          userInfoResponse = new UserInfoErrorResponse(BearerTokenError.INVALID_TOKEN);
+        }
       } else {
-        throw new BadCredentialsException("No valid bearer token");
+        userInfoResponse = new UserInfoErrorResponse(BearerTokenError.MISSING_TOKEN);
       }
     }
-    return user.map(UserInfo::new).orElseThrow(() -> new BadCredentialsException("no user"));
+    return userInfoResponse.toHTTPResponse();
   }
 
   @ExceptionHandler(MissingRequestHeaderException.class)
   public ResponseEntity<String> handle(MissingRequestHeaderException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("WWW-Authenticate", "Basic")
         .body(
             "WWW-Authenticate: error=\"invalid_token\",\n"
                 + "    error_description=\"Access Token is required\"\n");

@@ -20,6 +20,7 @@
             <th th:text="#{user.firstname}">First name</th>
             <th th:text="#{user.lastname}">Last name</th>
             <th th:text="#{user.email}">Email</th>
+            <th th:text="#{user.groups}">Groups</th>
         </tr>
         </thead>
         <tbody>
@@ -28,6 +29,7 @@
             <td th:text="${user.firstName}"></td>
             <td th:text="${user.lastName}"></td>
             <td th:text="${user.email}"></td>
+            <td th:text="${user.groups}"></td>
         </tr>
         </tbody>
     </table>

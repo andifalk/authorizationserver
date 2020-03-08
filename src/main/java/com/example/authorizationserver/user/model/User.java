@@ -9,15 +9,15 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static javax.persistence.FetchType.EAGER;
 
@@ -56,8 +56,12 @@ public class User extends AbstractPersistable<Long> {
   @ElementCollection(fetch = EAGER)
   private Set<String> groups = new HashSet<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = EAGER)
-  private Set<Address> addresses = new HashSet<>();
+  @NotNull
+  @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = EAGER)
+  private Address address;
+
+  @NotNull
+  private LocalDateTime updatedAt;
 
   public User() {}
 
@@ -71,7 +75,8 @@ public class User extends AbstractPersistable<Long> {
       String username,
       String phone,
       Set<String> groups,
-      Set<Address> addresses) {
+      Address address,
+      LocalDateTime updatedAt) {
     this.identifier = identifier;
     this.gender = gender;
     this.firstName = firstName;
@@ -81,13 +86,13 @@ public class User extends AbstractPersistable<Long> {
     this.username = username;
     this.phone = phone;
     this.groups = groups;
-    this.addresses = addresses;
+    this.address = address;
+    this.updatedAt = updatedAt;
   }
 
   public User(CreateUserResource userResource) {
     this.identifier = userResource.getIdentifier();
-    this.addresses =
-        userResource.getAddresses().stream().map(Address::new).collect(Collectors.toSet());
+    this.address = new Address(userResource.getAddress());
     this.email = userResource.getEmail();
     this.firstName = userResource.getFirstName();
     this.lastName = userResource.getLastName();
@@ -96,6 +101,7 @@ public class User extends AbstractPersistable<Long> {
     this.groups = userResource.getGroups();
     this.phone = userResource.getPhone();
     this.password = userResource.getPassword();
+    this.updatedAt = userResource.getUpdatedAt();
   }
 
   public UUID getIdentifier() {
@@ -170,12 +176,20 @@ public class User extends AbstractPersistable<Long> {
     this.groups = groups;
   }
 
-  public Set<Address> getAddresses() {
-    return addresses;
+  public Address getAddress() {
+    return address;
   }
 
-  public void setAddresses(Set<Address> addresses) {
-    this.addresses = addresses;
+  public void setAddress(Address address) {
+    this.address = address;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
   @Override
@@ -205,8 +219,10 @@ public class User extends AbstractPersistable<Long> {
         + '\''
         + ", groups="
         + groups
-        + ", addresses="
-        + addresses
+        + ", address="
+        + address
+        + ", updatedAt="
+        + updatedAt
         + '}';
   }
 }

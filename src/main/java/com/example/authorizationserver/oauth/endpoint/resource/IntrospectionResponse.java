@@ -65,10 +65,16 @@ public class IntrospectionResponse {
   /** OPTIONAL. String identifier for the token, as defined in JWT [RFC7519]. */
   private String jti;
 
+  private String error;
+
   public IntrospectionResponse() {}
 
   public IntrospectionResponse(boolean active) {
     this.active = active;
+  }
+
+  public IntrospectionResponse(String error) {
+    this.error = error;
   }
 
   public boolean isActive() {
@@ -167,6 +173,14 @@ public class IntrospectionResponse {
     this.jti = jti;
   }
 
+  public String getError() {
+    return error;
+  }
+
+  public void setError(String error) {
+    this.error = error;
+  }
+
   @Override
   public String toString() {
     return "IntrospectionResponse{"
@@ -200,6 +214,9 @@ public class IntrospectionResponse {
         + '\''
         + ", jti='"
         + jti
+        + '\''
+        + ", error='"
+        + error
         + '\''
         + '}';
   }

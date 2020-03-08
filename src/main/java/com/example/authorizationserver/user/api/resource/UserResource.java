@@ -8,10 +8,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class UserResource {
 
@@ -39,14 +39,16 @@ public class UserResource {
 
   @NotNull @NotEmpty private Set<String> groups = new HashSet<>();
 
-  @NotNull @NotEmpty private Set<AddressResource> addresses = new HashSet<>();
+  @NotNull private AddressResource address;
+
+  @NotNull
+  private LocalDateTime updatedAt;
 
   public UserResource() {}
 
   public UserResource(User user) {
     this.identifier = user.getIdentifier();
-    this.addresses =
-        user.getAddresses().stream().map(AddressResource::new).collect(Collectors.toSet());
+    this.address = new AddressResource(user.getAddress());
     this.email = user.getEmail();
     this.firstName = user.getFirstName();
     this.lastName = user.getLastName();
@@ -54,6 +56,7 @@ public class UserResource {
     this.gender = user.getGender();
     this.groups = user.getGroups();
     this.phone = user.getPhone();
+    this.updatedAt = user.getUpdatedAt();
   }
 
   public UUID getIdentifier() {
@@ -120,12 +123,20 @@ public class UserResource {
     this.groups = groups;
   }
 
-  public Set<AddressResource> getAddresses() {
-    return addresses;
+  public AddressResource getAddress() {
+    return address;
   }
 
-  public void setAddresses(Set<AddressResource> addresses) {
-    this.addresses = addresses;
+  public void setAddress(AddressResource address) {
+    this.address = address;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
   @Override
@@ -152,8 +163,10 @@ public class UserResource {
         + '\''
         + ", groups="
         + groups
-        + ", addresses="
-        + addresses
+        + ", address="
+        + address
+        + ", updatedAt="
+        + updatedAt
         + '}';
   }
 }

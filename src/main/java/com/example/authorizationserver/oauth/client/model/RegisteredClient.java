@@ -1,5 +1,6 @@
 package com.example.authorizationserver.oauth.client.model;
 
+import com.example.authorizationserver.oauth.common.GrantType;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Column;
@@ -38,16 +39,15 @@ public class RegisteredClient extends AbstractPersistable<Long> {
    */
   @NotNull private boolean confidential;
 
-  /** Refresh tokens supported? */
-  @NotNull private boolean offline;
-
-  /** Direct grants like 'client_credentials' or 'password' allowed? */
-  @NotNull private boolean directGrant;
-
   /** Specifies format for access tokens: JWt or Opaque */
   @NotNull
   @Enumerated(EnumType.STRING)
   private AccessTokenFormat accessTokenFormat;
+
+  /** Grants like 'client_credentials' or 'authorization_code' */
+  @NotEmpty
+  @ElementCollection(fetch = FetchType.EAGER)
+  private Set<GrantType> grantTypes = new HashSet<>();
 
   /** List of valid redirect URIs. */
   @NotEmpty
@@ -66,9 +66,8 @@ public class RegisteredClient extends AbstractPersistable<Long> {
       String clientId,
       String clientSecret,
       boolean confidential,
-      boolean offline,
-      boolean directGrant,
       AccessTokenFormat accessTokenFormat,
+      Set<GrantType> grantTypes,
       Set<String> redirectUris,
       Set<String> corsUris) {
     this.identifier = identifier;
@@ -76,8 +75,7 @@ public class RegisteredClient extends AbstractPersistable<Long> {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.confidential = confidential;
-    this.directGrant = directGrant;
-    this.offline = offline;
+    this.grantTypes = grantTypes;
     this.corsUris = corsUris;
     this.redirectUris = redirectUris;
   }
@@ -114,20 +112,12 @@ public class RegisteredClient extends AbstractPersistable<Long> {
     this.confidential = confidential;
   }
 
-  public boolean isOffline() {
-    return offline;
+  public Set<GrantType> getGrantTypes() {
+    return grantTypes;
   }
 
-  public void setOffline(boolean offline) {
-    this.offline = offline;
-  }
-
-  public boolean isDirectGrant() {
-    return directGrant;
-  }
-
-  public void setDirectGrant(boolean directGrant) {
-    this.directGrant = directGrant;
+  public void setGrantTypes(Set<GrantType> grantTypes) {
+    this.grantTypes = grantTypes;
   }
 
   public Set<String> getRedirectUris() {
@@ -167,10 +157,8 @@ public class RegisteredClient extends AbstractPersistable<Long> {
         + confidential
         + ", accessTokenFormat="
         + accessTokenFormat
-        + ", offline="
-        + offline
-        + ", directGrant="
-        + directGrant
+        + ", grantTypes="
+        + grantTypes
         + ", redirectUris="
         + redirectUris
         + ", corsUris="

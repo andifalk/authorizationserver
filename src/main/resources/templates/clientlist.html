@@ -19,8 +19,7 @@
             <th th:text="#{client.clientid}">Client-Id</th>
             <th th:text="#{client.clientsecret}">Client-Secret</th>
             <th th:text="#{client.confidential}">Confidential</th>
-            <th th:text="#{client.offline}">Refresh Tokens</th>
-            <th th:text="#{client.directgrant}">Direct Grant Supported</th>
+            <th th:text="#{client.granttypes}">Supported Grants</th>
             <th th:text="#{client.accesstokenformat}">Accesstoken Format</th>
             <th th:text="#{client.redirecturis}">Redirect-Uris</th>
             <th th:text="#{client.corsuris}">CORS-Uris</th>
@@ -31,11 +30,10 @@
             <td th:text="${client.clientId}"></td>
             <td th:text="${client.clientSecret}"></td>
             <td th:text="${client.confidential}"></td>
-            <td th:text="${client.offline}"></td>
-            <td th:text="${client.directGrant}"></td>
+            <td th:text="${client.grantTypes}"></td>
             <td th:text="${client.accessTokenFormat}"></td>
-            <td th:text="${client.redirectUris.iterator().next()}"></td>
-            <td th:text="${client.corsUris.iterator().next()}"></td>
+            <td th:text="${client.redirectUris}"></td>
+            <td th:text="${client.corsUris}"></td>
         </tr>
         </tbody>
     </table>
