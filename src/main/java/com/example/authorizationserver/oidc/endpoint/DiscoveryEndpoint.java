@@ -1,38 +1,21 @@
 package com.example.authorizationserver.oidc.endpoint;
 
 import com.example.authorizationserver.jwks.JwtPki;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.oauth2.sdk.GrantType;
-import com.nimbusds.oauth2.sdk.ResponseType;
-import com.nimbusds.oauth2.sdk.Scope;
-import com.nimbusds.oauth2.sdk.http.HTTPResponse;
-import com.nimbusds.oauth2.sdk.id.Issuer;
-import com.nimbusds.openid.connect.sdk.SubjectType;
-import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
-import org.springframework.stereotype.Controller;
+import com.example.authorizationserver.oauth.common.GrantType;
+import com.example.authorizationserver.oauth.common.Scope;
+import com.example.authorizationserver.oauth.endpoint.AuthorizationEndpoint;
+import com.example.authorizationserver.oauth.endpoint.IntrospectionEndpoint;
+import com.example.authorizationserver.oauth.endpoint.RevocationEndpoint;
+import com.example.authorizationserver.oauth.endpoint.TokenEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-
-import static com.nimbusds.oauth2.sdk.GrantType.AUTHORIZATION_CODE;
-import static com.nimbusds.oauth2.sdk.GrantType.CLIENT_CREDENTIALS;
-import static com.nimbusds.oauth2.sdk.GrantType.JWT_BEARER;
-import static com.nimbusds.oauth2.sdk.GrantType.REFRESH_TOKEN;
-import static com.nimbusds.oauth2.sdk.ResponseMode.FORM_POST;
-import static com.nimbusds.oauth2.sdk.ResponseMode.QUERY;
-import static com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
-import static com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod.CLIENT_SECRET_POST;
-import static com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod.PLAIN;
-import static com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod.S256;
-import static com.nimbusds.openid.connect.sdk.claims.ACR.PHR;
-import static com.nimbusds.openid.connect.sdk.claims.ACR.PHRH;
-
-@Controller
+@RestController
+@RequestMapping(DiscoveryEndpoint.ENDPOINT)
 public class DiscoveryEndpoint {
 
-  private static final GrantType TOKEN_EXCHANGE = new GrantType("urn:ietf:params:oauth:grant-type:token-exchange");
+  public static final String ENDPOINT = "/.well-known/openid-configuration";
 
   private final JwtPki jwtPki;
 
@@ -40,31 +23,62 @@ public class DiscoveryEndpoint {
     this.jwtPki = jwtPki;
   }
 
-  @GetMapping("/.well-known/openid-configuration")
-  public HTTPResponse discoveryEndpoint() {
+  @GetMapping
+  public Discovery discoveryEndpoint() {
 
-    OIDCProviderMetadata metadata = new OIDCProviderMetadata(
-            new Issuer(jwtPki.getIssuer()),
-            Collections.singletonList(SubjectType.PUBLIC),
-            URI.create(jwtPki.getIssuer() + "/jwks"));
-    metadata.setAuthorizationEndpointURI(URI.create(jwtPki.getIssuer() + "/authorize"));
-    metadata.setTokenEndpointURI(URI.create(jwtPki.getIssuer() + "/token"));
-    metadata.setUserInfoEndpointURI(URI.create(jwtPki.getIssuer() + "/userinfo"));
-    metadata.setIntrospectionEndpointURI(URI.create(jwtPki.getIssuer() + "/introspect"));
-    metadata.setRevocationEndpointURI(URI.create(jwtPki.getIssuer() + "/revoke"));
-    metadata.setResponseTypes(Collections.singletonList(ResponseType.getDefault()));
-    metadata.setIDTokenJWSAlgs(Collections.singletonList(JWSAlgorithm.RS256));
-    metadata.setTokenEndpointJWSAlgs(Collections.singletonList(JWSAlgorithm.RS256));
-    metadata.setScopes(new Scope("openid", "profile", "offline_access", "email", "address"));
-    metadata.setGrantTypes(Arrays.asList(AUTHORIZATION_CODE, CLIENT_CREDENTIALS, REFRESH_TOKEN, JWT_BEARER, TOKEN_EXCHANGE));
-    metadata.setSupportsBackChannelLogout(false);
-    metadata.setSupportsFrontChannelLogout(false);
-    metadata.setACRs(Arrays.asList(PHR, PHRH));
-    metadata.setResponseModes(Arrays.asList(QUERY, FORM_POST));
-    metadata.setCodeChallengeMethods(Arrays.asList(PLAIN, S256));
-    metadata.setTokenEndpointAuthMethods(Arrays.asList(CLIENT_SECRET_BASIC,CLIENT_SECRET_POST));
-    HTTPResponse response = new HTTPResponse(200);
-    response.setContent(metadata.toJSONObject().toString());
-    return response;
+    Discovery discovery = new Discovery();
+    discovery.setAuthorization_endpoint(jwtPki.getIssuer() + AuthorizationEndpoint.ENDPOINT);
+    discovery.setIssuer(jwtPki.getIssuer());
+    discovery.setToken_endpoint(jwtPki.getIssuer() + TokenEndpoint.ENDPOINT);
+    discovery.setIntrospection_endpoint(jwtPki.getIssuer() + IntrospectionEndpoint.ENDPOINT);
+    discovery.setRevocation_endpoint(jwtPki.getIssuer() + RevocationEndpoint.ENDPOINT);
+    discovery.setUserinfo_endpoint(jwtPki.getIssuer() + UserInfoEndpoint.ENDPOINT);
+    discovery.setJwks_uri(jwtPki.getIssuer() + "/jwks");
+    discovery.getGrant_types_supported().add(GrantType.AUTHORIZATION_CODE.getGrant());
+    discovery.getGrant_types_supported().add(GrantType.CLIENT_CREDENTIALS.getGrant());
+    discovery.getGrant_types_supported().add(GrantType.PASSWORD.getGrant());
+    discovery.getGrant_types_supported().add(GrantType.TOKEN_EXCHANGE.getGrant());
+    discovery.getResponse_types_supported().add("code");
+    discovery.getScopes_supported().add(Scope.OPENID.name().toLowerCase());
+    discovery.getScopes_supported().add(Scope.OFFLINE_ACCESS.name().toLowerCase());
+    discovery.getScopes_supported().add(Scope.PROFILE.name().toLowerCase());
+    discovery.getScopes_supported().add(Scope.EMAIL.name().toLowerCase());
+    discovery.getScopes_supported().add(Scope.PHONE.name().toLowerCase());
+    discovery.getScopes_supported().add(Scope.ADDRESS.name().toLowerCase());
+    discovery.getResponse_modes_supported().add("query");
+    discovery.getResponse_modes_supported().add("form_post");
+    discovery.getSubject_types_supported().add("public");
+    discovery.getId_token_signing_alg_values_supported().add("RS256");
+    discovery.getToken_endpoint_auth_methods_supported().add("client_secret_basic");
+    discovery.getToken_endpoint_auth_methods_supported().add("client_secret_post");
+    discovery.getCode_challenge_methods_supported().add("S256");
+    discovery.getCode_challenge_methods_supported().add("plain");
+    discovery.getClaims_supported().add("aud");
+    discovery.getClaims_supported().add("auth_time");
+    discovery.getClaims_supported().add("created_at");
+    discovery.getClaims_supported().add("gender");
+    discovery.getClaims_supported().add("birthdate");
+    discovery.getClaims_supported().add("locale");
+    discovery.getClaims_supported().add("zoneinfo");
+    discovery.getClaims_supported().add("address");
+    discovery.getClaims_supported().add("email");
+    discovery.getClaims_supported().add("email_verified");
+    discovery.getClaims_supported().add("exp");
+    discovery.getClaims_supported().add("website");
+    discovery.getClaims_supported().add("picture");
+    discovery.getClaims_supported().add("family_name");
+    discovery.getClaims_supported().add("given_name");
+    discovery.getClaims_supported().add("iat");
+    discovery.getClaims_supported().add("identities");
+    discovery.getClaims_supported().add("iss");
+    discovery.getClaims_supported().add("identities");
+    discovery.getClaims_supported().add("name");
+    discovery.getClaims_supported().add("nickname");
+    discovery.getClaims_supported().add("phone_number");
+    discovery.getClaims_supported().add("phone_number_verified");
+    discovery.getClaims_supported().add("sub");
+    discovery.getToken_endpoint_auth_signing_alg_values_supported().add("RS256");
+
+    return discovery;
   }
 }

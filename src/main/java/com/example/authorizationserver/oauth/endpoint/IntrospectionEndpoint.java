@@ -28,6 +28,8 @@ import java.util.UUID;
 @RestController
 public class IntrospectionEndpoint {
 
+  public static final String ENDPOINT = "/introspect";
+
   private final TokenService tokenService;
   private final UserService userService;
   private final JsonWebTokenService jsonWebTokenService;
@@ -39,7 +41,7 @@ public class IntrospectionEndpoint {
     this.jsonWebTokenService = jsonWebTokenService;
   }
 
-  @PostMapping("/introspect")
+  @PostMapping(ENDPOINT)
   public ResponseEntity<IntrospectionResponse> introspect(
       @RequestHeader("Authorization") String authorizationHeader,
       @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest,

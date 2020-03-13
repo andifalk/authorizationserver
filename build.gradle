@@ -26,8 +26,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    //implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'com.nimbusds:oauth2-oidc-sdk:7.1'
+    implementation 'com.nimbusds:nimbus-jose-jwt:8.8'
     implementation 'org.apache.commons:commons-lang3:3.9'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
@@ -38,6 +39,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.rest-assured:spring-mock-mvc:3.3.0'
 }
 
 test {

@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/jwks")
-public class JwksRestController {
+@RequestMapping(JwksEndpoint.ENDPOINT)
+public class JwksEndpoint {
+
+  public static final String ENDPOINT = "/jwks";
 
   private final JwtPki jwtPki;
 
-  public JwksRestController(JwtPki jwtPki) {
+  public JwksEndpoint(JwtPki jwtPki) {
     this.jwtPki = jwtPki;
   }
 

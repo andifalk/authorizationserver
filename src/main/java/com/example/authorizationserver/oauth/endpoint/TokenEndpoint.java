@@ -39,9 +39,10 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequestMapping("/token")
+@RequestMapping(TokenEndpoint.ENDPOINT)
 @RestController
 public class TokenEndpoint {
+  public static final String ENDPOINT = "/token";
   private static final Logger LOG = LoggerFactory.getLogger(TokenEndpoint.class);
 
   private final AuthenticationService authenticationService;

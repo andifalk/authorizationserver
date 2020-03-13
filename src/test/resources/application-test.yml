@@ -1,0 +1,20 @@
+server:
+  error:
+    include-stacktrace: always
+
+auth-server:
+  issuer: http://localhost:8080${server.servlet.context-path}
+
+logging:
+  level:
+    com:
+      example:
+        authorizationserver: trace
+    org:
+      springframework:
+        security: info
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update

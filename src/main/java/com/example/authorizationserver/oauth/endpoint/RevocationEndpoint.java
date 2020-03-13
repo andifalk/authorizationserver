@@ -20,13 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RevocationEndpoint {
 
+  public static final String ENDPOINT = "/revoke";
+
   private final TokenService tokenService;
 
   public RevocationEndpoint(TokenService tokenService) {
     this.tokenService = tokenService;
   }
 
-  @PostMapping("/revoke")
+  @PostMapping(ENDPOINT)
   public ResponseEntity<RevocationResponse> revoke(
       @RequestHeader("Authorization") String authorizationHeader,
       @ModelAttribute("introspection_request") RevocationRequest revocationRequest,

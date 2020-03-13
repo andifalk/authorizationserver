@@ -44,8 +44,14 @@ public class DataInitializer implements CommandLineRunner {
   @Transactional
   @Override
   public void run(String... args) {
-    createUsers();
-    createClients();
+    long countUsers = this.userRepository.count();
+    if (countUsers == 0) {
+      createUsers();
+    }
+    long countClients = this.registeredClientRepository.count();
+    if (countClients == 0) {
+      createClients();
+    }
   }
 
   private void createUsers() {

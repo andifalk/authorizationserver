@@ -3,8 +3,6 @@ package com.example.authorizationserver.oidc.endpoint;
 import com.example.authorizationserver.user.api.resource.AddressResource;
 import com.example.authorizationserver.user.model.User;
 
-import java.util.stream.Collectors;
-
 public class UserInfo {
 
   private String sub;
@@ -29,7 +27,7 @@ public class UserInfo {
 
   private String email;
 
-  private boolean email_verified;
+  private Boolean email_verified;
 
   private String gender;
 
@@ -41,13 +39,22 @@ public class UserInfo {
 
   private String phone_number;
 
-  private boolean phone_number_verified;
+  private Boolean phone_number_verified;
 
   private AddressResource address;
 
   private String updated_at;
 
+  private String error;
+
+  private String error_description;
+
   public UserInfo() {}
+
+  public UserInfo(String error, String error_description) {
+    this.error = error;
+    this.error_description = error_description;
+  }
 
   public UserInfo(User user) {
     this.address = new AddressResource(user.getAddress());
@@ -152,11 +159,11 @@ public class UserInfo {
     this.email = email;
   }
 
-  public boolean isEmail_verified() {
+  public Boolean isEmail_verified() {
     return email_verified;
   }
 
-  public void setEmail_verified(boolean email_verified) {
+  public void setEmail_verified(Boolean email_verified) {
     this.email_verified = email_verified;
   }
 
@@ -200,11 +207,11 @@ public class UserInfo {
     this.phone_number = phone_number;
   }
 
-  public boolean isPhone_number_verified() {
+  public Boolean isPhone_number_verified() {
     return phone_number_verified;
   }
 
-  public void setPhone_number_verified(boolean phone_number_verified) {
+  public void setPhone_number_verified(Boolean phone_number_verified) {
     this.phone_number_verified = phone_number_verified;
   }
 
@@ -222,6 +229,14 @@ public class UserInfo {
 
   public void setUpdated_at(String updated_at) {
     this.updated_at = updated_at;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public String getError_description() {
+    return error_description;
   }
 
   @Override

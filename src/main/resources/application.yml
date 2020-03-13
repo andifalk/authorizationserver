@@ -27,3 +27,6 @@ logging:
     com:
       example:
         authorizationserver: trace
+    org:
+      springframework:
+        security: info

@@ -8,9 +8,8 @@ import com.example.authorizationserver.security.user.EndUserDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.Arrays;
@@ -34,6 +35,8 @@ import java.util.List;
 @RequestMapping("/")
 @Controller
 public class AuthorizationEndpoint {
+
+  public static final String ENDPOINT = "/authorize";
 
   private static final Logger LOG = LoggerFactory.getLogger(AuthorizationEndpoint.class);
   private final AuthorizationCodeService authorizationCodeService;
@@ -160,9 +163,10 @@ public class AuthorizationEndpoint {
    *     locator that corresponds to a network-addressable location where the target resource is
    *     hosted. Multiple resource parameters MAY be used to indicate that the requested token is
    *     intended to be used at multiple resources.
-   * @return the page containing the login form
+   * @return redirection to client with authorization code
    */
-  @GetMapping("/authorize")
+  @SuppressWarnings({"unused", "SpringMVCViewInspection"})
+  @GetMapping(ENDPOINT)
   public String authorizationRequest(
           @RequestParam("response_type") @Pattern(regexp = "code") String responseType,
           @RequestParam("scope") String scope,
@@ -187,7 +191,7 @@ public class AuthorizationEndpoint {
           @Pattern(regexp = "plain|S256")
           String code_challenge_method,
           @RequestParam(name = "resource", required = false) URI resource,
-          @AuthenticationPrincipal(errorOnInvalidType = true) EndUserDetails endUserDetails) {
+          @AuthenticationPrincipal EndUserDetails endUserDetails) {
 
     LOG.trace(
         "Authorization Request: client_id={}, response_type = {}, scope={}, redirectUri={}, endUser={}",
@@ -195,10 +199,10 @@ public class AuthorizationEndpoint {
         responseType,
         scope,
         redirectUri,
-        endUserDetails.getUsername());
+        endUserDetails != null ? endUserDetails.getUsername() : "n/a");
 
     if (StringUtils.isBlank(clientId)) {
-      return redirectError(redirectUri, "invalid_request", "client_id is required", state);
+      throw new InvalidClientIdError("");
     }
     if (StringUtils.isBlank(scope)) {
       return redirectError(redirectUri, "invalid_scope", "scope must not be empty", state);
@@ -207,11 +211,10 @@ public class AuthorizationEndpoint {
     RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientId);
 
     if (registeredClient == null) {
-      return redirectError(
-          redirectUri, "unauthorized_client", "no registered client for 'client_id'", state);
+      throw new InvalidClientIdError(clientId);
     } else {
       if (!registeredClient.getRedirectUris().contains(redirectUri.toString())) {
-        return redirectError(redirectUri, "invalid_request", "redirect uri mismatch", state);
+        throw new InvalidRedirectUriError(redirectUri.toString());
       }
       if (!registeredClient.isConfidential() && StringUtils.isBlank(code_challenge)) {
         return redirectError(
@@ -222,7 +225,7 @@ public class AuthorizationEndpoint {
     List<String> scopes = Arrays.asList(scope.split(" "));
     LOG.info(
           "Authenticated user {} for client id {} and scopes {}",
-          endUserDetails.getIdentifier(),
+          endUserDetails != null ? endUserDetails.getIdentifier() : null,
           clientId,
           scopes);
 
@@ -231,7 +234,7 @@ public class AuthorizationEndpoint {
               clientId,
               redirectUri,
               scopes,
-                  endUserDetails.getIdentifier().toString(),
+              endUserDetails != null ? endUserDetails.getIdentifier().toString() : "",
               nonce,
               code_challenge,
               code_challenge_method);
@@ -261,8 +264,42 @@ public class AuthorizationEndpoint {
     return ResponseEntity.badRequest().body(ex.getMessage());
   }
 
-  @ExceptionHandler(BadCredentialsException.class)
-  public ResponseEntity<String> handle(BadCredentialsException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+  @ExceptionHandler(InvalidClientIdError.class)
+  public ResponseEntity<String> handle(InvalidClientIdError ex) {
+    LOG.warn("Invalid client {}", ex.getMessage());
+    return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=invalid client");
   }
+
+  @ExceptionHandler(InvalidRedirectUriError.class)
+  public ResponseEntity<String> handle(InvalidRedirectUriError ex) {
+    LOG.warn("Invalid client {}", ex.getMessage());
+    return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=redirect uri mismatch");
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<String> handle(ConstraintViolationException ex) {
+    if (!ex.getConstraintViolations().isEmpty()) {
+      ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
+      if (constraintViolation.getPropertyPath().toString().contains("responseType")) {
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=unsupported_response_type");
+      } else {
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=invalid_request");
+      }
+    } else {
+      return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=server_error");
+    }
+  }
+
+  static class InvalidClientIdError extends RuntimeException {
+    InvalidClientIdError(String clientId) {
+      super("Invalid client id " + clientId);
+    }
+  }
+
+  static class InvalidRedirectUriError extends RuntimeException {
+    InvalidRedirectUriError(String redirectUri) {
+      super("Invalid redirect URI " + redirectUri);
+    }
+  }
+
 }
