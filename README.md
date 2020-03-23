@@ -30,6 +30,7 @@ __IMPORTANT:__ This project initially is intended to be used for demos and as pa
 * [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html)
 * [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
 * [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
+* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/html/draft-fett-oauth-dpop)
 * Simple User Access Management (API & Web UI)
 * Management of OAuth2/OIDC Clients (API & Web UI)
 
