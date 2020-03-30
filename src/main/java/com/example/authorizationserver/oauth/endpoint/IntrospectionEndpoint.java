@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,20 +83,34 @@ public class IntrospectionEndpoint {
     try {
       opaqueWebToken.validate();
       clientId = opaqueWebToken.getClientId();
-      user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
-      return user.map(
-              u -> {
-                IntrospectionResponse introspectionResponse = new IntrospectionResponse();
-                introspectionResponse.setActive(true);
-                introspectionResponse.setClient_id(clientId);
-                introspectionResponse.setSub(u.getIdentifier().toString());
-                introspectionResponse.setUsername(u.getUsername());
-                /*introspectionResponse.setIss(jwtClaimsSet.getIssuer());
-                introspectionResponse.setNbf(jwtClaimsSet.getNotBeforeTime().getTime());
-                introspectionResponse.setIat(jwtClaimsSet.getIssueTime().getTime());*/
-                return introspectionResponse;
-              })
-          .orElse(new IntrospectionResponse(false));
+      if (TokenService.ANONYMOUS_TOKEN.equals(opaqueWebToken.getSubject())) {
+        IntrospectionResponse introspectionResponse = new IntrospectionResponse();
+        introspectionResponse.setActive(true);
+        introspectionResponse.setClient_id(clientId);
+        introspectionResponse.setSub(TokenService.ANONYMOUS_TOKEN);
+        introspectionResponse.setUsername(TokenService.ANONYMOUS_TOKEN);
+        introspectionResponse.setExp(opaqueWebToken.getExpiry().atZone(ZoneId.systemDefault()).toEpochSecond());
+        introspectionResponse.setIss(opaqueWebToken.getIssuer());
+        introspectionResponse.setNbf(opaqueWebToken.getNotBefore().atZone(ZoneId.systemDefault()).toEpochSecond());
+        introspectionResponse.setIat(opaqueWebToken.getIssuedAt().atZone(ZoneId.systemDefault()).toEpochSecond());
+        return introspectionResponse;
+      } else {
+        user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+        return user.map(
+                u -> {
+                  IntrospectionResponse introspectionResponse = new IntrospectionResponse();
+                  introspectionResponse.setActive(true);
+                  introspectionResponse.setClient_id(clientId);
+                  introspectionResponse.setSub(u.getIdentifier().toString());
+                  introspectionResponse.setUsername(u.getUsername());
+                  introspectionResponse.setExp(opaqueWebToken.getExpiry().atZone(ZoneId.systemDefault()).toEpochSecond());
+                  introspectionResponse.setIss(opaqueWebToken.getIssuer());
+                  introspectionResponse.setNbf(opaqueWebToken.getNotBefore().atZone(ZoneId.systemDefault()).toEpochSecond());
+                  introspectionResponse.setIat(opaqueWebToken.getIssuedAt().atZone(ZoneId.systemDefault()).toEpochSecond());
+                  return introspectionResponse;
+                })
+            .orElse(new IntrospectionResponse(false));
+      }
     } catch (BadCredentialsException ex) {
       return new IntrospectionResponse(false);
     }

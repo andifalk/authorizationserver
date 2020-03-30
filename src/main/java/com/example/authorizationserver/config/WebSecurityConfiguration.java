@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,6 +26,12 @@ public class WebSecurityConfiguration {
 
     public PublicEndpoints(@Autowired @Qualifier("registeredClientDetailsService") RegisteredClientDetailsService registeredClientDetailsService) {
       this.registeredClientDetailsService = registeredClientDetailsService;
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+      web.ignoring().mvcMatchers("/token", "/introspect",
+              "/revoke", "/userinfo", "/.well-known/openid-configuration", "/jwks");
     }
 
     protected void configure(HttpSecurity http) throws Exception {

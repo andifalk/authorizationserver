@@ -8,6 +8,7 @@ import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
 import com.example.authorizationserver.user.model.User;
 import com.nimbusds.jose.JOSEException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,10 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class TokenService {
+
+  public static final String ANONYMOUS_TOKEN = "anonymous";
+
+  private @Value("${auth-server.issuer}") String issuer;
 
   private final JsonWebTokenRepository jsonWebTokenRepository;
   private final OpaqueTokenRepository opaqueTokenRepository;
@@ -103,12 +108,16 @@ public class TokenService {
   @Transactional
   public OpaqueToken createPersonalizedOpaqueAccessToken(
       User user, String clientId, Duration accessTokenLifetime) {
-    LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
+    LocalDateTime issueTime = LocalDateTime.now();
+    LocalDateTime expiryDateTime = issueTime.plusMinutes(accessTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
     opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setValue(token);
     opaqueToken.setClientId(clientId);
+    opaqueToken.setIssuedAt(issueTime);
+    opaqueToken.setNotBefore(issueTime);
+    opaqueToken.setIssuer(issuer);
     opaqueToken.setSubject(user.getIdentifier().toString());
     return opaqueTokenRepository.save(opaqueToken);
   }
@@ -116,10 +125,14 @@ public class TokenService {
   @Transactional
   public OpaqueToken createAnonymousOpaqueAccessToken(
       String clientId, Duration accessTokenLifetime) {
-    LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
+    LocalDateTime issueTime = LocalDateTime.now();
+    LocalDateTime expiryDateTime = issueTime.plusMinutes(accessTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
     opaqueToken.setExpiry(expiryDateTime);
+    opaqueToken.setIssuedAt(issueTime);
+    opaqueToken.setNotBefore(issueTime);
+    opaqueToken.setIssuer(issuer);
     opaqueToken.setValue(token);
     opaqueToken.setClientId(clientId);
     opaqueToken.setSubject("anonymous");
@@ -128,11 +141,14 @@ public class TokenService {
 
   @Transactional
   public OpaqueToken createRefreshToken(String clientId, Duration refreshTokenLifetime) {
-    LocalDateTime expiryDateTime =
-        LocalDateTime.now().plusMinutes(refreshTokenLifetime.toMinutes());
+    LocalDateTime issueTime = LocalDateTime.now();
+    LocalDateTime expiryDateTime = issueTime.plusMinutes(refreshTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
     opaqueToken.setExpiry(expiryDateTime);
+    opaqueToken.setIssuedAt(issueTime);
+    opaqueToken.setNotBefore(issueTime);
+    opaqueToken.setIssuer(issuer);
     opaqueToken.setValue(token);
     opaqueToken.setRefreshToken(true);
     opaqueToken.setClientId(clientId);

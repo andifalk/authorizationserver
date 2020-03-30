@@ -1,7 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
+    id 'com.adarshr.test-logger' version '2.0.0'
+    id 'org.owasp.dependencycheck' version '5.3.2'
 }
 
 group = 'com.example'
@@ -26,7 +28,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    //implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.nimbusds:nimbus-jose-jwt:8.8'
     implementation 'org.apache.commons:commons-lang3:3.9'
@@ -45,3 +46,19 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+dependencyCheck {
+    analyzedTypes = ['jar']
+    failBuildOnCVSS=8
+    format='ALL'
+    suppressionFile=file("$projectDir/dependency-check-suppressions.xml")
+    analyzers {
+        experimentalEnabled = false
+        assemblyEnabled = false
+        nuspecEnabled = false
+        nodeEnabled = false
+        nodeAuditEnabled = false
+        nexusEnabled = false
+    }
+}
+

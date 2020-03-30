@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -166,6 +168,7 @@ public class AuthorizationEndpoint {
    * @return redirection to client with authorization code
    */
   @SuppressWarnings({"unused", "SpringMVCViewInspection"})
+  @PreAuthorize("isAuthenticated()")
   @GetMapping(ENDPOINT)
   public String authorizationRequest(
           @RequestParam("response_type") @Pattern(regexp = "code") String responseType,
@@ -200,6 +203,10 @@ public class AuthorizationEndpoint {
         scope,
         redirectUri,
         endUserDetails != null ? endUserDetails.getUsername() : "n/a");
+
+    if (endUserDetails == null || endUserDetails.getIdentifier() == null) {
+      throw new BadCredentialsException("No user");
+    }
 
     if (StringUtils.isBlank(clientId)) {
       throw new InvalidClientIdError("");

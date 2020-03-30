@@ -29,4 +29,4 @@ logging:
         authorizationserver: trace
     org:
       springframework:
-        security: info
+        security: debug

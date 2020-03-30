@@ -117,8 +117,8 @@ public class DataInitializer implements CommandLineRunner {
         Stream.of(
                 new RegisteredClient(
                     UUID.randomUUID(),
-                    "confidential-demo",
-                    "demo",
+                    "confidential-jwt",
+                    passwordEncoder.encode("demo"),
                     true,
                     AccessTokenFormat.JWT,
                     Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS),
@@ -127,8 +127,8 @@ public class DataInitializer implements CommandLineRunner {
                     Collections.singleton("*")),
                 new RegisteredClient(
                     UUID.randomUUID(),
-                    "public-demo",
-                    null,
+                    "public-jwt",
+                    passwordEncoder.encode("n/a"),
                     false,
                     AccessTokenFormat.JWT,
                     Set.of(GrantType.AUTHORIZATION_CODE),
@@ -137,11 +137,21 @@ public class DataInitializer implements CommandLineRunner {
                     Collections.singleton("*")),
                 new RegisteredClient(
                     UUID.randomUUID(),
-                    "opaque-demo",
-                    null,
-                    false,
+                    "confidential-opaque",
+                    passwordEncoder.encode("demo"),
+                    true,
                     AccessTokenFormat.OPAQUE,
                     Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS),
+                    Collections.singleton(
+                        "http://localhost:9090/demo-client/login/oauth2/code/demo"),
+                    Collections.singleton("*")),
+                new RegisteredClient(
+                    UUID.randomUUID(),
+                    "public-opaque",
+                    passwordEncoder.encode("n/a"),
+                    false,
+                    AccessTokenFormat.OPAQUE,
+                    Set.of(GrantType.AUTHORIZATION_CODE),
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")))
