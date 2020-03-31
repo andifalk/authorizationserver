@@ -7,13 +7,21 @@ An OAuth 2.0 & OpenID Connect (OIDC) compliant authorization server just for dem
 
 ## Targets
 
-This authorization server should
+This authorization server should..
 
-* be easy to setup and start
-* support latest specs and drafts for OAuth 2.x and OpenID Connect 1.0
-* available as docker container / [testcontainers](https://www.testcontainers.org/)
+* be available for free as open-source
+* support efforts to learn OAuth2/OpenID Connect (self-study or as part of workshops)
+* be easy to setup and start (i.e. without consulting tons of documentation)
+* support latest specs and drafts for OAuth 2.x and OpenID Connect
+* be provided as docker container & support [testcontainers](https://www.testcontainers.org/)
 
-__IMPORTANT:__ This project initially is intended to be used for demos and as part of trainings/workshops. It is __NOT__ ready for production use!!
+__IMPORTANT:__  
+This project is intended to be used for demos and as part of trainings/workshops.  
+It is __NOT__ ready for production use!!
+
+If you are looking for a production-grade identity access management solution please consult the 
+list of [Certified OpenID provider servers and services](https://openid.net/developers/certified/) 
+at the [OpenID Foundation](https://openid.net/).
 
 ## Features
 
@@ -33,6 +41,11 @@ __IMPORTANT:__ This project initially is intended to be used for demos and as pa
 * [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/html/draft-fett-oauth-dpop) (Planned)
 * Simple User Access Management (API & Web UI) (Partly implemented)
 * Management of OAuth2/OIDC Clients (API & Web UI) (Partly implemented)
+
+## Roadmap
+
+* End of April 2020: [Initial Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
+* May/June 2020: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
 
 ## Setup and Run the Authorization Server
 
