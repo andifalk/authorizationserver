@@ -1,5 +1,6 @@
 package com.example.authorizationserver.jwks;
 
+import com.example.authorizationserver.config.AuthorizationServerConfigurationProperties;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.JWSVerifier;
@@ -8,7 +9,6 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -26,8 +26,8 @@ public class JwtPki {
 
   private final String issuer;
 
-  public JwtPki(@Value("${auth-server.issuer}") String issuer) {
-    this.issuer = issuer;
+  public JwtPki(AuthorizationServerConfigurationProperties authorizationServerProperties) {
+    this.issuer = authorizationServerProperties.getIssuer().toString();
   }
 
   @PostConstruct

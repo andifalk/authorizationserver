@@ -1,6 +1,7 @@
 package com.example.authorizationserver.oauth.endpoint;
 
 import com.example.authorizationserver.authentication.AuthenticationService;
+import com.example.authorizationserver.config.AuthorizationServerConfigurationProperties;
 import com.example.authorizationserver.oauth.client.RegisteredClientService;
 import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
@@ -19,7 +20,6 @@ import com.nimbusds.jose.JOSEException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,29 +53,21 @@ public class TokenEndpoint {
   private final UserService userService;
   private final TokenService tokenService;
   private final PasswordEncoder passwordEncoder;
-
-  private final Duration accessTokenLifetime;
-  private final Duration idTokenLifetime;
-  private final Duration refreshTokenLifetime;
+  private final AuthorizationServerConfigurationProperties authorizationServerProperties;
 
   public TokenEndpoint(
           AuthenticationService authenticationService,
           AuthorizationCodeService authorizationCodeService,
           UserService userService,
           TokenService tokenService,
-          @Value("${auth-server.access-token.lifetime}") Duration accessTokenLifetime,
-          @Value("${auth-server.id-token.lifetime}") Duration idTokenLifetime,
-          @Value("${auth-server.refresh-token.lifetime}") Duration refreshTokenLifetime,
-          RegisteredClientService registeredClientService, PasswordEncoder passwordEncoder) {
+          RegisteredClientService registeredClientService, PasswordEncoder passwordEncoder, AuthorizationServerConfigurationProperties authorizationServerProperties) {
     this.authenticationService = authenticationService;
     this.authorizationCodeService = authorizationCodeService;
     this.userService = userService;
     this.tokenService = tokenService;
-    this.accessTokenLifetime = accessTokenLifetime;
-    this.idTokenLifetime = idTokenLifetime;
-    this.refreshTokenLifetime = refreshTokenLifetime;
     this.registeredClientService = registeredClientService;
     this.passwordEncoder = passwordEncoder;
+    this.authorizationServerProperties = authorizationServerProperties;
   }
 
   @PostMapping
@@ -191,6 +183,10 @@ public class TokenEndpoint {
           authorizationCode.getClientId(),
           authorizationCode.getScopes());
 
+      Duration accessTokenLifetime = authorizationServerProperties.getAccessToken().getLifetime();
+      Duration refreshTokenLifetime = authorizationServerProperties.getRefreshToken().getLifetime();
+      Duration idTokenLifetime = authorizationServerProperties.getIdToken().getLifetime();
+
       return ResponseEntity.ok(
           new TokenResponse(
               AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
@@ -248,6 +244,9 @@ public class TokenEndpoint {
     if (clientCredentials == null) {
       return reportInvalidClientError();
     }
+
+    Duration accessTokenLifetime = authorizationServerProperties.getAccessToken().getLifetime();
+    Duration refreshTokenLifetime = authorizationServerProperties.getRefreshToken().getLifetime();
 
     RegisteredClient registeredClient =
         registeredClientService.findOneByClientId(clientCredentials.getClientId());
@@ -328,6 +327,9 @@ public class TokenEndpoint {
           return reportUnauthorizedClientError();
         }
 
+        Duration accessTokenLifetime = authorizationServerProperties.getAccessToken().getLifetime();
+        Duration refreshTokenLifetime = authorizationServerProperties.getRefreshToken().getLifetime();
+
         return ResponseEntity.ok(
             new TokenResponse(
                 AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
@@ -384,6 +386,9 @@ public class TokenEndpoint {
     if (clientCredentials == null) {
       return reportInvalidClientError();
     }
+
+    Duration accessTokenLifetime = authorizationServerProperties.getAccessToken().getLifetime();
+    Duration refreshTokenLifetime = authorizationServerProperties.getRefreshToken().getLifetime();
 
     RegisteredClient registeredClient =
         registeredClientService.findOneByClientId(clientCredentials.getClientId());
