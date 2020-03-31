@@ -78,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
                     "clark.kent@example.com",
                     "ckent",
                     "0711-222222",
-                    Collections.singleton("library_user"),
+                    Collections.singleton("library_admin"),
                     new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
                     LocalDateTime.now()),
                 new User(
@@ -90,7 +90,7 @@ public class DataInitializer implements CommandLineRunner {
                     "peter.parker@example.com",
                     "pparker",
                     "0711-1234567",
-                    Collections.singleton("library_user"),
+                    Collections.singleton("library_curator"),
                     new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
                     LocalDateTime.now()),
                 new User(
