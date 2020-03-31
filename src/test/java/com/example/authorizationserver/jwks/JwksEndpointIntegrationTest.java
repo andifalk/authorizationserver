@@ -28,7 +28,7 @@ class JwksEndpointIntegrationTest {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
   }
 
-  @DisplayName("JWKS endpoint is accessable and returns expected result")
+  @DisplayName("JWKS endpoint is accessible and returns expected result")
   @Test
   void jwksEndpoint() throws Exception {
     this.mockMvc

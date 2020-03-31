@@ -15,7 +15,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
 import java.time.ZoneId;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,8 +44,7 @@ public class IntrospectionEndpoint {
   @PostMapping(ENDPOINT)
   public ResponseEntity<IntrospectionResponse> introspect(
       @RequestHeader("Authorization") String authorizationHeader,
-      @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest,
-      BindingResult result) {
+      @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest) {
 
     ClientCredentials clientCredentials;
 
@@ -60,6 +56,10 @@ public class IntrospectionEndpoint {
       }
 
     String tokenValue = introspectionRequest.getToken();
+
+    if (tokenValue == null || tokenValue.isBlank()) {
+      return ResponseEntity.ok(new IntrospectionResponse(false));
+    }
 
     JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
     if (jsonWebToken != null) {
@@ -118,26 +118,41 @@ public class IntrospectionEndpoint {
 
   private IntrospectionResponse getIntrospectionResponse(JsonWebToken jsonWebToken) {
     String clientId;
-    Optional<User> user;
+
     try {
       JWTClaimsSet jwtClaimsSet =
           jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
       clientId = jwtClaimsSet.getStringClaim("client_id");
-      user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
-      return user.map(
-              u -> {
-                IntrospectionResponse introspectionResponse = new IntrospectionResponse();
-                introspectionResponse.setActive(true);
-                introspectionResponse.setClient_id(clientId);
-                introspectionResponse.setSub(u.getIdentifier().toString());
-                introspectionResponse.setUsername(u.getUsername());
-                introspectionResponse.setIss(jwtClaimsSet.getIssuer());
-                introspectionResponse.setNbf(jwtClaimsSet.getNotBeforeTime().getTime());
-                introspectionResponse.setIat(jwtClaimsSet.getIssueTime().getTime());
-                introspectionResponse.setExp(jwtClaimsSet.getExpirationTime().getTime());
-                return introspectionResponse;
-              })
-          .orElse(new IntrospectionResponse(false));
+      String subject = jwtClaimsSet.getSubject();
+
+      if (TokenService.ANONYMOUS_TOKEN.equals(subject)) {
+        IntrospectionResponse introspectionResponse = new IntrospectionResponse();
+        introspectionResponse.setActive(true);
+        introspectionResponse.setClient_id(clientId);
+        introspectionResponse.setSub(TokenService.ANONYMOUS_TOKEN);
+        introspectionResponse.setUsername(TokenService.ANONYMOUS_TOKEN);
+        introspectionResponse.setIss(jwtClaimsSet.getIssuer());
+        introspectionResponse.setNbf(jwtClaimsSet.getNotBeforeTime().getTime());
+        introspectionResponse.setIat(jwtClaimsSet.getIssueTime().getTime());
+        introspectionResponse.setExp(jwtClaimsSet.getExpirationTime().getTime());
+        return introspectionResponse;
+      } else {
+        Optional<User> user = userService.findOneByIdentifier(UUID.fromString(subject));
+        return user.map(
+                u -> {
+                  IntrospectionResponse introspectionResponse = new IntrospectionResponse();
+                  introspectionResponse.setActive(true);
+                  introspectionResponse.setClient_id(clientId);
+                  introspectionResponse.setSub(u.getIdentifier().toString());
+                  introspectionResponse.setUsername(u.getUsername());
+                  introspectionResponse.setIss(jwtClaimsSet.getIssuer());
+                  introspectionResponse.setNbf(jwtClaimsSet.getNotBeforeTime().getTime());
+                  introspectionResponse.setIat(jwtClaimsSet.getIssueTime().getTime());
+                  introspectionResponse.setExp(jwtClaimsSet.getExpirationTime().getTime());
+                  return introspectionResponse;
+                })
+            .orElse(new IntrospectionResponse(false));
+      }
     } catch (ParseException | JOSEException e) {
       return new IntrospectionResponse(false);
     }

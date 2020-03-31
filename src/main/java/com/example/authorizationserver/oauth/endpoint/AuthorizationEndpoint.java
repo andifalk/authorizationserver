@@ -232,7 +232,7 @@ public class AuthorizationEndpoint {
     List<String> scopes = Arrays.asList(scope.split(" "));
     LOG.info(
           "Authenticated user {} for client id {} and scopes {}",
-          endUserDetails != null ? endUserDetails.getIdentifier() : null,
+          endUserDetails.getIdentifier(),
           clientId,
           scopes);
 
@@ -241,7 +241,7 @@ public class AuthorizationEndpoint {
               clientId,
               redirectUri,
               scopes,
-              endUserDetails != null ? endUserDetails.getIdentifier().toString() : "",
+              endUserDetails.getIdentifier() != null ? endUserDetails.getIdentifier().toString() : "",
               nonce,
               code_challenge,
               code_challenge_method);

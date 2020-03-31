@@ -4,6 +4,13 @@ import javax.validation.constraints.NotBlank;
 
 public class IntrospectionRequest {
 
+  public IntrospectionRequest() {}
+
+  public IntrospectionRequest(@NotBlank String token, String token_type_hint) {
+    this.token = token;
+    this.token_type_hint = token_type_hint;
+  }
+
   /**
    * REQUIRED. The string value of the token. For access tokens, this is the "access_token" value
    * returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. For refresh
