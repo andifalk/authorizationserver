@@ -38,7 +38,7 @@ at the [OpenID Foundation](https://openid.net/).
 * [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html) (Planned)
 * [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html) (Planned)
 * [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html) (Planned)
-* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/html/draft-fett-oauth-dpop) (Planned)
+* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/id/draft-ietf-oauth-dpop-00.html) (Planned)
 * Simple User Access Management (API & Web UI) (Partly implemented)
 * Management of OAuth2/OIDC Clients (API & Web UI) (Partly implemented)
 
