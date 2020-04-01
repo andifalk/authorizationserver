@@ -8,21 +8,22 @@ package com.example.authorizationserver.oauth.endpoint.resource;
  */
 public class TokenResponse {
 
-  private static final String BEARER_TOKEN_TYPE = "Bearer";
+  public static final String BEARER_TOKEN_TYPE = "Bearer";
 
   private String access_token;
-  private String token_type = BEARER_TOKEN_TYPE;
+  private String token_type;
   private String refresh_token;
   private long expires_in;
   private String id_token;
   private String error;
 
   public TokenResponse(
-      String access_token, String refresh_token, long expires_in, String id_token) {
+      String access_token, String refresh_token, long expires_in, String id_token, String token_type) {
     this.access_token = access_token;
     this.refresh_token = refresh_token;
     this.expires_in = expires_in;
     this.id_token = id_token;
+    this.token_type = token_type;
   }
 
   public TokenResponse(String error) {

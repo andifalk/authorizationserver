@@ -30,7 +30,7 @@ at the [OpenID Foundation](https://openid.net/).
 * OAuth 2.0 Grant Flows:
   * [Authorization Code Grant Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1) (+ [PKCE](https://tools.ietf.org/html/rfc7636)) (Implemented)
   * [Client Credentials Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4) (Implemented)
-  * [Resource Owner Password Credentials Grant Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.3) (Not Supported)
+  * [Resource Owner Password Credentials Grant Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.3) (Implemented)
 * [OAuth 2.0 / OIDC Bearer Tokens](https://www.rfc-editor.org/rfc/rfc6750.html) (Implemented)
   * Signed [Json Web Tokens (using RSA PKI)](https://tools.ietf.org/html/rfc7519) (Implemented)
   * Opaque Tokens + [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662) (Implemented)

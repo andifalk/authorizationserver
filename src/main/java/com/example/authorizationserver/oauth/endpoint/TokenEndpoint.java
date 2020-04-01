@@ -39,6 +39,7 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.example.authorizationserver.oauth.endpoint.resource.TokenResponse.BEARER_TOKEN_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @RequestMapping(TokenEndpoint.ENDPOINT)
@@ -150,6 +151,7 @@ public class TokenEndpoint {
         return reportInvalidClientError();
       }
     } else {
+      // TODO: Validate min and max length of code verifier
       if (StringUtils.isNotBlank(tokenRequest.getCode_verifier())) {
         if (StringUtils.isBlank(authorizationCode.getCode_challenge_method())
             || "S256".equalsIgnoreCase(authorizationCode.getCode_challenge_method())) {
@@ -202,7 +204,7 @@ public class TokenEndpoint {
                           user.get(), authorizationCode.getClientId(), accessTokenLifetime)
                       .getValue(),
               tokenService
-                  .createRefreshToken(authorizationCode.getClientId(), refreshTokenLifetime)
+                  .createPersonalizedRefreshToken(authorizationCode.getClientId(), user.get(), refreshTokenLifetime)
                   .getValue(),
               accessTokenLifetime.toSeconds(),
               tokenService
@@ -212,7 +214,7 @@ public class TokenEndpoint {
                       authorizationCode.getNonce(),
                       authorizationCode.getScopes(),
                       idTokenLifetime)
-                  .getValue()));
+                  .getValue(), BEARER_TOKEN_TYPE));
     } else {
       return reportInvalidGrantError();
     }
@@ -265,10 +267,10 @@ public class TokenEndpoint {
                             clientCredentials.getClientId(), accessTokenLifetime)
                         .getValue(),
                 tokenService
-                    .createRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime)
+                    .createAnonymousRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime)
                     .getValue(),
                 accessTokenLifetime.toSeconds(),
-                null));
+                null, BEARER_TOKEN_TYPE));
       } else {
         return reportUnauthorizedClientError();
       }
@@ -315,7 +317,7 @@ public class TokenEndpoint {
     RegisteredClient registeredClient =
         registeredClientService.findOneByClientId(clientCredentials.getClientId());
     if (registeredClient != null
-        && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
+        && passwordEncoder.matches(clientCredentials.getClientSecret(), registeredClient.getClientSecret())) {
       if (registeredClient.getGrantTypes().contains(GrantType.PASSWORD)) {
 
         User authenticatedUser;
@@ -345,10 +347,10 @@ public class TokenEndpoint {
                             authenticatedUser, clientCredentials.getClientId(), accessTokenLifetime)
                         .getValue(),
                 tokenService
-                    .createRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime)
+                    .createPersonalizedRefreshToken(clientCredentials.getClientId(), authenticatedUser, refreshTokenLifetime)
                     .getValue(),
                 accessTokenLifetime.toSeconds(),
-                null));
+                null, BEARER_TOKEN_TYPE));
       } else {
         return reportUnauthorizedClientError();
       }
@@ -393,35 +395,65 @@ public class TokenEndpoint {
     RegisteredClient registeredClient =
         registeredClientService.findOneByClientId(clientCredentials.getClientId());
     if (registeredClient != null
-        && registeredClient.getClientSecret().equals(clientCredentials.getClientSecret())) {
+        && passwordEncoder.matches(clientCredentials.getClientSecret(), registeredClient.getClientSecret())) {
       if (registeredClient.getGrantTypes().contains(GrantType.REFRESH_TOKEN)) {
         OpaqueToken opaqueWebToken =
             tokenService.findOpaqueWebToken(tokenRequest.getRefresh_token());
         if (opaqueWebToken != null && opaqueWebToken.isRefreshToken()) {
+          opaqueWebToken.validate();
+          String subject = opaqueWebToken.getSubject();
+          if (TokenService.ANONYMOUS_TOKEN.equals(subject)) {
+            return ResponseEntity.ok(
+                    new TokenResponse(
+                            AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                                    ? tokenService
+                                    .createAnonymousJwtAccessToken(
+                                            clientCredentials.getClientId(),
+                                            accessTokenLifetime)
+                                    .getValue()
+                                    : tokenService
+                                    .createAnonymousOpaqueAccessToken(
+                                            clientCredentials.getClientId(),
+                                            accessTokenLifetime)
+                                    .getValue(),
+                            tokenService
+                                    .createAnonymousRefreshToken(
+                                            clientCredentials.getClientId(),
+                                            refreshTokenLifetime)
+                                    .getValue(),
+                            accessTokenLifetime.toSeconds(),
+                            null, BEARER_TOKEN_TYPE));
+          } else {
           Optional<User> authenticatedUser =
               userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
-          if (authenticatedUser.isPresent()) {
-            // TODO: Remove refresh token
-            return ResponseEntity.ok(
-                new TokenResponse(
-                    AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
-                        ? tokenService
-                            .createPersonalizedJwtAccessToken(
-                                authenticatedUser.get(),
-                                clientCredentials.getClientId(),
-                                null,
-                                accessTokenLifetime)
-                            .getValue()
-                        : tokenService
-                            .createAnonymousOpaqueAccessToken(
-                                clientCredentials.getClientId(), accessTokenLifetime)
-                            .getValue(),
-                    tokenService
-                        .createRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime)
-                        .getValue(),
-                    accessTokenLifetime.toSeconds(),
-                    null));
+            if (authenticatedUser.isPresent()) {
+              return ResponseEntity.ok(
+                  new TokenResponse(
+                      AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                          ? tokenService
+                              .createPersonalizedJwtAccessToken(
+                                  authenticatedUser.get(),
+                                  clientCredentials.getClientId(),
+                                  null,
+                                  accessTokenLifetime)
+                              .getValue()
+                          : tokenService
+                              .createPersonalizedOpaqueAccessToken(
+                                  authenticatedUser.get(),
+                                  clientCredentials.getClientId(),
+                                  accessTokenLifetime)
+                              .getValue(),
+                      tokenService
+                          .createPersonalizedRefreshToken(
+                              clientCredentials.getClientId(),
+                              authenticatedUser.get(),
+                              refreshTokenLifetime)
+                          .getValue(),
+                      accessTokenLifetime.toSeconds(),
+                      null, BEARER_TOKEN_TYPE));
+            }
           }
+          tokenService.remove(opaqueWebToken);
         }
         return reportInvalidClientError();
       } else {

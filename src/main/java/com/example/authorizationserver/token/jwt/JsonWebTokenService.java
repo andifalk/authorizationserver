@@ -1,6 +1,7 @@
 package com.example.authorizationserver.token.jwt;
 
 import com.example.authorizationserver.jwks.JwtPki;
+import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.user.model.User;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -88,7 +89,7 @@ public class JsonWebTokenService {
       throws JOSEException {
     JWTClaimsSet claimsSet =
         new JWTClaimsSet.Builder()
-            .subject("anonymous")
+            .subject(TokenService.ANONYMOUS_TOKEN)
             .issuer(jwtPki.getIssuer())
             .expirationTime(Date.from(expiryDateTime.atZone(ZoneId.systemDefault()).toInstant()))
             .audience(audiences)

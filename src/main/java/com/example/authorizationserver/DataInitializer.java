@@ -121,7 +121,7 @@ public class DataInitializer implements CommandLineRunner {
                     passwordEncoder.encode("demo"),
                     true,
                     AccessTokenFormat.JWT,
-                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS),
+                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS, GrantType.PASSWORD, GrantType.REFRESH_TOKEN),
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")),
@@ -141,7 +141,7 @@ public class DataInitializer implements CommandLineRunner {
                     passwordEncoder.encode("demo"),
                     true,
                     AccessTokenFormat.OPAQUE,
-                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS),
+                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS, GrantType.PASSWORD, GrantType.REFRESH_TOKEN),
                     Collections.singleton(
                         "http://localhost:9090/demo-client/login/oauth2/code/demo"),
                     Collections.singleton("*")),

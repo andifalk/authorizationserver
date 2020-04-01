@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -136,12 +137,12 @@ public class TokenService {
     opaqueToken.setIssuer(authorizationServerProperties.getIssuer().toString());
     opaqueToken.setValue(token);
     opaqueToken.setClientId(clientId);
-    opaqueToken.setSubject("anonymous");
+    opaqueToken.setSubject(ANONYMOUS_TOKEN);
     return opaqueTokenRepository.save(opaqueToken);
   }
 
   @Transactional
-  public OpaqueToken createRefreshToken(String clientId, Duration refreshTokenLifetime) {
+  public OpaqueToken createPersonalizedRefreshToken(String clientId, User user, Duration refreshTokenLifetime) {
     LocalDateTime issueTime = LocalDateTime.now();
     LocalDateTime expiryDateTime = issueTime.plusMinutes(refreshTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
@@ -153,7 +154,24 @@ public class TokenService {
     opaqueToken.setValue(token);
     opaqueToken.setRefreshToken(true);
     opaqueToken.setClientId(clientId);
-    opaqueToken.setSubject("refresh");
+    opaqueToken.setSubject(user.getIdentifier().toString());
+    return opaqueTokenRepository.save(opaqueToken);
+  }
+
+  @Transactional
+  public OpaqueToken createAnonymousRefreshToken(String clientId, Duration refreshTokenLifetime) {
+    LocalDateTime issueTime = LocalDateTime.now();
+    LocalDateTime expiryDateTime = issueTime.plusMinutes(refreshTokenLifetime.toMinutes());
+    String token = opaqueTokenService.createToken();
+    OpaqueToken opaqueToken = new OpaqueToken();
+    opaqueToken.setExpiry(expiryDateTime);
+    opaqueToken.setIssuedAt(issueTime);
+    opaqueToken.setNotBefore(issueTime);
+    opaqueToken.setIssuer(authorizationServerProperties.getIssuer().toString());
+    opaqueToken.setValue(token);
+    opaqueToken.setRefreshToken(true);
+    opaqueToken.setClientId(clientId);
+    opaqueToken.setSubject(ANONYMOUS_TOKEN);
     return opaqueTokenRepository.save(opaqueToken);
   }
 

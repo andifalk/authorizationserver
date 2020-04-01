@@ -13,12 +13,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 public class RegisteredClient extends AbstractPersistable<Long> {
+
+  public static final URI DEFAULT_REDIRECT_URI = URI.create("http://localhost:9090/demo-client/login/oauth2/code/demo");
 
   /** Technical Identifier. */
   @NotNull private UUID identifier;
