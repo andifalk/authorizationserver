@@ -34,7 +34,7 @@ import java.util.List;
  * @link https://www.rfc-editor.org/rfc/rfc6749.html#section-3.1
  */
 @Validated
-@RequestMapping("/")
+@RequestMapping(AuthorizationEndpoint.ENDPOINT)
 @Controller
 public class AuthorizationEndpoint {
 
@@ -169,7 +169,7 @@ public class AuthorizationEndpoint {
    */
   @SuppressWarnings({"unused", "SpringMVCViewInspection"})
   @PreAuthorize("isAuthenticated()")
-  @GetMapping(ENDPOINT)
+  @GetMapping
   public String authorizationRequest(
           @RequestParam("response_type") @Pattern(regexp = "code") String responseType,
           @RequestParam("scope") String scope,

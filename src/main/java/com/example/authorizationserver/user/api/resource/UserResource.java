@@ -41,7 +41,6 @@ public class UserResource {
 
   @NotNull private AddressResource address;
 
-  @NotNull
   private LocalDateTime updatedAt;
 
   public UserResource() {}

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.IdGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,11 +28,30 @@ public class UserService {
   }
 
   @Transactional
-  public User save(User entity) {
+  public User create(User entity) {
     if (entity.getIdentifier() == null) {
       entity.setIdentifier(idGenerator.generateId());
     }
+    entity.setUpdatedAt(LocalDateTime.now());
     return userRepository.save(entity);
+  }
+
+  @Transactional
+  public Optional<User> update(UUID userId, User userForUpdate) {
+    return findOneByIdentifier(userId).map(u -> {
+      u.setAddress(userForUpdate.getAddress());
+      u.setEmail(userForUpdate.getEmail());
+      u.setFirstName(userForUpdate.getFirstName());
+      u.setLastName(userForUpdate.getLastName());
+      u.setGender(userForUpdate.getGender());
+      u.setGroups(userForUpdate.getGroups());
+      u.setPassword(userForUpdate.getPassword());
+      u.setPhone(userForUpdate.getPhone());
+      u.setUsername(userForUpdate.getUsername());
+      u.setUpdatedAt(LocalDateTime.now());
+      return Optional.of(userRepository.save(u));
+    }).orElse(Optional.empty());
+
   }
 
   public Optional<User> findOneByIdentifier(UUID identifier) {
@@ -40,5 +60,10 @@ public class UserService {
 
   public Optional<User> findOneByUsername(String username) {
     return userRepository.findOneByUsername(username);
+  }
+
+  @Transactional
+  public void deleteOneByIdentifier(UUID identifier) {
+    userRepository.deleteOneByIdentifier(identifier);
   }
 }

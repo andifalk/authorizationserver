@@ -95,7 +95,7 @@ public class TokenEndpoint {
   }
 
   /* ---------------------
-  Access Token Request
+  Access Token Request with Authorization Code.
 
   The client makes a request to the token endpoint by sending the
   following parameters using the "application/x-www-form-urlencoded"
@@ -117,6 +117,9 @@ public class TokenEndpoint {
   client_id
         REQUIRED, if the client is not authenticating with the
         authorization server as described in Section 3.2.1.
+
+  code_verifier
+        REQUIRED. Code verifier as specified by PKCE
 
   If the client type is confidential or the client was issued client
   credentials (or assigned other authentication requirements), the

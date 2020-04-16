@@ -14,10 +14,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /** OAuth 2.0 Token Revocation as specified in https://tools.ietf.org/html/rfc7009 */
 @RestController
+@RequestMapping(RevocationEndpoint.ENDPOINT)
 public class RevocationEndpoint {
 
   public static final String ENDPOINT = "/revoke";
@@ -28,7 +30,7 @@ public class RevocationEndpoint {
     this.tokenService = tokenService;
   }
 
-  @PostMapping(ENDPOINT)
+  @PostMapping
   public ResponseEntity<RevocationResponse> revoke(
       @RequestHeader("Authorization") String authorizationHeader,
       @ModelAttribute("introspection_request") RevocationRequest revocationRequest,

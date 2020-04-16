@@ -18,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@RequestMapping(IntrospectionEndpoint.ENDPOINT)
 public class IntrospectionEndpoint {
 
   public static final String ENDPOINT = "/introspect";
@@ -41,7 +43,7 @@ public class IntrospectionEndpoint {
     this.jsonWebTokenService = jsonWebTokenService;
   }
 
-  @PostMapping(ENDPOINT)
+  @PostMapping
   public ResponseEntity<IntrospectionResponse> introspect(
       @RequestHeader("Authorization") String authorizationHeader,
       @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest) {

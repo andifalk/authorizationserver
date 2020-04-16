@@ -1,0 +1,101 @@
+= Authorization Server API Reference
+Andreas Falk;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+= Overview
+
+[[overview-http-verbs]]
+== HTTP verbs
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[overview-http-status-codes]]
+== HTTP status codes
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `201 Created`
+| A new resource has been created successfully. The resource's URI is available from the response's
+`Location` header
+
+| `204 No Content`
+| An update to an existing resource has been applied successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+|===
+
+[[overview-errors]]
+== Errors
+
+Whenever an error response (status code >= 400) is returned, the body will contain a JSON object
+that describes the problem. The error object has the following structure:
+
+[[resources]]
+== Resources
+
+[[users]]
+=== Users
+
+==== Retrieve User List
+
+A `GET` request is used to retrieve a list of all existing users.
+
+operation::getAllUsers[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Retrieve Single User
+
+A `GET` request is used to retrieve a single user.
+
+operation::getUser[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Create User
+
+A `POST` request is used to create a new user.
+
+operation::createUser[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Update User
+
+A `PUT` request is used to update a user.
+
+operation::updateUser[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Delete User
+
+A `DELETE` request is used to delete a user.
+
+operation::deleteUser[snippets='http-request,httpie-request,curl-request,http-response']
