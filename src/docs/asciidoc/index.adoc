@@ -4,7 +4,7 @@ Andreas Falk;
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
-:toclevels: 4
+:toclevels: 3
 :sectlinks:
 
 [[overview]]
@@ -97,5 +97,38 @@ operation::updateUser[snippets='http-request,httpie-request,curl-request,http-re
 ==== Delete User
 
 A `DELETE` request is used to delete a user.
+
+operation::deleteUser[snippets='http-request,httpie-request,curl-request,http-response']
+
+[[clients]]
+=== Registered Clients
+
+==== Retrieve Client List
+
+A `GET` request is used to retrieve a list of all existing clients.
+
+operation::getAllClients[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Retrieve Single Client
+
+A `GET` request is used to retrieve a single client.
+
+operation::getClient[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Register new Client
+
+A `POST` request is used to register a new client.
+
+operation::createUser[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Update Client
+
+A `PUT` request is used to update a client.
+
+operation::updateUser[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Delete Client
+
+A `DELETE` request is used to delete a client.
 
 operation::deleteUser[snippets='http-request,httpie-request,curl-request,http-response']
