@@ -23,9 +23,6 @@ public class RegisteredClientResource {
   @Size(max = 100)
   private String clientId;
 
-  @Size(max = 100)
-  private String clientSecret;
-
   @NotNull private boolean confidential;
 
   @NotNull
@@ -47,7 +44,6 @@ public class RegisteredClientResource {
     this.identifier = registeredClient.getIdentifier();
     this.accessTokenFormat = registeredClient.getAccessTokenFormat();
     this.clientId = registeredClient.getClientId();
-    this.clientSecret = registeredClient.getClientSecret();
     this.confidential = registeredClient.isConfidential();
     this.corsUris = registeredClient.getCorsUris();
     this.grantTypes = registeredClient.getGrantTypes();
@@ -68,14 +64,6 @@ public class RegisteredClientResource {
 
   public void setClientId(String clientId) {
     this.clientId = clientId;
-  }
-
-  public String getClientSecret() {
-    return clientSecret;
-  }
-
-  public void setClientSecret(String clientSecret) {
-    this.clientSecret = clientSecret;
   }
 
   public boolean isConfidential() {

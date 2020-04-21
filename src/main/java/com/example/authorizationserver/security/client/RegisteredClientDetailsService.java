@@ -1,7 +1,6 @@
 package com.example.authorizationserver.security.client;
 
 import com.example.authorizationserver.oauth.client.RegisteredClientService;
-import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,11 +21,8 @@ public class RegisteredClientDetailsService implements UserDetailsService {
   @Transactional(readOnly = true)
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    RegisteredClient registeredClient = this.registeredClientService.findOneByClientId(username);
-    if (registeredClient != null) {
-      return new RegisteredClientDetails(registeredClient);
-    } else {
-      throw new UsernameNotFoundException(String.format("No client found for '%s'", username));
-    }
+    return this.registeredClientService.findOneByClientId(username).map(
+            RegisteredClientDetails::new
+    ).orElseThrow(() -> new UsernameNotFoundException(String.format("No client found for '%s'", username)));
   }
 }

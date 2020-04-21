@@ -1,5 +1,6 @@
 package com.example.authorizationserver.oauth.client.model;
 
+import com.example.authorizationserver.oauth.client.api.resource.ModifyRegisteredClientResource;
 import com.example.authorizationserver.oauth.common.GrantType;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -63,6 +64,13 @@ public class RegisteredClient extends AbstractPersistable<Long> {
   private Set<String> corsUris = new HashSet<>();
 
   public RegisteredClient() {}
+
+  public RegisteredClient(ModifyRegisteredClientResource modifyRegisteredClientResource) {
+    this(modifyRegisteredClientResource.getIdentifier(), modifyRegisteredClientResource.getClientId(),
+            modifyRegisteredClientResource.getClientSecret(), modifyRegisteredClientResource.isConfidential(),
+            modifyRegisteredClientResource.getAccessTokenFormat(), modifyRegisteredClientResource.getGrantTypes(),
+            modifyRegisteredClientResource.getRedirectUris(), modifyRegisteredClientResource.getCorsUris());
+  }
 
   public RegisteredClient(
       UUID identifier,
