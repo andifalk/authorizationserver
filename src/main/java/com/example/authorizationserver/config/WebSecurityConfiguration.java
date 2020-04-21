@@ -50,9 +50,7 @@ public class WebSecurityConfiguration {
               a -> {
                 a.mvcMatchers(POST, "/introspect").hasRole("CLIENT");
                 a.mvcMatchers(POST, "/revoke").hasRole("CLIENT");
-                a.mvcMatchers(POST, "/token").permitAll();
-                a.mvcMatchers(GET, "/.well-known/openid-configuration", "/jwks", "/userinfo")
-                    .permitAll();
+                a.mvcMatchers(POST, "/token").hasRole("CLIENT");
                 a.anyRequest().denyAll();
               })
           .httpBasic(withDefaults())
@@ -105,7 +103,16 @@ public class WebSecurityConfiguration {
     protected void configure(HttpSecurity http) throws Exception {
       http.authorizeRequests(authorize -> authorize.anyRequest().authenticated())
           .formLogin(withDefaults())
-          .userDetailsService(this.endUserDetailsService);
+          .userDetailsService(this.endUserDetailsService)
+          .headers().contentSecurityPolicy(
+            csp -> csp.policyDirectives(
+                    "upgrade-insecure-requests; default-src 'self' https:; " +
+                    "style-src 'self' stackpath.bootstrapcdn.com maxcdn.bootstrapcdn.com getbootstrap.com; " +
+                    "script-src code.jquery.com cdnjs.cloudflare.com " +
+                            "stackpath.bootstrapcdn.com;" +
+                    "font-src 'self' data:;" +
+                    "object-src to 'none'")
+          );
     }
   }
 }
