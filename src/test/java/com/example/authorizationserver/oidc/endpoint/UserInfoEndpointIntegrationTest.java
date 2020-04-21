@@ -1,6 +1,7 @@
 package com.example.authorizationserver.oidc.endpoint;
 
 import com.example.authorizationserver.annotation.WebIntegrationTest;
+import com.example.authorizationserver.oidc.endpoint.userinfo.UserInfo;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;

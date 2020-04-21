@@ -2,7 +2,7 @@ package com.example.authorizationserver.oauth.endpoint;
 
 import com.example.authorizationserver.annotation.WebIntegrationTest;
 import com.example.authorizationserver.oauth.endpoint.resource.IntrospectionResponse;
-import com.example.authorizationserver.oidc.endpoint.UserInfo;
+import com.example.authorizationserver.oidc.endpoint.userinfo.UserInfo;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;

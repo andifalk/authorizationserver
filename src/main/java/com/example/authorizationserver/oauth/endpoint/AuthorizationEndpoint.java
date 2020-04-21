@@ -27,6 +27,7 @@ import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Authorization endpoint as specified in RFC 6749: The OAuth 2.0 Authorization Framework
@@ -196,7 +197,7 @@ public class AuthorizationEndpoint {
           @RequestParam(name = "resource", required = false) URI resource,
           @AuthenticationPrincipal EndUserDetails endUserDetails) {
 
-    LOG.trace(
+    LOG.debug(
         "Authorization Request: client_id={}, response_type = {}, scope={}, redirectUri={}, endUser={}",
         clientId,
         responseType,
@@ -215,15 +216,15 @@ public class AuthorizationEndpoint {
       return redirectError(redirectUri, "invalid_scope", "scope must not be empty", state);
     }
 
-    RegisteredClient registeredClient = registeredClientService.findOneByClientId(clientId);
+    Optional<RegisteredClient> registeredClient = registeredClientService.findOneByClientId(clientId);
 
-    if (registeredClient == null) {
+    if (registeredClient.isEmpty()) {
       throw new InvalidClientIdError(clientId);
     } else {
-      if (!registeredClient.getRedirectUris().contains(redirectUri.toString())) {
+      if (!registeredClient.get().getRedirectUris().contains(redirectUri.toString())) {
         throw new InvalidRedirectUriError(redirectUri.toString());
       }
-      if (!registeredClient.isConfidential() && StringUtils.isBlank(code_challenge)) {
+      if (!registeredClient.get().isConfidential() && StringUtils.isBlank(code_challenge)) {
         return redirectError(
             redirectUri, "invalid_request", "code_challenge is required for public client", state);
       }

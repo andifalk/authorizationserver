@@ -12,6 +12,7 @@ import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,13 +21,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.authorizationserver.oauth.endpoint.TokenEndpoint.ENDPOINT;
+import static com.example.authorizationserver.oauth.endpoint.token.TokenEndpoint.ENDPOINT;
+import static com.example.authorizationserver.oauth.pkce.ProofKeyForCodeExchangeVerifier.CHALLENGE_METHOD_S_256;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
@@ -54,7 +59,7 @@ class TokenEndpointIntegrationTest {
   }
 
   @Test
-  void getTokenForAuthorizationCodeSuccess() {
+  void getOpenIdConnectTokensForAuthorizationCodeSuccess() {
 
     AuthorizationCode authorizationCode =
         authorizationCodeService.createAndStoreAuthorizationState(
@@ -104,6 +109,115 @@ class TokenEndpointIntegrationTest {
         .isEqualTo(EXPIRY);
     assertThat(tokenResponse.getError()).describedAs("error must not be present").isNull();
   }
+
+  @Test
+  void getOAuthTokensForAuthorizationCodeSuccess() {
+
+    AuthorizationCode authorizationCode =
+            authorizationCodeService.createAndStoreAuthorizationState(
+                    "confidential-jwt",
+                    RegisteredClient.DEFAULT_REDIRECT_URI,
+                    List.of("profile"),
+                    bwayne_user.getIdentifier().toString(),
+                    "1234",
+                    null,
+                    null);
+
+    TokenResponse tokenResponse =
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString("confidential-jwt:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("grant_type", GrantType.AUTHORIZATION_CODE.getGrant())
+                    .formParam("code", authorizationCode.getCode())
+                    .formParam("redirect_uri", authorizationCode.getRedirectUri().toString())
+                    .formParam("client_id", "confidential-jwt")
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(TokenResponse.class);
+    assertThat(tokenResponse).describedAs("token response should be present").isNotNull();
+    assertThat(tokenResponse.getAccess_token())
+            .describedAs("access token should be present")
+            .isNotBlank();
+    assertThat(tokenResponse.getId_token()).describedAs("id token must not be present").isNull();
+    assertThat(tokenResponse.getRefresh_token())
+            .describedAs("refresh token should be present")
+            .isNotBlank();
+    assertThat(tokenResponse.getToken_type())
+            .describedAs("token type must be %s", BEARER)
+            .isEqualTo(BEARER);
+    assertThat(tokenResponse.getExpires_in())
+            .describedAs("expires in must be %s", EXPIRY)
+            .isEqualTo(EXPIRY);
+    assertThat(tokenResponse.getError()).describedAs("error must not be present").isNull();
+  }
+
+  @Test
+  void getTokenForAuthorizationCodeWithPkceSuccess() throws NoSuchAlgorithmException {
+
+    String codeVerifier = RandomStringUtils.random(64, true, true);
+    String codeChallenge = hashCodeChallenge(codeVerifier);
+
+    AuthorizationCode authorizationCode =
+            authorizationCodeService.createAndStoreAuthorizationState(
+                    "public-jwt",
+                    RegisteredClient.DEFAULT_REDIRECT_URI,
+                    List.of("openid", "profile"),
+                    bwayne_user.getIdentifier().toString(),
+                    "1234",
+                    codeChallenge,
+                    CHALLENGE_METHOD_S_256);
+
+    TokenResponse tokenResponse =
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString("public-jwt:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("grant_type", GrantType.AUTHORIZATION_CODE.getGrant())
+                    .formParam("code", authorizationCode.getCode())
+                    .formParam("redirect_uri", authorizationCode.getRedirectUri().toString())
+                    .formParam("client_id", "public-jwt")
+                    .formParam("code_verifier", codeVerifier)
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(TokenResponse.class);
+    assertThat(tokenResponse).describedAs("token response should be present").isNotNull();
+    assertThat(tokenResponse.getAccess_token())
+            .describedAs("access token should be present")
+            .isNotBlank();
+    assertThat(tokenResponse.getId_token()).describedAs("id token should be present").isNotBlank();
+    assertThat(tokenResponse.getRefresh_token())
+            .describedAs("refresh token should be present")
+            .isNotBlank();
+    assertThat(tokenResponse.getToken_type())
+            .describedAs("token type must be %s", BEARER)
+            .isEqualTo(BEARER);
+    assertThat(tokenResponse.getExpires_in())
+            .describedAs("expires in must be %s", EXPIRY)
+            .isEqualTo(EXPIRY);
+    assertThat(tokenResponse.getError()).describedAs("error must not be present").isNull();
+  }
+
 
   @Test
   void getTokenForClientCredentialsSuccess() {
@@ -319,5 +433,11 @@ class TokenEndpointIntegrationTest {
             .isEqualTo(0);
     assertThat(tokenResponse.getError())
             .describedAs("error must be present").isEqualTo("unsupported_grant_type");
+  }
+
+  private String hashCodeChallenge(String codeVerifier) throws NoSuchAlgorithmException {
+    final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    final byte[] hashedBytes = digest.digest(codeVerifier.getBytes(UTF_8));
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(hashedBytes);
   }
 }

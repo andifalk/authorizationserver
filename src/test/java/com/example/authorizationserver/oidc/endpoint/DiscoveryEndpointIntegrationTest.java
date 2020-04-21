@@ -2,6 +2,8 @@ package com.example.authorizationserver.oidc.endpoint;
 
 import com.example.authorizationserver.annotation.WebIntegrationTest;
 import com.example.authorizationserver.oauth.endpoint.AuthorizationEndpoint;
+import com.example.authorizationserver.oidc.endpoint.discovery.Discovery;
+import com.example.authorizationserver.oidc.endpoint.discovery.DiscoveryEndpoint;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;

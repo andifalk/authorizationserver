@@ -1,8 +1,8 @@
 package com.example.authorizationserver;
 
 import com.example.authorizationserver.oauth.endpoint.AuthorizationEndpoint;
-import com.example.authorizationserver.oauth.endpoint.TokenEndpoint;
-import com.example.authorizationserver.oidc.endpoint.UserInfoEndpoint;
+import com.example.authorizationserver.oauth.endpoint.token.TokenEndpoint;
+import com.example.authorizationserver.oidc.endpoint.userinfo.UserInfoEndpoint;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

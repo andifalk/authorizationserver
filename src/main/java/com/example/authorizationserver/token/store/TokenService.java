@@ -9,6 +9,8 @@ import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
 import com.example.authorizationserver.user.model.User;
 import com.nimbusds.jose.JOSEException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.List;
 public class TokenService {
 
   public static final String ANONYMOUS_TOKEN = "anonymous";
+  private static final Logger LOG = LoggerFactory.getLogger(TokenService.class);
 
   private final AuthorizationServerConfigurationProperties authorizationServerProperties;
   private final JsonWebTokenRepository jsonWebTokenRepository;
@@ -30,11 +33,11 @@ public class TokenService {
   private final OpaqueTokenService opaqueTokenService;
 
   public TokenService(
-          AuthorizationServerConfigurationProperties authorizationServerProperties,
-          JsonWebTokenRepository jsonWebTokenRepository,
-          OpaqueTokenRepository opaqueTokenRepository,
-          JsonWebTokenService jsonWebTokenService,
-          OpaqueTokenService opaqueTokenService) {
+      AuthorizationServerConfigurationProperties authorizationServerProperties,
+      JsonWebTokenRepository jsonWebTokenRepository,
+      OpaqueTokenRepository opaqueTokenRepository,
+      JsonWebTokenService jsonWebTokenService,
+      OpaqueTokenService opaqueTokenService) {
     this.authorizationServerProperties = authorizationServerProperties;
     this.jsonWebTokenRepository = jsonWebTokenRepository;
     this.opaqueTokenRepository = opaqueTokenRepository;
@@ -52,58 +55,74 @@ public class TokenService {
 
   @Transactional
   public JsonWebToken createIdToken(
-      User user, String clientId, String nonce, List<String> scopes, Duration idTokenLifetime)
-      throws JOSEException {
+      User user, String clientId, String nonce, List<String> scopes, Duration idTokenLifetime) {
     LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(idTokenLifetime.toMinutes());
-    String token =
-        jsonWebTokenService.createPersonalizedToken(
-            clientId,
-            Collections.singletonList(clientId),
-            "test",
-            scopes,
-            user,
-            nonce,
-            expiryDateTime);
-    JsonWebToken jsonWebToken = new JsonWebToken();
-    jsonWebToken.setExpiry(expiryDateTime);
-    jsonWebToken.setValue(token);
-    return jsonWebTokenRepository.save(jsonWebToken);
+    String token;
+    try {
+      token =
+          jsonWebTokenService.createPersonalizedToken(
+              clientId,
+              Collections.singletonList(clientId),
+              "test",
+              scopes,
+              user,
+              nonce,
+              expiryDateTime);
+      JsonWebToken jsonWebToken = new JsonWebToken();
+      jsonWebToken.setExpiry(expiryDateTime);
+      jsonWebToken.setValue(token);
+      return jsonWebTokenRepository.save(jsonWebToken);
+    } catch (JOSEException e) {
+      LOG.error("Error creating Id token", e);
+      throw new TokenServiceException("Error creating Id token", e);
+    }
   }
 
   @Transactional
   public JsonWebToken createPersonalizedJwtAccessToken(
-      User user, String clientId, String nonce, Duration accessTokenLifetime) throws JOSEException {
+      User user, String clientId, String nonce, Duration accessTokenLifetime) {
     LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
-    String token =
-        jsonWebTokenService.createPersonalizedToken(
-            clientId,
-            Collections.singletonList(clientId),
-            "test",
-            Collections.emptyList(),
-            user,
-            nonce,
-            expiryDateTime);
-    JsonWebToken jsonWebToken = new JsonWebToken();
-    jsonWebToken.setExpiry(expiryDateTime);
-    jsonWebToken.setValue(token);
-    return jsonWebTokenRepository.save(jsonWebToken);
+    String token;
+    try {
+      token =
+          jsonWebTokenService.createPersonalizedToken(
+              clientId,
+              Collections.singletonList(clientId),
+              "test",
+              Collections.emptyList(),
+              user,
+              nonce,
+              expiryDateTime);
+      JsonWebToken jsonWebToken = new JsonWebToken();
+      jsonWebToken.setExpiry(expiryDateTime);
+      jsonWebToken.setValue(token);
+      return jsonWebTokenRepository.save(jsonWebToken);
+    } catch (JOSEException e) {
+      LOG.error("Error creating a personalized JWT", e);
+      throw new TokenServiceException("Error creating a personalized JWT", e);
+    }
   }
 
   @Transactional
-  public JsonWebToken createAnonymousJwtAccessToken(String clientId, Duration accessTokenLifetime)
-      throws JOSEException {
+  public JsonWebToken createAnonymousJwtAccessToken(String clientId, Duration accessTokenLifetime) {
     LocalDateTime expiryDateTime = LocalDateTime.now().plusMinutes(accessTokenLifetime.toMinutes());
-    String token =
-        jsonWebTokenService.createAnonymousToken(
-            clientId,
-            Collections.singletonList(clientId),
-            "test",
-            Collections.emptyList(),
-            expiryDateTime);
-    JsonWebToken jsonWebToken = new JsonWebToken();
-    jsonWebToken.setExpiry(expiryDateTime);
-    jsonWebToken.setValue(token);
-    return jsonWebTokenRepository.save(jsonWebToken);
+    String token;
+    try {
+      token =
+          jsonWebTokenService.createAnonymousToken(
+              clientId,
+              Collections.singletonList(clientId),
+              "test",
+              Collections.emptyList(),
+              expiryDateTime);
+      JsonWebToken jsonWebToken = new JsonWebToken();
+      jsonWebToken.setExpiry(expiryDateTime);
+      jsonWebToken.setValue(token);
+      return jsonWebTokenRepository.save(jsonWebToken);
+    } catch (JOSEException e) {
+      LOG.error("Error creating a anonymous JWT", e);
+      throw new TokenServiceException("Error creating a anonymous JWT", e);
+    }
   }
 
   @Transactional
@@ -141,7 +160,8 @@ public class TokenService {
   }
 
   @Transactional
-  public OpaqueToken createPersonalizedRefreshToken(String clientId, User user, Duration refreshTokenLifetime) {
+  public OpaqueToken createPersonalizedRefreshToken(
+      String clientId, User user, Duration refreshTokenLifetime) {
     LocalDateTime issueTime = LocalDateTime.now();
     LocalDateTime expiryDateTime = issueTime.plusMinutes(refreshTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
