@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oidc.endpoint;
+package com.example.authorizationserver.oidc.endpoint.discovery;
 
 import java.util.ArrayList;
 import java.util.List;

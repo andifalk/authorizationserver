@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oidc.endpoint;
+package com.example.authorizationserver.oidc.endpoint.userinfo;
 
 import com.example.authorizationserver.oauth.common.AuthenticationUtil;
 import com.example.authorizationserver.token.jwt.JsonWebTokenService;

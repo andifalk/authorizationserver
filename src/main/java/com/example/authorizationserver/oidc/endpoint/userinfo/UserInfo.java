@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oidc.endpoint;
+package com.example.authorizationserver.oidc.endpoint.userinfo;
 
 import com.example.authorizationserver.user.api.resource.AddressResource;
 import com.example.authorizationserver.user.model.User;

@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oauth.common;
+package com.example.authorizationserver.oidc.common;
 
 public enum Scope {
   OPENID,
