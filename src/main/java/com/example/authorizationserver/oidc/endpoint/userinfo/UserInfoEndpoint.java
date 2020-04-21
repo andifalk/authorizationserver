@@ -40,7 +40,8 @@ public class UserInfoEndpoint {
   }
 
   @GetMapping
-  public ResponseEntity<UserInfo> userInfo(@RequestHeader("Authorization") String authorizationHeader) {
+  public ResponseEntity<UserInfo> userInfo(
+      @RequestHeader("Authorization") String authorizationHeader) {
     String tokenValue = AuthenticationUtil.fromBearerAuthHeader(authorizationHeader);
     JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
     Optional<User> user;
@@ -48,28 +49,47 @@ public class UserInfoEndpoint {
       try {
         JWTClaimsSet jwtClaimsSet =
             jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
-        user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
+        if (TokenService.ANONYMOUS_TOKEN.equals(jwtClaimsSet.getSubject())) {
+          return ResponseEntity.ok(new UserInfo(jwtClaimsSet.getSubject()));
+        } else {
+          user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
+          return user.map(u -> ResponseEntity.ok(new UserInfo(u)))
+              .orElse(
+                  ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                      .header("WWW-Authenticate", "Bearer")
+                      .build());
+        }
       } catch (ParseException | JOSEException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("WWW-Authenticate", "Bearer")
-                .body(new UserInfo("invalid_token", "Access Token is invalid"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .header("WWW-Authenticate", "Bearer")
+            .body(new UserInfo("invalid_token", "Access Token is invalid"));
       }
     } else {
       OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenValue);
       if (opaqueWebToken != null) {
         opaqueWebToken.validate();
-        user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+        if (TokenService.ANONYMOUS_TOKEN.equals(opaqueWebToken.getSubject())) {
+          return ResponseEntity.ok(new UserInfo(opaqueWebToken.getSubject()));
+        } else {
+          user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+          return user.map(u -> ResponseEntity.ok(new UserInfo(u)))
+              .orElse(
+                  ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                      .header("WWW-Authenticate", "Bearer")
+                      .build());
+        }
       } else {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("WWW-Authenticate", "Bearer")
-                .body(new UserInfo("invalid_token", "Access Token is invalid"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .header("WWW-Authenticate", "Bearer")
+            .body(new UserInfo("invalid_token", "Access Token is invalid"));
       }
     }
-    return user.map(u -> ResponseEntity.ok(new UserInfo(u))).orElse(
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("WWW-Authenticate", "Bearer").build());
   }
 
   @ExceptionHandler(MissingRequestHeaderException.class)
   public ResponseEntity<UserInfo> handle(MissingRequestHeaderException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header("WWW-Authenticate", "Bearer")
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .header("WWW-Authenticate", "Bearer")
         .body(new UserInfo("invalid_token", "Access Token is required"));
   }
 }

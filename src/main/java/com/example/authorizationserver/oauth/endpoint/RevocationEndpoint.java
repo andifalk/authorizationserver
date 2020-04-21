@@ -33,7 +33,7 @@ public class RevocationEndpoint {
   @PostMapping
   public ResponseEntity<RevocationResponse> revoke(
       @RequestHeader("Authorization") String authorizationHeader,
-      @ModelAttribute("introspection_request") RevocationRequest revocationRequest,
+      @ModelAttribute("revocation_request") RevocationRequest revocationRequest,
       BindingResult result) {
 
     ClientCredentials clientCredentials;

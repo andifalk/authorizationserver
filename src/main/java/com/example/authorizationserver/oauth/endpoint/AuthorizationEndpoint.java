@@ -2,6 +2,7 @@ package com.example.authorizationserver.oauth.endpoint;
 
 import com.example.authorizationserver.oauth.client.RegisteredClientService;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
+import com.example.authorizationserver.oauth.common.GrantType;
 import com.example.authorizationserver.oauth.store.AuthorizationCode;
 import com.example.authorizationserver.oauth.store.AuthorizationCodeService;
 import com.example.authorizationserver.security.user.EndUserDetails;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Pattern;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -172,7 +175,7 @@ public class AuthorizationEndpoint {
   @PreAuthorize("isAuthenticated()")
   @GetMapping
   public String authorizationRequest(
-          @RequestParam("response_type") @Pattern(regexp = "code") String responseType,
+          @RequestParam("response_type") @Pattern(regexp = "code|token") String responseType,
           @RequestParam("scope") String scope,
           @RequestParam("client_id") String clientId,
           @RequestParam("redirect_uri") URI redirectUri,
@@ -221,13 +224,26 @@ public class AuthorizationEndpoint {
     if (registeredClient.isEmpty()) {
       throw new InvalidClientIdError(clientId);
     } else {
-      if (!registeredClient.get().getRedirectUris().contains(redirectUri.toString())) {
+      RegisteredClient client = registeredClient.get();
+      if (!client.getRedirectUris().contains(redirectUri.toString())) {
         throw new InvalidRedirectUriError(redirectUri.toString());
       }
-      if (!registeredClient.get().isConfidential() && StringUtils.isBlank(code_challenge)) {
+      if (!client.isConfidential() && StringUtils.isBlank(code_challenge)) {
         return redirectError(
             redirectUri, "invalid_request", "code_challenge is required for public client", state);
       }
+      if (!client.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE)) {
+        return redirectError(
+            redirectUri,
+            "unauthorized_client",
+            "The client is not authorized to request an authorization code using this method",
+            state);
+      }
+    }
+
+    if ("token".equals(responseType)) {
+      return redirectError(
+              redirectUri, "invalid_request", "implicit grant is not supported", state);
     }
 
     List<String> scopes = Arrays.asList(scope.split(" "));
@@ -273,8 +289,9 @@ public class AuthorizationEndpoint {
   }
 
   @ExceptionHandler(InvalidClientIdError.class)
-  public ResponseEntity<String> handle(InvalidClientIdError ex) {
+  public ResponseEntity<String> handle(InvalidClientIdError ex, HttpServletResponse httpServletResponse) throws IOException {
     LOG.warn("Invalid client {}", ex.getMessage());
+    httpServletResponse.sendError(400, "invalid client");
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=invalid client");
   }
 
@@ -307,6 +324,12 @@ public class AuthorizationEndpoint {
   static class InvalidRedirectUriError extends RuntimeException {
     InvalidRedirectUriError(String redirectUri) {
       super("Invalid redirect URI " + redirectUri);
+    }
+  }
+
+  static class UnauthorizedClientError extends RuntimeException {
+    UnauthorizedClientError(String clientId) {
+      super("Unauthorized client " + clientId);
     }
   }
 

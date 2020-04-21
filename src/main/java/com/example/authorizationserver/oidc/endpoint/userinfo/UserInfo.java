@@ -51,6 +51,11 @@ public class UserInfo {
 
   public UserInfo() {}
 
+  public UserInfo(String subject) {
+    this.sub = subject;
+    this.name = subject;
+  }
+
   public UserInfo(String error, String error_description) {
     this.error = error;
     this.error_description = error_description;
