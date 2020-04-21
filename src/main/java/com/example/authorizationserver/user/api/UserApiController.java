@@ -71,8 +71,7 @@ public class UserApiController {
 
   @PutMapping("/{userId}")
   public ResponseEntity<UserResource> update(@PathVariable("userId") UUID userId,
-          @Valid @RequestBody CreateUserResource createUserResource,
-          HttpServletRequest httpServletRequest) {
+          @Valid @RequestBody CreateUserResource createUserResource) {
     return userService
             .update(userId, new User(createUserResource))
             .map(UserResource::new)

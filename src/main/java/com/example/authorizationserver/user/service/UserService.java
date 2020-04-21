@@ -2,6 +2,7 @@ package com.example.authorizationserver.user.service;
 
 import com.example.authorizationserver.user.dao.UserRepository;
 import com.example.authorizationserver.user.model.User;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.IdGenerator;
@@ -23,10 +24,12 @@ public class UserService {
     this.idGenerator = idGenerator;
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   public List<User> findAll() {
     return userRepository.findAll();
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   public User create(User entity) {
     if (entity.getIdentifier() == null) {
@@ -36,6 +39,7 @@ public class UserService {
     return userRepository.save(entity);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   public Optional<User> update(UUID userId, User userForUpdate) {
     return findOneByIdentifier(userId).map(u -> {
@@ -62,6 +66,7 @@ public class UserService {
     return userRepository.findOneByUsername(username);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   public void deleteOneByIdentifier(UUID identifier) {
     userRepository.deleteOneByIdentifier(identifier);
