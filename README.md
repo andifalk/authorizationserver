@@ -67,7 +67,7 @@ at the [OpenID Foundation](https://openid.net/).
 
 ## Setup and Run the Authorization Server
 
-To run the server you need at least a Java 11 JDK or higher (All LTS versions, i.e. 11 and 14 are tested).
+To run the server you need at least a Java 11 JDK or higher (versions 11 and 14 are currently tested).
 
 To run the server just perform a ```gradlew bootrun``` or 
 run the Spring Boot starter class _com.example.authorizationserver.AuthorizationServerApplication_ via your Java IDE.
