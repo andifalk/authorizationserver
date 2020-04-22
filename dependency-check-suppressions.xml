@@ -22,5 +22,11 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-rsa@.*$</packageUrl>
         <cpe>cpe:/a:vmware:springsource_spring_security</cpe>
     </suppress>
-
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: bcprov-jdk15on-1.56.jar
+   ]]></notes>
+        <sha1>a153c6f9744a3e9dd6feab5e210e1c9861362ec7</sha1>
+        <cve>CVE-2018-1000613</cve>
+    </suppress>
 </suppressions>
