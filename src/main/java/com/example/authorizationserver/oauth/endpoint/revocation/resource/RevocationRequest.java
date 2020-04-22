@@ -1,7 +1,11 @@
-package com.example.authorizationserver.oauth.endpoint.resource;
+package com.example.authorizationserver.oauth.endpoint.revocation.resource;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
+/**
+ * Revocation request as defined in https://www.rfc-editor.org/rfc/rfc7009.html.
+ */
 public class RevocationRequest {
 
   /**
@@ -21,6 +25,7 @@ public class RevocationRequest {
    *   <li>refresh_token: A refresh token as defined in [RFC6749], Section 1.5</li>
    * </ul>
    */
+  @Pattern(regexp = "access_token|refresh_token")
   private String token_type_hint;
 
   public String getToken() {

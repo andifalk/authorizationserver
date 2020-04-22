@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oauth.endpoint.resource;
+package com.example.authorizationserver.oauth.endpoint.token.resource;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -62,7 +62,6 @@ public class TokenRequest {
    */
   private final String refresh_token;
 
-
   public TokenRequest(
       @NotBlank String grant_type,
       @NotBlank String code,
@@ -122,16 +121,29 @@ public class TokenRequest {
 
   @Override
   public String toString() {
-    return "TokenRequest{" +
-            "grant_type='" + grant_type + '\'' +
-            ", code='" + code + '\'' +
-            ", redirect_uri=" + redirect_uri +
-            ", client_id='" + client_id + '\'' +
-            ", client_secret='*****'" +
-            ", code_verifier='" + code_verifier + '\'' +
-            ", refresh_token='" + refresh_token + '\'' +
-            ", username='" + username + '\'' +
-            ", password='*****'" +
-            '}';
+    return "TokenRequest{"
+        + "grant_type='"
+        + grant_type
+        + '\''
+        + ", code='"
+        + code
+        + '\''
+        + ", redirect_uri="
+        + redirect_uri
+        + ", client_id='"
+        + client_id
+        + '\''
+        + ", client_secret='*****'"
+        + ", code_verifier='"
+        + code_verifier
+        + '\''
+        + ", refresh_token='"
+        + refresh_token
+        + '\''
+        + ", username='"
+        + username
+        + '\''
+        + ", password='*****'"
+        + '}';
   }
 }

@@ -1,9 +1,9 @@
-package com.example.authorizationserver.oauth.endpoint;
+package com.example.authorizationserver.oauth.endpoint.introspection;
 
 import com.example.authorizationserver.oauth.common.AuthenticationUtil;
 import com.example.authorizationserver.oauth.common.ClientCredentials;
-import com.example.authorizationserver.oauth.endpoint.resource.IntrospectionRequest;
-import com.example.authorizationserver.oauth.endpoint.resource.IntrospectionResponse;
+import com.example.authorizationserver.oauth.endpoint.introspection.resource.IntrospectionRequest;
+import com.example.authorizationserver.oauth.endpoint.introspection.resource.IntrospectionResponse;
 import com.example.authorizationserver.token.jwt.JsonWebTokenService;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
@@ -67,7 +67,7 @@ public class IntrospectionEndpoint {
     if (jsonWebToken != null) {
       return ResponseEntity.ok(getIntrospectionResponse(jsonWebToken));
     } else {
-      OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenValue);
+      OpaqueToken opaqueWebToken = tokenService.findOpaqueToken(tokenValue);
       if (opaqueWebToken != null) {
         return ResponseEntity.ok(getIntrospectionResponse(opaqueWebToken));
       } else {

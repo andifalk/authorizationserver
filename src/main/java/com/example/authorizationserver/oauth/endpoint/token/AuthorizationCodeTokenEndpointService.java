@@ -6,13 +6,14 @@ import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 import com.example.authorizationserver.oauth.common.ClientCredentials;
 import com.example.authorizationserver.oauth.common.GrantType;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenRequest;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenResponse;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenRequest;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse;
 import com.example.authorizationserver.oauth.pkce.CodeChallengeError;
 import com.example.authorizationserver.oauth.pkce.ProofKeyForCodeExchangeVerifier;
 import com.example.authorizationserver.oauth.store.AuthorizationCode;
 import com.example.authorizationserver.oauth.store.AuthorizationCodeService;
 import com.example.authorizationserver.oidc.common.Scope;
+import com.example.authorizationserver.security.client.RegisteredClientAuthenticationService;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
@@ -20,14 +21,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.example.authorizationserver.oauth.endpoint.resource.TokenResponse.BEARER_TOKEN_TYPE;
+import static com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse.BEARER_TOKEN_TYPE;
 
 @Service
 public class AuthorizationCodeTokenEndpointService {
@@ -37,26 +38,26 @@ public class AuthorizationCodeTokenEndpointService {
   private final RegisteredClientService registeredClientService;
   private final AuthorizationCodeService authorizationCodeService;
   private final TokenService tokenService;
-  private final PasswordEncoder passwordEncoder;
   private final UserService userService;
   private final ProofKeyForCodeExchangeVerifier proofKeyForCodeExchangeVerifier;
   private final AuthorizationServerConfigurationProperties authorizationServerProperties;
+  private final RegisteredClientAuthenticationService registeredClientAuthenticationService;
 
   public AuthorizationCodeTokenEndpointService(
       TokenService tokenService,
       RegisteredClientService registeredClientService,
       AuthorizationCodeService authorizationCodeService,
-      PasswordEncoder passwordEncoder,
       UserService userService,
       ProofKeyForCodeExchangeVerifier proofKeyForCodeExchangeVerifier,
-      AuthorizationServerConfigurationProperties authorizationServerProperties) {
+      AuthorizationServerConfigurationProperties authorizationServerProperties,
+      RegisteredClientAuthenticationService registeredClientAuthenticationService) {
     this.tokenService = tokenService;
     this.registeredClientService = registeredClientService;
     this.authorizationCodeService = authorizationCodeService;
-    this.passwordEncoder = passwordEncoder;
     this.userService = userService;
     this.proofKeyForCodeExchangeVerifier = proofKeyForCodeExchangeVerifier;
     this.authorizationServerProperties = authorizationServerProperties;
+    this.registeredClientAuthenticationService = registeredClientAuthenticationService;
   }
 
   /* ---------------------
@@ -93,8 +94,6 @@ public class AuthorizationCodeTokenEndpointService {
   public ResponseEntity<TokenResponse> getTokenResponseForAuthorizationCode(
       String authorizationHeader, TokenRequest tokenRequest) {
 
-    // TODO: Replace by spring security authentication filter/provider
-
     LOG.debug("Exchange token for 'authorization code' with [{}]", tokenRequest);
 
     ClientCredentials clientCredentials =
@@ -105,8 +104,23 @@ public class AuthorizationCodeTokenEndpointService {
     }
 
     AuthorizationCode authorizationCode = authorizationCodeService.getCode(tokenRequest.getCode());
-    if (authorizationCode == null
-        || !clientCredentials.getClientId().equals(authorizationCode.getClientId())) {
+
+    if (authorizationCode == null) {
+      LOG.warn("Invalid authorization code");
+      return TokenEndpointHelper.reportInvalidClientError();
+    }
+
+    if (authorizationCode.isExpired()) {
+      LOG.warn("Authorization code already expired");
+      authorizationCodeService.removeCode(authorizationCode.getCode());
+      return TokenEndpointHelper.reportInvalidClientError();
+    }
+
+    if (!clientCredentials.getClientId().equals(authorizationCode.getClientId())) {
+      LOG.warn(
+          "Client id mismatch for authorization code, [{}] does not match [{}]",
+          authorizationCode.getClientId(),
+          clientCredentials.getClientId());
       return TokenEndpointHelper.reportInvalidClientError();
     }
 
@@ -141,10 +155,12 @@ public class AuthorizationCodeTokenEndpointService {
                       registeredClient.getClientId());
                   return TokenEndpointHelper.reportInvalidClientError();
                 }
-                // Confidential clients must have present client secret if PKCE is not used
-                if (StringUtils.isBlank(clientCredentials.getClientSecret())
-                    || !passwordEncoder.matches(
-                        clientCredentials.getClientSecret(), registeredClient.getClientSecret())) {
+
+                // Confidential clients must present the client secret if PKCE is not used
+                try {
+                  registeredClientAuthenticationService.authenticate(
+                      clientCredentials.getClientId(), clientCredentials.getClientSecret());
+                } catch (AuthenticationException ex) {
                   return TokenEndpointHelper.reportInvalidClientError();
                 }
               }
@@ -165,6 +181,8 @@ public class AuthorizationCodeTokenEndpointService {
                             authorizationServerProperties.getRefreshToken().getLifetime();
                         Duration idTokenLifetime =
                             authorizationServerProperties.getIdToken().getLifetime();
+
+                        authorizationCodeService.removeCode(authorizationCode.getCode());
 
                         return ResponseEntity.ok(
                             createTokenResponse(

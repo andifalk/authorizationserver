@@ -1,40 +1,40 @@
 package com.example.authorizationserver.oauth.endpoint.token;
 
 import com.example.authorizationserver.config.AuthorizationServerConfigurationProperties;
-import com.example.authorizationserver.oauth.client.RegisteredClientService;
 import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
+import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 import com.example.authorizationserver.oauth.common.ClientCredentials;
 import com.example.authorizationserver.oauth.common.GrantType;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenRequest;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenResponse;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenRequest;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse;
+import com.example.authorizationserver.security.client.RegisteredClientAuthenticationService;
 import com.example.authorizationserver.token.store.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-import static com.example.authorizationserver.oauth.endpoint.resource.TokenResponse.BEARER_TOKEN_TYPE;
+import static com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse.BEARER_TOKEN_TYPE;
 
 @Service
 public class ClientCredentialsTokenEndpointService {
-  private static final Logger LOG = LoggerFactory.getLogger(ClientCredentialsTokenEndpointService.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(ClientCredentialsTokenEndpointService.class);
 
-  private final RegisteredClientService registeredClientService;
   private final TokenService tokenService;
-  private final PasswordEncoder passwordEncoder;
   private final AuthorizationServerConfigurationProperties authorizationServerProperties;
+  private final RegisteredClientAuthenticationService registeredClientAuthenticationService;
 
   public ClientCredentialsTokenEndpointService(
-          TokenService tokenService,
-          RegisteredClientService registeredClientService, PasswordEncoder passwordEncoder,
-          AuthorizationServerConfigurationProperties authorizationServerProperties) {
+      TokenService tokenService,
+      AuthorizationServerConfigurationProperties authorizationServerProperties,
+      RegisteredClientAuthenticationService registeredClientAuthenticationService) {
     this.tokenService = tokenService;
-    this.registeredClientService = registeredClientService;
-    this.passwordEncoder = passwordEncoder;
     this.authorizationServerProperties = authorizationServerProperties;
+    this.registeredClientAuthenticationService = registeredClientAuthenticationService;
   }
 
   /* -------------------
@@ -60,7 +60,7 @@ public class ClientCredentialsTokenEndpointService {
     LOG.debug("Exchange token for 'client credentials' with [{}]", tokenRequest);
 
     ClientCredentials clientCredentials =
-            TokenEndpointHelper.retrieveClientCredentials(authorizationHeader, tokenRequest);
+        TokenEndpointHelper.retrieveClientCredentials(authorizationHeader, tokenRequest);
 
     if (clientCredentials == null) {
       return TokenEndpointHelper.reportInvalidClientError();
@@ -69,34 +69,42 @@ public class ClientCredentialsTokenEndpointService {
     Duration accessTokenLifetime = authorizationServerProperties.getAccessToken().getLifetime();
     Duration refreshTokenLifetime = authorizationServerProperties.getRefreshToken().getLifetime();
 
-    return registeredClientService.findOneByClientId(clientCredentials.getClientId()).map(
-      registeredClient -> {
-        if (passwordEncoder.matches(clientCredentials.getClientSecret(), registeredClient.getClientSecret())) {
-          if (registeredClient.getGrantTypes().contains(GrantType.CLIENT_CREDENTIALS)) {
-            LOG.info("Creating token response for client credentials for client [{}]", tokenRequest.getClient_id());
-            return ResponseEntity.ok(
-                    new TokenResponse(
-                            AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
-                                    ? tokenService
-                                    .createAnonymousJwtAccessToken(
-                                            clientCredentials.getClientId(), accessTokenLifetime)
-                                    .getValue()
-                                    : tokenService
-                                    .createAnonymousOpaqueAccessToken(
-                                            clientCredentials.getClientId(), accessTokenLifetime)
-                                    .getValue(),
-                            tokenService
-                                    .createAnonymousRefreshToken(clientCredentials.getClientId(), refreshTokenLifetime)
-                                    .getValue(),
-                            accessTokenLifetime.toSeconds(),
-                            null, BEARER_TOKEN_TYPE));
-          } else {
-            return TokenEndpointHelper.reportUnauthorizedClientError();
-          }
-        } else {
-          return TokenEndpointHelper.reportInvalidClientError();
-        }
-      }
-    ).orElse(TokenEndpointHelper.reportInvalidClientError());
+    RegisteredClient registeredClient;
+
+    try {
+      registeredClient =
+          registeredClientAuthenticationService.authenticate(
+              clientCredentials.getClientId(), clientCredentials.getClientSecret());
+
+    } catch (AuthenticationException ex) {
+      return TokenEndpointHelper.reportInvalidClientError();
+    }
+
+    if (registeredClient.getGrantTypes().contains(GrantType.CLIENT_CREDENTIALS)) {
+
+      LOG.info(
+          "Creating token response for client credentials for client [{}]",
+          tokenRequest.getClient_id());
+      return ResponseEntity.ok(
+          new TokenResponse(
+              AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                  ? tokenService
+                      .createAnonymousJwtAccessToken(
+                          clientCredentials.getClientId(), accessTokenLifetime)
+                      .getValue()
+                  : tokenService
+                      .createAnonymousOpaqueAccessToken(
+                          clientCredentials.getClientId(), accessTokenLifetime)
+                      .getValue(),
+              tokenService
+                  .createAnonymousRefreshToken(
+                      clientCredentials.getClientId(), refreshTokenLifetime)
+                  .getValue(),
+              accessTokenLifetime.toSeconds(),
+              null,
+              BEARER_TOKEN_TYPE));
+    } else {
+      return TokenEndpointHelper.reportUnauthorizedClientError();
+    }
   }
 }

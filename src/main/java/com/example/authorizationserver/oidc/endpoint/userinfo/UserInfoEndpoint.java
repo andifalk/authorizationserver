@@ -65,7 +65,7 @@ public class UserInfoEndpoint {
             .body(new UserInfo("invalid_token", "Access Token is invalid"));
       }
     } else {
-      OpaqueToken opaqueWebToken = tokenService.findOpaqueWebToken(tokenValue);
+      OpaqueToken opaqueWebToken = tokenService.findOpaqueToken(tokenValue);
       if (opaqueWebToken != null) {
         opaqueWebToken.validate();
         if (TokenService.ANONYMOUS_TOKEN.equals(opaqueWebToken.getSubject())) {

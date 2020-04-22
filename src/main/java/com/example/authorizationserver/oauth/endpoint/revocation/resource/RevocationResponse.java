@@ -1,7 +1,7 @@
-package com.example.authorizationserver.oauth.endpoint.resource;
+package com.example.authorizationserver.oauth.endpoint.revocation.resource;
 
 /**
- * Revocation Response.
+ * Revocation response as defined in https://www.rfc-editor.org/rfc/rfc7009.html.
  */
 public class RevocationResponse {
 

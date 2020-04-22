@@ -19,8 +19,6 @@ public abstract class Token extends AbstractPersistable<Long> {
 
   private boolean revoked;
 
-  private boolean refreshToken;
-
   public Token() {}
 
   public String getValue() {
@@ -47,14 +45,6 @@ public abstract class Token extends AbstractPersistable<Long> {
     this.revoked = revoked;
   }
 
-  public boolean isRefreshToken() {
-    return refreshToken;
-  }
-
-  public void setRefreshToken(boolean refreshToken) {
-    this.refreshToken = refreshToken;
-  }
-
   public abstract boolean isReferenceToken();
 
   @Override
@@ -67,8 +57,6 @@ public abstract class Token extends AbstractPersistable<Long> {
         + expiry
         + ", revoked="
         + revoked
-        + ", refreshToken="
-        + refreshToken
         + ", referenceToken="
         + isReferenceToken()
         + '}';

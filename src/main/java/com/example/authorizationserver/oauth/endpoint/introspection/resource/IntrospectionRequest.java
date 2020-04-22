@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oauth.endpoint.resource;
+package com.example.authorizationserver.oauth.endpoint.introspection.resource;
 
 import javax.validation.constraints.NotBlank;
 

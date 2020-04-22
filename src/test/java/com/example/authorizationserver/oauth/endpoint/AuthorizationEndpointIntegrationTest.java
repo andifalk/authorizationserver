@@ -113,8 +113,9 @@ class AuthorizationEndpointIntegrationTest {
                             .queryParams(multiValueMap)
                             .with(user(new EndUserDetails(bwayne_user))))
             .andDo(print())
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("http://localhost:9090/demo-client/login/oauth2/code/demo?error=invalid_scope**"));
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(content().string(endsWith("error=invalid client")));
   }
 
   @Test
@@ -150,7 +151,7 @@ class AuthorizationEndpointIntegrationTest {
                             .with(user(new EndUserDetails(bwayne_user))))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(endsWith("'client_id' is not present")));
+            .andExpect(content().string(endsWith("error=invalid_request")));
   }
 
   @Test

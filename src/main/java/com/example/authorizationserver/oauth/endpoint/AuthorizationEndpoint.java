@@ -175,30 +175,30 @@ public class AuthorizationEndpoint {
   @PreAuthorize("isAuthenticated()")
   @GetMapping
   public String authorizationRequest(
-          @RequestParam("response_type") @Pattern(regexp = "code|token") String responseType,
-          @RequestParam("scope") String scope,
-          @RequestParam("client_id") String clientId,
-          @RequestParam("redirect_uri") URI redirectUri,
-          @RequestParam(name = "state", required = false) String state,
-          @RequestParam(name = "response_mode", required = false) @Pattern(regexp = "query|form_post")
+      @RequestParam("response_type") @Pattern(regexp = "code|token") String responseType,
+      @RequestParam("scope") String scope,
+      @RequestParam("client_id") String clientId,
+      @RequestParam("redirect_uri") URI redirectUri,
+      @RequestParam(name = "state", required = false) String state,
+      @RequestParam(name = "response_mode", required = false) @Pattern(regexp = "query|form_post")
           String responseMode,
-          @RequestParam(name = "nonce", required = false) String nonce,
-          @RequestParam(name = "prompt", required = false)
+      @RequestParam(name = "nonce", required = false) String nonce,
+      @RequestParam(name = "prompt", required = false)
           @Pattern(regexp = "none|login|consent|select_account")
           String prompt,
-          @RequestParam(name = "display", required = false) @Pattern(regexp = "page|popup|touch|wap")
+      @RequestParam(name = "display", required = false) @Pattern(regexp = "page|popup|touch|wap")
           String display,
-          @RequestParam(name = "max_age", required = false) Long max_age,
-          @RequestParam(name = "ui_locales", required = false) String ui_locales,
-          @RequestParam(name = "id_token_hint", required = false) String id_token_hint,
-          @RequestParam(name = "login_hint", required = false) String login_hint,
-          @RequestParam(name = "acr_values", required = false) String acr_values,
-          @RequestParam(name = "code_challenge", required = false) String code_challenge,
-          @RequestParam(name = "code_challenge_method", required = false)
+      @RequestParam(name = "max_age", required = false) Long max_age,
+      @RequestParam(name = "ui_locales", required = false) String ui_locales,
+      @RequestParam(name = "id_token_hint", required = false) String id_token_hint,
+      @RequestParam(name = "login_hint", required = false) String login_hint,
+      @RequestParam(name = "acr_values", required = false) String acr_values,
+      @RequestParam(name = "code_challenge", required = false) String code_challenge,
+      @RequestParam(name = "code_challenge_method", required = false)
           @Pattern(regexp = "plain|S256")
           String code_challenge_method,
-          @RequestParam(name = "resource", required = false) URI resource,
-          @AuthenticationPrincipal EndUserDetails endUserDetails) {
+      @RequestParam(name = "resource", required = false) URI resource,
+      @AuthenticationPrincipal EndUserDetails endUserDetails) {
 
     LOG.debug(
         "Authorization Request: client_id={}, response_type = {}, scope={}, redirectUri={}, endUser={}",
@@ -213,13 +213,11 @@ public class AuthorizationEndpoint {
     }
 
     if (StringUtils.isBlank(clientId)) {
-      throw new InvalidClientIdError("");
-    }
-    if (StringUtils.isBlank(scope)) {
-      return redirectError(redirectUri, "invalid_scope", "scope must not be empty", state);
+      throw new InvalidClientIdError("Invalid client");
     }
 
-    Optional<RegisteredClient> registeredClient = registeredClientService.findOneByClientId(clientId);
+    Optional<RegisteredClient> registeredClient =
+        registeredClientService.findOneByClientId(clientId);
 
     if (registeredClient.isEmpty()) {
       throw new InvalidClientIdError(clientId);
@@ -241,34 +239,38 @@ public class AuthorizationEndpoint {
       }
     }
 
+    if (StringUtils.isBlank(scope)) {
+      return redirectError(redirectUri, "invalid_scope", "scope must not be empty", state);
+    }
+
     if ("token".equals(responseType)) {
       return redirectError(
-              redirectUri, "invalid_request", "implicit grant is not supported", state);
+          redirectUri, "invalid_request", "implicit grant is not supported", state);
     }
 
     List<String> scopes = Arrays.asList(scope.split(" "));
     LOG.info(
-          "Authenticated user {} for client id {} and scopes {}",
-          endUserDetails.getIdentifier(),
-          clientId,
-          scopes);
+        "Authenticated user {} for client id {} and scopes {}",
+        endUserDetails.getIdentifier(),
+        clientId,
+        scopes);
 
-      AuthorizationCode authorizationCode =
-          authorizationCodeService.createAndStoreAuthorizationState(
-              clientId,
-              redirectUri,
-              scopes,
-              endUserDetails.getIdentifier() != null ? endUserDetails.getIdentifier().toString() : "",
-              nonce,
-              code_challenge,
-              code_challenge_method);
+    AuthorizationCode authorizationCode =
+        authorizationCodeService.createAndStoreAuthorizationState(
+            clientId,
+            redirectUri,
+            scopes,
+            endUserDetails.getIdentifier() != null ? endUserDetails.getIdentifier().toString() : "",
+            nonce,
+            code_challenge,
+            code_challenge_method);
 
-      return "redirect:"
-          + redirectUri.toString()
-          + "?code="
-          + authorizationCode.getCode()
-          + "&state="
-          + state;
+    return "redirect:"
+        + redirectUri.toString()
+        + "?code="
+        + authorizationCode.getCode()
+        + "&state="
+        + state;
   }
 
   private String redirectError(
@@ -284,34 +286,57 @@ public class AuthorizationEndpoint {
   }
 
   @ExceptionHandler(MissingServletRequestParameterException.class)
-  public ResponseEntity<String> handle(MissingServletRequestParameterException ex) {
-    return ResponseEntity.badRequest().body(ex.getMessage());
+  public ResponseEntity<String> handle(
+      MissingServletRequestParameterException ex, HttpServletResponse httpServletResponse)
+      throws IOException {
+    LOG.warn("Invalid_request {}", ex.getMessage());
+    httpServletResponse.sendError(400, "invalid_request");
+    return ResponseEntity.badRequest()
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .body("error=invalid_request");
   }
 
   @ExceptionHandler(InvalidClientIdError.class)
-  public ResponseEntity<String> handle(InvalidClientIdError ex, HttpServletResponse httpServletResponse) throws IOException {
+  public ResponseEntity<String> handle(
+      InvalidClientIdError ex, HttpServletResponse httpServletResponse) throws IOException {
     LOG.warn("Invalid client {}", ex.getMessage());
     httpServletResponse.sendError(400, "invalid client");
-    return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=invalid client");
+    return ResponseEntity.badRequest()
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .body("error=invalid client");
   }
 
   @ExceptionHandler(InvalidRedirectUriError.class)
-  public ResponseEntity<String> handle(InvalidRedirectUriError ex) {
-    LOG.warn("Invalid client {}", ex.getMessage());
-    return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=redirect uri mismatch");
+  public ResponseEntity<String> handle(
+      InvalidRedirectUriError ex, HttpServletResponse httpServletResponse) throws IOException {
+    LOG.warn("Redirect uri mismatch {}", ex.getMessage());
+    httpServletResponse.sendError(400, "redirect uri mismatch");
+    return ResponseEntity.badRequest()
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .body("error=redirect uri mismatch");
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<String> handle(ConstraintViolationException ex) {
+  public ResponseEntity<String> handle(
+      ConstraintViolationException ex, HttpServletResponse httpServletResponse) throws IOException {
     if (!ex.getConstraintViolations().isEmpty()) {
       ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
       if (constraintViolation.getPropertyPath().toString().contains("responseType")) {
-        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=unsupported_response_type");
+        httpServletResponse.sendError(400, "unsupported_response_type");
+        return ResponseEntity.badRequest()
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .body("error=unsupported_response_type");
       } else {
-        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=invalid_request");
+        httpServletResponse.sendError(400, "invalid_request");
+        return ResponseEntity.badRequest()
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .body("error=invalid_request");
       }
     } else {
-      return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_FORM_URLENCODED).body("error=server_error");
+      httpServletResponse.sendError(400, "server_error");
+      return ResponseEntity.badRequest()
+          .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+          .body("error=server_error");
     }
   }
 
@@ -326,11 +351,4 @@ public class AuthorizationEndpoint {
       super("Invalid redirect URI " + redirectUri);
     }
   }
-
-  static class UnauthorizedClientError extends RuntimeException {
-    UnauthorizedClientError(String clientId) {
-      super("Unauthorized client " + clientId);
-    }
-  }
-
 }

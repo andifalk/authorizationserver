@@ -31,6 +31,9 @@ public class OpaqueToken extends Token {
   @NotNull
   private LocalDateTime notBefore;
 
+  @NotNull
+  private boolean refreshToken;
+
   public String getSubject() {
     return subject;
   }
@@ -71,6 +74,14 @@ public class OpaqueToken extends Token {
     this.notBefore = notBefore;
   }
 
+  public boolean isRefreshToken() {
+    return refreshToken;
+  }
+
+  public void setRefreshToken(boolean refreshToken) {
+    this.refreshToken = refreshToken;
+  }
+
   @Override
   public boolean isReferenceToken() {
     return true;
@@ -83,5 +94,17 @@ public class OpaqueToken extends Token {
     if (LocalDateTime.now().isBefore(this.getNotBefore())) {
       throw new BadCredentialsException("Not yet valid");
     }
+  }
+
+  @Override
+  public String toString() {
+    return "OpaqueToken{" +
+            "subject='" + subject + '\'' +
+            ", clientId='" + clientId + '\'' +
+            ", issuer='" + issuer + '\'' +
+            ", issuedAt=" + issuedAt +
+            ", notBefore=" + notBefore +
+            ", refreshToken=" + refreshToken +
+            "} " + super.toString();
   }
 }

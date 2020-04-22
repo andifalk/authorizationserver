@@ -1,4 +1,4 @@
-package com.example.authorizationserver.oauth.endpoint.resource;
+package com.example.authorizationserver.oauth.endpoint.token.resource;
 
 /**
  * Token Response as specified by:
@@ -18,7 +18,11 @@ public class TokenResponse {
   private String error;
 
   public TokenResponse(
-      String access_token, String refresh_token, long expires_in, String id_token, String token_type) {
+      String access_token,
+      String refresh_token,
+      long expires_in,
+      String id_token,
+      String token_type) {
     this.access_token = access_token;
     this.refresh_token = refresh_token;
     this.expires_in = expires_in;

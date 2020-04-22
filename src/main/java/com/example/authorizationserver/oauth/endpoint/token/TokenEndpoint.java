@@ -1,8 +1,8 @@
 package com.example.authorizationserver.oauth.endpoint.token;
 
 import com.example.authorizationserver.oauth.common.GrantType;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenRequest;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenResponse;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenRequest;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse;
 import com.nimbusds.jose.JOSEException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +29,10 @@ public class TokenEndpoint {
   private final AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService;
 
   public TokenEndpoint(
-          ClientCredentialsTokenEndpointService clientCredentialsTokenEndpointService,
-          PasswordTokenEndpointService passwordTokenEndpointService,
-          RefreshTokenEndpointService refreshTokenEndpointService,
-          AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService) {
+      ClientCredentialsTokenEndpointService clientCredentialsTokenEndpointService,
+      PasswordTokenEndpointService passwordTokenEndpointService,
+      RefreshTokenEndpointService refreshTokenEndpointService,
+      AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService) {
     this.clientCredentialsTokenEndpointService = clientCredentialsTokenEndpointService;
     this.passwordTokenEndpointService = passwordTokenEndpointService;
     this.refreshTokenEndpointService = refreshTokenEndpointService;
@@ -47,15 +47,19 @@ public class TokenEndpoint {
     LOG.debug("Exchange token with grant type [{}]", tokenRequest.getGrant_type());
 
     if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.CLIENT_CREDENTIALS.getGrant())) {
-      return clientCredentialsTokenEndpointService.getTokenResponseForClientCredentials(authorizationHeader, tokenRequest);
+      return clientCredentialsTokenEndpointService.getTokenResponseForClientCredentials(
+          authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.PASSWORD.getGrant())) {
-      return passwordTokenEndpointService.getTokenResponseForPassword(authorizationHeader, tokenRequest);
+      return passwordTokenEndpointService.getTokenResponseForPassword(
+          authorizationHeader, tokenRequest);
     } else if (tokenRequest
         .getGrant_type()
         .equalsIgnoreCase(GrantType.AUTHORIZATION_CODE.getGrant())) {
-      return authorizationCodeTokenEndpointService.getTokenResponseForAuthorizationCode(authorizationHeader, tokenRequest);
+      return authorizationCodeTokenEndpointService.getTokenResponseForAuthorizationCode(
+          authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.REFRESH_TOKEN.getGrant())) {
-      return refreshTokenEndpointService.getTokenResponseForRefreshToken(authorizationHeader, tokenRequest);
+      return refreshTokenEndpointService.getTokenResponseForRefreshToken(
+          authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.TOKEN_EXCHANGE.getGrant())) {
       LOG.warn("Requested grant type for 'Token Exchange' is not yet supported");
       return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));

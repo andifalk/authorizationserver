@@ -72,6 +72,10 @@ public class AuthorizationCode {
     return code_challenge_method;
   }
 
+  public boolean isExpired() {
+    return LocalDateTime.now().isAfter(getExpiry());
+  }
+
   @Override
   public String toString() {
     return "AuthorizationState{"

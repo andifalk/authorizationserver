@@ -3,7 +3,7 @@ package com.example.authorizationserver.oauth.endpoint;
 import com.example.authorizationserver.annotation.WebIntegrationTest;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 import com.example.authorizationserver.oauth.common.GrantType;
-import com.example.authorizationserver.oauth.endpoint.resource.TokenResponse;
+import com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse;
 import com.example.authorizationserver.oauth.store.AuthorizationCode;
 import com.example.authorizationserver.oauth.store.AuthorizationCodeService;
 import com.example.authorizationserver.token.store.TokenService;

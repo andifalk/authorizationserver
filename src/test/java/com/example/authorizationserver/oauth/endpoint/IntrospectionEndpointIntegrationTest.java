@@ -1,14 +1,12 @@
 package com.example.authorizationserver.oauth.endpoint;
 
 import com.example.authorizationserver.annotation.WebIntegrationTest;
-import com.example.authorizationserver.oauth.endpoint.resource.IntrospectionResponse;
-import com.example.authorizationserver.oidc.endpoint.userinfo.UserInfo;
+import com.example.authorizationserver.oauth.endpoint.introspection.resource.IntrospectionResponse;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
 import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
-import com.nimbusds.jose.JOSEException;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +19,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
 
-import static com.example.authorizationserver.oauth.endpoint.IntrospectionEndpoint.ENDPOINT;
+import static com.example.authorizationserver.oauth.endpoint.introspection.IntrospectionEndpoint.ENDPOINT;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -43,7 +41,7 @@ class IntrospectionEndpointIntegrationTest {
   }
 
   @Test
-  void introspectionWithPersonalJwtToken() throws JOSEException {
+  void introspectionWithPersonalJwtToken() {
     JsonWebToken jsonWebToken =
         tokenService.createPersonalizedJwtAccessToken(
             bwayne_user, "confidential-jwt", "nonce", Duration.ofMinutes(5));
@@ -72,7 +70,7 @@ class IntrospectionEndpointIntegrationTest {
   }
 
   @Test
-  void introspectionWithAnonymousJwtToken() throws JOSEException {
+  void introspectionWithAnonymousJwtToken() {
     JsonWebToken jsonWebToken =
         tokenService.createAnonymousJwtAccessToken("confidential-jwt", Duration.ofMinutes(5));
     IntrospectionResponse introspectionResponse =
@@ -280,25 +278,5 @@ class IntrospectionEndpointIntegrationTest {
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(false);
     assertThat(introspectionResponse.getSub()).isNull();
-  }
-
-  @Test
-  void userInfoWithMissingToken() {
-
-    UserInfo userInfo =
-        given()
-            .when()
-            .get("/userinfo")
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(401)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(UserInfo.class);
-    assertThat(userInfo).isNotNull();
-    assertThat(userInfo.getError()).isEqualTo("invalid_token");
-    assertThat(userInfo.getError_description()).isEqualTo("Access Token is required");
   }
 }

@@ -49,8 +49,24 @@ public class TokenService {
     return jsonWebTokenRepository.findOneByValue(value);
   }
 
-  public OpaqueToken findOpaqueWebToken(String value) {
+  public JsonWebToken findJsonWebAccessToken(String value) {
+    return jsonWebTokenRepository.findOneByValueAndAccessToken(value, true);
+  }
+
+  public JsonWebToken findJsonWebIdToken(String value) {
+    return jsonWebTokenRepository.findOneByValueAndAccessToken(value, false);
+  }
+
+  public OpaqueToken findOpaqueToken(String value) {
     return opaqueTokenRepository.findOneByValue(value);
+  }
+
+  public OpaqueToken findOpaqueAccessToken(String value) {
+    return opaqueTokenRepository.findOneByValueAndRefreshToken(value, false);
+  }
+
+  public OpaqueToken findOpaqueRefreshToken(String value) {
+    return opaqueTokenRepository.findOneByValueAndRefreshToken(value, true);
   }
 
   @Transactional
@@ -71,6 +87,7 @@ public class TokenService {
       JsonWebToken jsonWebToken = new JsonWebToken();
       jsonWebToken.setExpiry(expiryDateTime);
       jsonWebToken.setValue(token);
+      jsonWebToken.setAccessToken(false);
       return jsonWebTokenRepository.save(jsonWebToken);
     } catch (JOSEException e) {
       LOG.error("Error creating Id token", e);
@@ -96,6 +113,7 @@ public class TokenService {
       JsonWebToken jsonWebToken = new JsonWebToken();
       jsonWebToken.setExpiry(expiryDateTime);
       jsonWebToken.setValue(token);
+      jsonWebToken.setAccessToken(true);
       return jsonWebTokenRepository.save(jsonWebToken);
     } catch (JOSEException e) {
       LOG.error("Error creating a personalized JWT", e);
@@ -118,6 +136,7 @@ public class TokenService {
       JsonWebToken jsonWebToken = new JsonWebToken();
       jsonWebToken.setExpiry(expiryDateTime);
       jsonWebToken.setValue(token);
+      jsonWebToken.setAccessToken(true);
       return jsonWebTokenRepository.save(jsonWebToken);
     } catch (JOSEException e) {
       LOG.error("Error creating a anonymous JWT", e);
@@ -132,6 +151,7 @@ public class TokenService {
     LocalDateTime expiryDateTime = issueTime.plusMinutes(accessTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
+    opaqueToken.setRefreshToken(false);
     opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setValue(token);
     opaqueToken.setClientId(clientId);
@@ -149,6 +169,7 @@ public class TokenService {
     LocalDateTime expiryDateTime = issueTime.plusMinutes(accessTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
+    opaqueToken.setRefreshToken(false);
     opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setIssuedAt(issueTime);
     opaqueToken.setNotBefore(issueTime);
@@ -166,6 +187,7 @@ public class TokenService {
     LocalDateTime expiryDateTime = issueTime.plusMinutes(refreshTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
+    opaqueToken.setRefreshToken(true);
     opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setIssuedAt(issueTime);
     opaqueToken.setNotBefore(issueTime);
@@ -183,6 +205,7 @@ public class TokenService {
     LocalDateTime expiryDateTime = issueTime.plusMinutes(refreshTokenLifetime.toMinutes());
     String token = opaqueTokenService.createToken();
     OpaqueToken opaqueToken = new OpaqueToken();
+    opaqueToken.setRefreshToken(true);
     opaqueToken.setExpiry(expiryDateTime);
     opaqueToken.setIssuedAt(issueTime);
     opaqueToken.setNotBefore(issueTime);
