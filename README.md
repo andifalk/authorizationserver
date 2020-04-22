@@ -23,28 +23,46 @@ If you are looking for a production-grade identity access management solution pl
 list of [Certified OpenID provider servers and services](https://openid.net/developers/certified/) 
 at the [OpenID Foundation](https://openid.net/).
 
-## Features
+## Features (Supported)
 
-* [RFC 6749: OAuth 2.0](https://www.rfc-editor.org/rfc/rfc6749.html) compliant (Implemented)
-* [OpenID Connect 1.0](https://openid.net/specs/openid-connect-core-1_0.html) compliant (Implemented)
+* [RFC 6749: OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html)
+* [OpenID Connect 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
 * OAuth 2.0 Grant Flows:
-  * [Authorization Code Grant Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1) (+ [PKCE](https://tools.ietf.org/html/rfc7636)) (Implemented)
-  * [Client Credentials Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4) (Implemented)
-  * [Resource Owner Password Credentials Grant Flow](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.3) (Implemented)
-* [OAuth 2.0 / OIDC Bearer Tokens](https://www.rfc-editor.org/rfc/rfc6750.html) (Implemented)
-  * Signed [Json Web Tokens (using RSA PKI)](https://tools.ietf.org/html/rfc7519) (Implemented)
-  * Opaque Tokens + [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662) (Implemented)
-* [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) (Implemented)
-* [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html) (Planned)
-* [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html) (Planned)
-* [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html) (Planned)
-* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/id/draft-ietf-oauth-dpop-00.html) (Planned)
-* Simple User Access Management (API & Web UI) (Partly implemented)
-* Management of OAuth2/OIDC Clients (API & Web UI) (Partly implemented)
+  * [Authorization Code Grant](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1) (+ [PKCE](https://tools.ietf.org/html/rfc7636))
+  * [Client Credentials Grant](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4)
+  * [Resource Owner Password Credentials Grant](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.3)
+* [RFC 6750: OAuth 2.0 Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html)
+  * Signed [Json Web Tokens (using RSA PKI)](https://tools.ietf.org/html/rfc7519)
+  * Opaque Tokens + [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662)
+  * [OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html)
+* [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html)
+* Simple User Access Management API
+* Simple User Access Management Web UI (Read access only)
+* Management of OAuth2/OIDC Clients API
+* Management of OAuth2/OIDC Clients Web UI (Read access only)J2
+
+## Features (NOT Supported)
+
+* OAuth 2.0 Grant Flows:
+  * [Implicit Grant](https://www.rfc-editor.org/rfc/rfc6749#section-4.2) (Not supported by intention, because of [OAuth 2.0 Security Best Current Practice](https://www.ietf.org/id/draft-ietf-oauth-security-topics-15.html))
+
+## Features (Planned)
+
+* [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html)
+* [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
+* [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
+* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/id/draft-ietf-oauth-dpop-00.html)
+* [JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://datatracker.ietf.org/doc/draft-ietf-oauth-access-token-jwt/)
+* [The OAuth 2.0 Authorization Framework: JWT Secured Authorization Request (JAR)](https://datatracker.ietf.org/doc/draft-ietf-oauth-jwsreq/)
+* [OAuth 2.0 Pushed Authorization Requests](https://datatracker.ietf.org/doc/draft-ietf-oauth-par/)
+* [OAuth 2.0 Rich Authorization Requests](https://datatracker.ietf.org/doc/draft-ietf-oauth-rar/)
+* [JWT Response for OAuth Token Introspection](https://datatracker.ietf.org/doc/draft-ietf-oauth-jwt-introspection-response/)
+* [The OAuth 2.1 Authorization Framework](https://datatracker.ietf.org/doc/draft-parecki-oauth-v2-1/)
+
 
 ## Roadmap
 
-* End of April 2020: [Initial Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
+* April/May 2020: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
 * May/June 2020: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
 
 ## Setup and Run the Authorization Server
@@ -59,7 +77,7 @@ It is also planned to provide the server as pre-packaged docker container image 
 ## User Management
 
 It is planned to provide an integrated user management system via Web UI and Rest API.
-Currently the Web UI only supports read-only access at [localhost:8080/auth/admin](http://localhost:8080/auth/admin).
+Currently, the Web UI only supports read-only access at [localhost:8080/auth/admin](http://localhost:8080/auth/admin).
 The Rest API also supports creating new users already.
 
 The following predefined users are setup at startup time automatically:
@@ -80,17 +98,17 @@ The Rest API also supports creating new clients already.
 
 The following predefined clients are setup at startup time automatically:
 
-| Client-Id           | Client-Secret | Confidential | Grants                              | Token-Format | Redirect Uris |
-| --------------------| --------------| ------------ | ----------------------------------- |--------------|---------------|
-| confidential-jwt    | demo          | yes          | Authz Code (+/- PKCE), Client Creds | JWT          | http://localhost:9090/demo-client/login/oauth2/code/demo |
-| public-jwt          | --            | no           | Authz Code + PKCE                   | JWT          | http://localhost:9090/demo-client/login/oauth2/code/demo |
-| confidential-opaque | demo          | yes          | Authz Code (+/- PKCE), Client Creds | Opaque       | http://localhost:9090/demo-client/login/oauth2/code/demo |
-| public-opaque       | --            | no           | Authz Code + PKCE                   | Opaque       | http://localhost:9090/demo-client/login/oauth2/code/demo |
+| Client-Id           | Client-Secret | Confidential | Grants                              | Token-Format | Redirect Uris | CORS |
+| --------------------| --------------| ------------ | ----------------------------------- |--------------|---------------|------|
+| confidential-jwt    | demo          | yes          | Authz Code (+/- PKCE), Client Creds | JWT          | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
+| public-jwt          | --            | no           | Authz Code + PKCE                   | JWT          | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
+| confidential-opaque | demo          | yes          | Authz Code (+/- PKCE), Client Creds | Opaque       | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
+| public-opaque       | --            | no           | Authz Code + PKCE                   | Opaque       | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
 
 
 ## Feedback
 
-Any feedback on this project is highly appreciated.
+If you have any feedback on this project this is highly appreciated.
 
 Just send an email to _andreas.falk(at)novatec-gmbh.de_ or contact me via Twitter (_@andifalk_).
 
