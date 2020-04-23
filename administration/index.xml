@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Administration on Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server</title>
+    <link>https://andifalk.github.io/authorizationserver/administration/</link>
+    <description>Recent content in Administration on Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://andifalk.github.io/authorizationserver/administration/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Users</title>
+      <link>https://andifalk.github.io/authorizationserver/administration/users/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://andifalk.github.io/authorizationserver/administration/users/</guid>
+      <description>User Management It is planned to provide an integrated user management system via Web UI and Rest API. Currently, the Web UI only supports read-only access at localhost:8080/auth/admin.
+The Rest API also supports creating/modifying and deleting users already.
+The following predefined users are setup at startup time automatically:
+   Username Email Password Role     bwayne bruce.wayne@example.com wayne LIBRARY_USER   pparker peter.parker@example.com parker LIBRARY_CURATOR   ckent clark.</description>
+    </item>
+    
+    <item>
+      <title>Clients</title>
+      <link>https://andifalk.github.io/authorizationserver/administration/clients/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://andifalk.github.io/authorizationserver/administration/clients/</guid>
+      <description>Client Management It is planned to provide an integrated client management system via Web UI and Rest API. Currently the Web UI only supports read-only access at localhost:8080/auth/admin.
+The Rest API also supports creating, updating and deleting clients already.
+The following predefined clients are setup at startup time automatically:
+   Client-Id Client-Secret Confidential Grants Token-Format Redirect Uris CORS     confidential-jwt demo yes Authz Code (+/- PKCE), Client Creds JWT http://localhost:9090/demo-client/login/oauth2/code/demo *   public-jwt &amp;ndash; no Authz Code + PKCE JWT http://localhost:9090/demo-client/login/oauth2/code/demo *   confidential-opaque demo yes Authz Code (+/- PKCE), Client Creds Opaque http://localhost:9090/demo-client/login/oauth2/code/demo *   public-opaque &amp;ndash; no Authz Code + PKCE Opaque http://localhost:9090/demo-client/login/oauth2/code/demo *    </description>
+    </item>
+    
+  </channel>
+</rss>

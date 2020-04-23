@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html><head>
+	<meta name="generator" content="Hugo 0.69.1" />
+
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="canonical" href="https://andifalk.github.io/authorizationserver/">
+
+    <title>
+        
+        Spring Boot OAuth2 &amp; OpenID Connect Authorization Server | Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server
+        
+    </title>
+
+    
+    <link href="https://andifalk.github.io/authorizationservercss/fontawesome.min.css" rel="stylesheet">
+
+    
+    <link rel="stylesheet" href="https://andifalk.github.io/authorizationserver/css/ace.min.css">
+
+    
+
+</head>
+<body><nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow sticky-top" id="navbarMain">
+    <div class="container">
+        <div>
+            <a class="navbar-brand" href="/authorizationserver">
+                Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server
+            </a>
+        </div>
+        <button class="navbar-toggler navbar-toggler-right collapsed" type="button" data-toggle="collapse" data-target="#navbarMainCollapse" aria-controls="navbarMainCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMainCollapse">
+          <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://andreas-falk.de" target="_blank">
+                              About me
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://github.com/andifalk/authorizationserver" target="_blank">
+                              Github <i class='fab fa-github'></i>
+                            </a>
+                        </li>
+          </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+            <div class="row">
+
+                <div class="docs-sidenav order-0 col-12 col-md-3 col-lg-2 col-xl-2 position-sticky border-right"><nav class="navbar navbar-expand-md navbar-light pl-0">
+    <button class="navbar-toggler navbar-toggler-right collapsed" type="button" data-toggle="collapse" data-target="#sidenav-left-collapse" aria-controls="sidenav-left-collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+     <div class="collapse navbar-collapse align-items-start flex-column" id="sidenav-left-collapse">
+            <form class="form-inline my-2 my-lg-0 searchbox">
+                <input class="form-control mr-sm-2 w-100" data-search-input id="search-by" type="text" placeholder="Search">
+            </form>
+         <ul class="navbar-nav flex-column pt-3">
+    <li data-nav-id="/authorizationserver/getting-started/" class="nav-item my-1 haschildren
+        ">
+        
+        <a class="nav-link p-0" href="/authorizationserver/getting-started/"><h6>Getting started</h6></a>
+        <ul class="list-unstyled ml-2">
+        <li data-nav-id="/authorizationserver/getting-started/installation/" class="nav-item my-1">
+                
+                 <a href="/authorizationserver/getting-started/installation/" class="nav-link p-0">
+                    Installation
+                </a>
+        </li>
+        </ul>
+    </li>
+    <li data-nav-id="/authorizationserver/administration/" class="nav-item my-1 haschildren
+        ">
+        
+        <a class="nav-link p-0" href="/authorizationserver/administration/"><h6>Administration</h6></a>
+        <ul class="list-unstyled ml-2">
+        <li data-nav-id="/authorizationserver/administration/users/" class="nav-item my-1">
+                
+                 <a href="/authorizationserver/administration/users/" class="nav-link p-0">
+                    Users
+                </a>
+        </li>
+        <li data-nav-id="/authorizationserver/administration/clients/" class="nav-item my-1">
+                
+                 <a href="/authorizationserver/administration/clients/" class="nav-link p-0">
+                    Clients
+                </a>
+        </li>
+        </ul>
+    </li>
+        </ul>
+    </div>
+</nav>
+
+
+</div>
+
+                <div class="docs-toc large order-lg-2 order-md-0 order-xs-1 col-12 col-lg-2 col-xl-2 position-sticky border-left"><div class="docs-toc">
+	<nav id="TableOfContents">
+  <ul>
+    <li><a href="#features">Features</a></li>
+  </ul>
+</nav>
+</div>
+</div>
+
+                <div class="main col-12 order-1 col-md-9 col-lg-10 col-xl-8 py-3">
+	
+
+	<h1>Spring Boot OAuth2 &amp; OpenID Connect Authorization Server</h1>
+
+	<p class="lead">
+    This authorization server is implemented using Spring Boot and is compliant with <a href="https://tools.ietf.org/html/rfc6749" target="_blank">OAuth 2.0</a> and <a href="https://open.id/connect" target="_blank">OpenID Connect 1.0</a>.
+</p>
+
+<h2 id="features">Features</h2>
+<div class="row py-3 mb-5">
+	<div class="col-md-4">
+		<div class="card flex-row border-0">
+			<div class="mt-3">
+				<span class="fas fa-tachometer-alt fa-2x text-primary"></span>
+			</div>
+			<div class="card-body pl-2">
+				<h5 class="card-title">
+					Fast Start
+				</h5>
+				<p class="card-text text-muted">
+					This authorization server is build with Spring Boot and is easy to setup and has a fast startup time.
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="card flex-row border-0">
+			<div class="mt-3">
+				<span class="fas fa-project-diagram fa-2x text-primary"></span>
+			</div>
+			<div class="card-body pl-2">
+				<h5 class="card-title">
+					Cloud-Native
+				</h5>
+				<p class="card-text text-muted">
+					Spring Boot based cloud-native application that can easily
+					be deployed to the cloud (i.e. Kubernetes or CloudFoundry).
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="card flex-row border-0">
+			<div class="mt-3">
+				<span class="fas fa-cogs fa-2x text-primary"></span>
+			</div>
+			<div class="card-body pl-2">
+				<h5 class="card-title">
+					Easy Administration
+				</h5>
+				<p class="card-text text-muted">
+					Quick setup of users and OAuth2 clients with the integrated
+					user and client management system (Web UI or Rest API).
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="card flex-row border-0">
+			<div class="mt-3">
+				<span class="fas fa-code fa-2x text-primary"></span>
+			</div>
+			<div class="card-body pl-2">
+				<h5 class="card-title">
+					OAuth 2.0 Compliant
+				</h5>
+				<p class="card-text text-muted">
+					Supports the following OAuth 2.0 grants: 
+					<ul>
+						<li>Authorization Code + PKCE</li>
+						<li>Client Credentials</li>
+						<li>Resource Owner Password</li>
+					</ul>.
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="card flex-row border-0">
+			<div class="mt-3">
+				<span class="fas fa-code fa-2x text-primary"></span>
+			</div>
+			<div class="card-body pl-2">
+				<h5 class="card-title">
+					OpenID Connect 1.0 Compliant
+				</h5>
+				<p class="card-text text-muted">
+					Supports authentication with OpenID Connect: 
+					<ul>
+						<li>ID Tokens (JWT)</li>
+						<li>User Info Endpoint</li>
+						<li>Discovery Service</li>
+					</ul>.
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="card flex-row border-0">
+			<div class="mt-3">
+				<span class="fab fa-font-awesome-flag fa-2x text-primary"></span>
+			</div>
+			<div class="card-body pl-2">
+				<h5 class="card-title">
+					Latest Specification Support
+				</h5>
+				<p class="card-text text-muted">
+					Supports the latest specifications as defined by the 
+					<a href="https://datatracker.ietf.org/wg/oauth/documents/" target="_blank">IETF working group</a>. Even includes preview implementations for draft specifications.
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+	
+
+                            
+                    
+                    <div class="row">
+                        
+                        <div class="position-relative mx-auto col-lg-9">
+                          <div class="bg-primary overflow-hidden p-3 mt-5 shadow">
+
+    <h4 class="text-white text-center">Read more</h4>
+
+    <div class="d-flex justify-content-center"><a class="p-1 ml-3 d-inline-block text-white text-right" href="/authorizationserver/getting-started/" title="Getting started">Getting started <i class="fas fa-chevron-right"></i></a></div>
+</div>
+
+                        </div>
+
+                    </div> 
+
+                </div>
+
+            </div> 
+
+        </div> 
+<script src="https://andifalk.github.io/authorizationserverlib/jquery.min.js"></script> 
+<script src="https://andifalk.github.io/authorizationserverlib/popper.min.js"></script> 
+
+<script src="https://andifalk.github.io/authorizationserverjs/bootstrap.min.js"></script> 
+
+
+<script type="text/javascript" src="/authorizationserver/plugins/lunr.min.js"></script>
+<script type="text/javascript" src="/authorizationserver/plugins/auto-complete.js"></script>
+<link href="/authorizationserver/plugins/auto-complete.css" rel="stylesheet">
+<script type="text/javascript">
+  
+      var baseurl = "https:\/\/andifalk.github.io\/authorizationserver";
+  
+</script>
+<script type="text/javascript" src="/authorizationserver/plugins/search.js"></script>
+
+
+<script type="text/javascript" src="/authorizationserver/plugins/clipboard.js"></script>
+<script>
+  new ClipboardJS('.btn');
+</script>
+</body>
+</html>

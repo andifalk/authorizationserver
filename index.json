@@ -1,0 +1,57 @@
+[
+{
+	"uri": "https://andifalk.github.io/authorizationserver/getting-started/",
+	"title": "Getting started",
+	"tags": [],
+	"description": "",
+	"content": "Setup and operation of the authorization server is easy. Just follow the instructions in the sub sections. Installing and running of the authorization server is easy.\nInstallation    "
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/getting-started/installation/",
+	"title": "Installation",
+	"tags": [],
+	"description": "",
+	"content": "Installing the authorization server is easy. Just follow the instructions in the next sections. System Requirements To run the server you need at least a Java 11 JDK or higher (versions 11 and 14 are currently tested).\nBuild and Run the Authorization Server To build the authorization server yourself just get the latest sources from master branch in the corresponding github repository.\nTo build the server perform a gradlew build command.\nTo run the server just perform a gradlew bootrun or run the Spring Boot starter class com.example.authorizationserver.AuthorizationServerApplication via your Java IDE.\nInstall and Run the Authorization Server To install the authorization server just get the latest release from the corresponding github repository.\nTo run the server just perform a java -jar authorizationserver-x.x.x.jar (replace x.x.x with the downloaded release version).\n"
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/administration/users/",
+	"title": "Users",
+	"tags": [],
+	"description": "",
+	"content": "User Management It is planned to provide an integrated user management system via Web UI and Rest API. Currently, the Web UI only supports read-only access at localhost:8080/auth/admin.\nThe Rest API also supports creating/modifying and deleting users already.\nThe following predefined users are setup at startup time automatically:\n   Username Email Password Role     bwayne bruce.wayne@example.com wayne LIBRARY_USER   pparker peter.parker@example.com parker LIBRARY_CURATOR   ckent clark.kent@example.com kent LIBRARY_ADMIN   admin max.root@example.com admin ADMIN    "
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/administration/clients/",
+	"title": "Clients",
+	"tags": [],
+	"description": "",
+	"content": "Client Management It is planned to provide an integrated client management system via Web UI and Rest API. Currently the Web UI only supports read-only access at localhost:8080/auth/admin.\nThe Rest API also supports creating, updating and deleting clients already.\nThe following predefined clients are setup at startup time automatically:\n   Client-Id Client-Secret Confidential Grants Token-Format Redirect Uris CORS     confidential-jwt demo yes Authz Code (+/- PKCE), Client Creds JWT http://localhost:9090/demo-client/login/oauth2/code/demo *   public-jwt \u0026ndash; no Authz Code + PKCE JWT http://localhost:9090/demo-client/login/oauth2/code/demo *   confidential-opaque demo yes Authz Code (+/- PKCE), Client Creds Opaque http://localhost:9090/demo-client/login/oauth2/code/demo *   public-opaque \u0026ndash; no Authz Code + PKCE Opaque http://localhost:9090/demo-client/login/oauth2/code/demo *    "
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/administration/",
+	"title": "Administration",
+	"tags": [],
+	"description": "",
+	"content": "The authorization server can be administered via a web ui and using a Rest API.\nTo use the Rest API just consult corresponding Rest API Doc.\nUsers   Clients    "
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/",
+	"title": "Spring Boot OAuth2 &amp; OpenID Connect Authorization Server",
+	"tags": [],
+	"description": "",
+	"content": "This authorization server is implemented using Spring Boot and is compliant with OAuth 2.0 and OpenID Connect 1.0. Features   Fast Start  This authorization server is build with Spring Boot and is easy to setup and has a fast startup time.      Cloud-Native  Spring Boot based cloud-native application that can easily be deployed to the cloud (i.e. Kubernetes or CloudFoundry).      Easy Administration  Quick setup of users and OAuth2 clients with the integrated user and client management system (Web UI or Rest API).      OAuth 2.0 Compliant  Supports the following OAuth 2.0 grants:  Authorization Code + PKCE Client Credentials Resource Owner Password .      OpenID Connect 1.0 Compliant  Supports authentication with OpenID Connect:  ID Tokens (JWT) User Info Endpoint Discovery Service .      Latest Specification Support  Supports the latest specifications as defined by the IETF working group. Even includes preview implementations for draft specifications.     "
+},
+{
+	"uri": "https://andifalk.github.io/authorizationserver/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]

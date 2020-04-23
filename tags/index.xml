@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server</title>
+    <link>https://andifalk.github.io/authorizationserver/tags/</link>
+    <description>Recent content in Tags on Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://andifalk.github.io/authorizationserver/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>

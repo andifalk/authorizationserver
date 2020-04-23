@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Getting started on Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server</title>
+    <link>https://andifalk.github.io/authorizationserver/getting-started/</link>
+    <description>Recent content in Getting started on Spring Boot OAuth 2.0 &amp; OpenID Connect Authorization Server</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://andifalk.github.io/authorizationserver/getting-started/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Installation</title>
+      <link>https://andifalk.github.io/authorizationserver/getting-started/installation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://andifalk.github.io/authorizationserver/getting-started/installation/</guid>
+      <description>Installing the authorization server is easy. Just follow the instructions in the next sections. System Requirements To run the server you need at least a Java 11 JDK or higher (versions 11 and 14 are currently tested).
+Build and Run the Authorization Server To build the authorization server yourself just get the latest sources from master branch in the corresponding github repository.
+To build the server perform a gradlew build command.</description>
+    </item>
+    
+  </channel>
+</rss>

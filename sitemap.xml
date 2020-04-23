@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/getting-started/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/getting-started/installation/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/administration/users/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/administration/clients/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/administration/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andifalk.github.io/authorizationserver/tags/</loc>
+  </url>
+  
+</urlset>
