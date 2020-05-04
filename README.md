@@ -7,16 +7,16 @@ An OAuth 2.0 & OpenID Connect (OIDC) compliant authorization server just for dem
 
 ## Targets
 
-This authorization server should..
+This authorization server should...
 
 * be available for free as open-source
 * support efforts to learn OAuth2/OpenID Connect (self-study or as part of workshops)
-* be easy to setup and start (i.e. without consulting tons of documentation)
+* provide an easy way for setting up and run it (i.e. without consulting tons of documentation)
 * support latest specs and drafts for OAuth 2.x and OpenID Connect
 * be provided as docker container & support [testcontainers](https://www.testcontainers.org/)
 
 __IMPORTANT:__  
-This project is intended to be used for demos and as part of trainings/workshops.  
+The intention of this project is to be used for demos and as part of trainings/workshops.  
 It is __NOT__ ready for production use!!
 
 If you are looking for a production-grade identity access management solution please consult the 
@@ -26,6 +26,7 @@ at the [OpenID Foundation](https://openid.net/).
 ## Features (Supported)
 
 * [RFC 6749: OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html)
+* [RFC 8252: OAuth 2.0 for Native Apps](https://www.rfc-editor.org/rfc/rfc8252.html)
 * [OpenID Connect 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
 * OAuth 2.0 Grant Flows:
   * [Authorization Code Grant](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1) (+ [PKCE](https://tools.ietf.org/html/rfc7636))
@@ -48,22 +49,24 @@ at the [OpenID Foundation](https://openid.net/).
 
 ## Features (Planned)
 
+* [RFC 8628: OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html)
 * [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html)
 * [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
 * [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
-* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://tools.ietf.org/id/draft-ietf-oauth-dpop-00.html)
+* [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://datatracker.ietf.org/doc/draft-ietf-oauth-dpop/)
 * [JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://datatracker.ietf.org/doc/draft-ietf-oauth-access-token-jwt/)
 * [The OAuth 2.0 Authorization Framework: JWT Secured Authorization Request (JAR)](https://datatracker.ietf.org/doc/draft-ietf-oauth-jwsreq/)
 * [OAuth 2.0 Pushed Authorization Requests](https://datatracker.ietf.org/doc/draft-ietf-oauth-par/)
 * [OAuth 2.0 Rich Authorization Requests](https://datatracker.ietf.org/doc/draft-ietf-oauth-rar/)
 * [JWT Response for OAuth Token Introspection](https://datatracker.ietf.org/doc/draft-ietf-oauth-jwt-introspection-response/)
+* [OAuth 2.0 Incremental Authorization](https://datatracker.ietf.org/doc/draft-ietf-oauth-incremental-authz/)
 * [The OAuth 2.1 Authorization Framework](https://datatracker.ietf.org/doc/draft-parecki-oauth-v2-1/)
 
 
 ## Roadmap
 
-* April/May 2020: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
-* May/June 2020: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
+* May 2020: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
+* June/July 2020: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
 
 ## Setup and Run the Authorization Server
 
