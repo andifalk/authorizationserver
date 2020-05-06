@@ -62,7 +62,7 @@ class UserApiControllerIntegrationTest {
         MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(
                 documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
+                        .uris().withPort(9090).and().operationPreprocessors()
                     .withRequestDefaults(prettyPrint())
                     .withResponseDefaults(prettyPrint()))
             .build();
