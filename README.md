@@ -80,7 +80,7 @@ It is also planned to provide the server as pre-packaged docker container image 
 ## User Management
 
 It is planned to provide an integrated user management system via Web UI and Rest API.
-Currently, the Web UI only supports read-only access at [localhost:8080/auth/admin](http://localhost:8080/auth/admin).
+Currently, the Web UI only supports read-only access at [localhost:9090/auth/admin](http://localhost:9090/auth/admin).
 The Rest API also supports creating new users already.
 
 The following predefined users are setup at startup time automatically:
@@ -96,17 +96,17 @@ The following predefined users are setup at startup time automatically:
 ## Client Management
 
 It is planned to provide an integrated client management system via Web UI and Rest API.
-Currently the Web UI only supports read-only access at [localhost:8080/auth/admin](http://localhost:8080/auth/admin).
+Currently the Web UI only supports read-only access at [localhost:9090/auth/admin](http://localhost:9090/auth/admin).
 The Rest API also supports creating new clients already.
 
 The following predefined clients are setup at startup time automatically:
 
 | Client-Id           | Client-Secret | Confidential | Grants                              | Token-Format | Redirect Uris | CORS |
 | --------------------| --------------| ------------ | ----------------------------------- |--------------|---------------|------|
-| confidential-jwt    | demo          | yes          | Authz Code (+/- PKCE), Client Creds | JWT          | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
-| public-jwt          | --            | no           | Authz Code + PKCE                   | JWT          | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
-| confidential-opaque | demo          | yes          | Authz Code (+/- PKCE), Client Creds | Opaque       | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
-| public-opaque       | --            | no           | Authz Code + PKCE                   | Opaque       | http://localhost:9090/demo-client/login/oauth2/code/demo | * |
+| confidential-jwt    | demo          | yes          | Authz Code (+/- PKCE), Client Creds | JWT          | http://localhost:8080/demo-client/login/oauth2/code/demo | * |
+| public-jwt          | --            | no           | Authz Code + PKCE                   | JWT          | http://localhost:8080/demo-client/login/oauth2/code/demo | * |
+| confidential-opaque | demo          | yes          | Authz Code (+/- PKCE), Client Creds | Opaque       | http://localhost:8080/demo-client/login/oauth2/code/demo | * |
+| public-opaque       | --            | no           | Authz Code + PKCE                   | Opaque       | http://localhost:8080/demo-client/login/oauth2/code/demo | * |
 
 
 ## Feedback

@@ -33,9 +33,9 @@ public class DataInitializer implements CommandLineRunner {
   private final PasswordEncoder passwordEncoder;
 
   public DataInitializer(
-      UserRepository userRepository,
-      RegisteredClientRepository registeredClientRepository,
-      PasswordEncoder passwordEncoder) {
+          UserRepository userRepository,
+          RegisteredClientRepository registeredClientRepository,
+          PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.registeredClientRepository = registeredClientRepository;
     this.passwordEncoder = passwordEncoder;
@@ -56,107 +56,117 @@ public class DataInitializer implements CommandLineRunner {
 
   private void createUsers() {
     Set<User> users =
-        Stream.of(
-                new User(
-                    UUID.randomUUID(),
-                    Gender.MALE,
-                    "Bruce",
-                    "Wayne",
-                    passwordEncoder.encode("wayne"),
-                    "bruce.wayne@example.com",
-                    "bwayne",
-                    "0711-1234567",
-                    Collections.singleton("library_user"),
-                    new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
-                    LocalDateTime.now()),
-                new User(
-                    UUID.randomUUID(),
-                    Gender.MALE,
-                    "Clark",
-                    "Kent",
-                    passwordEncoder.encode("kent"),
-                    "clark.kent@example.com",
-                    "ckent",
-                    "0711-222222",
-                    Collections.singleton("library_admin"),
-                    new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
-                    LocalDateTime.now()),
-                new User(
-                    UUID.randomUUID(),
-                    Gender.MALE,
-                    "Peter",
-                    "Parker",
-                    passwordEncoder.encode("parker"),
-                    "peter.parker@example.com",
-                    "pparker",
-                    "0711-1234567",
-                    Collections.singleton("library_curator"),
-                    new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
-                    LocalDateTime.now()),
-                new User(
-                    UUID.randomUUID(),
-                    Gender.MALE,
-                    "Max",
-                    "Root",
-                    passwordEncoder.encode("admin"),
-                    "max.root@example.com",
-                    "admin",
-                    "0711-1234567",
-                    Collections.singleton("admin"),
-                    new Address(
-                        "Batmanstr.1", "70159", "Stuttgart", "Baden-Württemberg", "Germany"),
-                    LocalDateTime.now()))
-            .map(userRepository::save)
-            .collect(Collectors.toSet());
+            Stream.of(
+                    new User(
+                            UUID.randomUUID(),
+                            Gender.MALE,
+                            "Bruce",
+                            "Wayne",
+                            passwordEncoder.encode("wayne"),
+                            "bruce.wayne@example.com",
+                            "bwayne",
+                            "0711-1234567",
+                            Collections.singleton("library_user"),
+                            new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
+                            LocalDateTime.now()),
+                    new User(
+                            UUID.randomUUID(),
+                            Gender.MALE,
+                            "Clark",
+                            "Kent",
+                            passwordEncoder.encode("kent"),
+                            "clark.kent@example.com",
+                            "ckent",
+                            "0711-222222",
+                            Collections.singleton("library_admin"),
+                            new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
+                            LocalDateTime.now()),
+                    new User(
+                            UUID.randomUUID(),
+                            Gender.MALE,
+                            "Peter",
+                            "Parker",
+                            passwordEncoder.encode("parker"),
+                            "peter.parker@example.com",
+                            "pparker",
+                            "0711-1234567",
+                            Collections.singleton("library_curator"),
+                            new Address("Batmanstr.1", "70177", "Gotham", "N/A", "USA"),
+                            LocalDateTime.now()),
+                    new User(
+                            UUID.randomUUID(),
+                            Gender.MALE,
+                            "Max",
+                            "Root",
+                            passwordEncoder.encode("admin"),
+                            "max.root@example.com",
+                            "admin",
+                            "0711-1234567",
+                            Collections.singleton("admin"),
+                            new Address(
+                                    "Batmanstr.1", "70159", "Stuttgart", "Baden-Württemberg", "Germany"),
+                            LocalDateTime.now()))
+                    .map(userRepository::save)
+                    .collect(Collectors.toSet());
 
     LOG.info("Created {} users", users.size());
   }
 
   private void createClients() {
     Set<RegisteredClient> registeredClients =
-        Stream.of(
-                new RegisteredClient(
-                    UUID.randomUUID(),
-                    "confidential-jwt",
-                    passwordEncoder.encode("demo"),
-                    true,
-                    AccessTokenFormat.JWT,
-                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS, GrantType.PASSWORD, GrantType.REFRESH_TOKEN),
-                    Collections.singleton(
-                        "http://localhost:9090/demo-client/login/oauth2/code/demo"),
-                    Collections.singleton("*")),
-                new RegisteredClient(
-                    UUID.randomUUID(),
-                    "public-jwt",
-                    passwordEncoder.encode("n/a"),
-                    false,
-                    AccessTokenFormat.JWT,
-                    Set.of(GrantType.AUTHORIZATION_CODE),
-                    Collections.singleton(
-                        "http://localhost:9090/demo-client/login/oauth2/code/demo"),
-                    Collections.singleton("*")),
-                new RegisteredClient(
-                    UUID.randomUUID(),
-                    "confidential-opaque",
-                    passwordEncoder.encode("demo"),
-                    true,
-                    AccessTokenFormat.OPAQUE,
-                    Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS, GrantType.PASSWORD, GrantType.REFRESH_TOKEN),
-                    Collections.singleton(
-                        "http://localhost:9090/demo-client/login/oauth2/code/demo"),
-                    Collections.singleton("*")),
-                new RegisteredClient(
-                    UUID.randomUUID(),
-                    "public-opaque",
-                    passwordEncoder.encode("n/a"),
-                    false,
-                    AccessTokenFormat.OPAQUE,
-                    Set.of(GrantType.AUTHORIZATION_CODE),
-                    Collections.singleton(
-                        "http://localhost:9090/demo-client/login/oauth2/code/demo"),
-                    Collections.singleton("*")))
-            .map(registeredClientRepository::save)
-            .collect(Collectors.toSet());
+            Stream.of(
+                    new RegisteredClient(
+                            UUID.randomUUID(),
+                            "confidential-jwt",
+                            passwordEncoder.encode("demo"),
+                            true,
+                            AccessTokenFormat.JWT,
+                            Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS, GrantType.PASSWORD, GrantType.REFRESH_TOKEN),
+                            Collections.singleton(
+                                    "http://localhost:8080/demo-client/login/oauth2/code/demo"),
+                            Collections.singleton("*")),
+                    new RegisteredClient(
+                            UUID.randomUUID(),
+                            "public-jwt",
+                            passwordEncoder.encode("n/a"),
+                            false,
+                            AccessTokenFormat.JWT,
+                            Set.of(GrantType.AUTHORIZATION_CODE),
+                            Collections.singleton(
+                                    "http://localhost:8080/demo-client/login/oauth2/code/demo"),
+                            Collections.singleton("*")),
+                    new RegisteredClient(
+                            UUID.randomUUID(),
+                            "public-jwt-angular",
+                            passwordEncoder.encode("n/a"),
+                            false,
+                            AccessTokenFormat.JWT,
+                            Set.of(GrantType.AUTHORIZATION_CODE),
+                            Collections.singleton(
+                                    "http://localhost:4200/callback/index.html"),
+                            Collections.singleton("http://localhost:4200")),
+                    new RegisteredClient(
+                            UUID.randomUUID(),
+                            "confidential-opaque",
+                            passwordEncoder.encode("demo"),
+                            true,
+                            AccessTokenFormat.OPAQUE,
+                            Set.of(GrantType.AUTHORIZATION_CODE, GrantType.CLIENT_CREDENTIALS, GrantType.PASSWORD, GrantType.REFRESH_TOKEN),
+                            Collections.singleton(
+                                    "http://localhost:8080/demo-client/login/oauth2/code/demo"),
+                            Collections.singleton("*")),
+                    new RegisteredClient(
+                            UUID.randomUUID(),
+                            "public-opaque",
+                            passwordEncoder.encode("n/a"),
+                            false,
+                            AccessTokenFormat.OPAQUE,
+                            Set.of(GrantType.AUTHORIZATION_CODE),
+                            Collections.singleton(
+                                    "http://localhost:8080/demo-client/login/oauth2/code/demo"),
+                            Collections.singleton("*")))
+                    .map(registeredClientRepository::save)
+                    .collect(Collectors.toSet());
 
     LOG.info("Created {} clients", registeredClients.size());
   }

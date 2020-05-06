@@ -50,16 +50,16 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "confidential-jwt");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
-        .perform(
-            MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
-                .accept(MediaType.APPLICATION_JSON)
-                .queryParams(multiValueMap)
-                .with(user(new EndUserDetails(bwayne_user))))
-        .andDo(print())
-        .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrlPattern("http://localhost:9090/demo-client/login/oauth2/code/demo?code=**"));
+            .perform(
+                    MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .queryParams(multiValueMap)
+                            .with(user(new EndUserDetails(bwayne_user))))
+            .andDo(print())
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrlPattern("http://localhost:8080/demo-client/login/oauth2/code/demo?code=**"));
   }
 
   @Test
@@ -69,7 +69,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "public-jwt");
     multiValueMap.add("code_challenge", "123456789");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -78,7 +78,7 @@ class AuthorizationEndpointIntegrationTest {
                             .with(user(new EndUserDetails(bwayne_user))))
             .andDo(print())
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("http://localhost:9090/demo-client/login/oauth2/code/demo?code=**"));
+            .andExpect(redirectedUrlPattern("http://localhost:8080/demo-client/login/oauth2/code/demo?code=**"));
   }
 
   @Test
@@ -87,7 +87,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "public-jwt");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -96,7 +96,7 @@ class AuthorizationEndpointIntegrationTest {
                             .with(user(new EndUserDetails(bwayne_user))))
             .andDo(print())
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("http://localhost:9090/demo-client/login/oauth2/code/demo?error=invalid_request&error_description=code_challenge**"));
+            .andExpect(redirectedUrlPattern("http://localhost:8080/demo-client/login/oauth2/code/demo?error=invalid_request&error_description=code_challenge**"));
   }
 
   @Test
@@ -105,7 +105,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "");
     multiValueMap.add("client_id", "confidential-demo");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -124,7 +124,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "id_token");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "confidential-demo");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -142,7 +142,7 @@ class AuthorizationEndpointIntegrationTest {
     var multiValueMap = new LinkedMultiValueMap<String, String>();
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -160,7 +160,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -178,7 +178,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "confidential-jwt");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/dummy");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/dummy");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -198,7 +198,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "confidential-demo");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -216,7 +216,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "confidential-demo");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
@@ -233,7 +233,7 @@ class AuthorizationEndpointIntegrationTest {
     multiValueMap.add("response_type", "code");
     multiValueMap.add("scope", "openid");
     multiValueMap.add("client_id", "dummy");
-    multiValueMap.add("redirect_uri", "http://localhost:9090/demo-client/login/oauth2/code/demo");
+    multiValueMap.add("redirect_uri", "http://localhost:8080/demo-client/login/oauth2/code/demo");
     this.mockMvc
             .perform(
                     MockMvcRequestBuilders.get(AuthorizationEndpoint.ENDPOINT)
