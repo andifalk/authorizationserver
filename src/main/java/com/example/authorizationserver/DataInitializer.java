@@ -143,7 +143,7 @@ public class DataInitializer implements CommandLineRunner {
                             AccessTokenFormat.JWT,
                             Set.of(GrantType.AUTHORIZATION_CODE),
                             Collections.singleton(
-                                    "http://localhost:4200/callback/index.html"),
+                                    "http://localhost:4200/index.html"),
                             Collections.singleton("http://localhost:4200")),
                     new RegisteredClient(
                             UUID.randomUUID(),

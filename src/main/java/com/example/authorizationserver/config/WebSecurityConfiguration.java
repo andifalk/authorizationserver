@@ -4,6 +4,7 @@ import com.example.authorizationserver.security.client.RegisteredClientDetailsSe
 import com.example.authorizationserver.security.user.EndUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -11,14 +12,30 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static org.springframework.http.HttpMethod.GET;
+import java.util.Collections;
+
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class WebSecurityConfiguration {
+
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Collections.singletonList("*"));
+    configuration.setAllowedMethods(Collections.singletonList("*"));
+    configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(Collections.singletonList("*"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
   @Configuration
   @Order(101)
@@ -45,16 +62,17 @@ public class WebSecurityConfiguration {
                       "/revoke",
                       "/userinfo",
                       "/.well-known/openid-configuration",
-                      "/jwks"))
-          .authorizeRequests(
-              a -> {
-                a.mvcMatchers(POST, "/introspect").hasRole("CLIENT");
-                a.mvcMatchers(POST, "/revoke").hasRole("CLIENT");
-                a.mvcMatchers(POST, "/token").hasRole("CLIENT");
-                a.anyRequest().denyAll();
-              })
-          .httpBasic(withDefaults())
-          .userDetailsService(this.registeredClientDetailsService)
+                          "/jwks"))
+              .authorizeRequests(
+                      a -> {
+                        a.mvcMatchers(POST, "/introspect").hasRole("CLIENT");
+                        a.mvcMatchers(POST, "/revoke").hasRole("CLIENT");
+                        a.mvcMatchers(POST, "/token").hasRole("CLIENT");
+                        a.anyRequest().denyAll();
+                      })
+              .httpBasic(withDefaults())
+              .userDetailsService(this.registeredClientDetailsService)
+              .cors(withDefaults())
           .csrf()
           .disable();
     }
@@ -74,14 +92,15 @@ public class WebSecurityConfiguration {
 
     protected void configure(HttpSecurity http) throws Exception {
       http.requestMatchers(r -> r.mvcMatchers("/api/*"))
-          .authorizeRequests(
-              a -> {
-                a.mvcMatchers("/api/*").hasRole("ADMIN");
-                a.anyRequest().denyAll();
-              })
-          .httpBasic(withDefaults())
-          .formLogin(withDefaults())
-          .userDetailsService(this.endUserDetailsService)
+              .authorizeRequests(
+                      a -> {
+                        a.mvcMatchers("/api/*").hasRole("ADMIN");
+                        a.anyRequest().denyAll();
+                      })
+              .httpBasic(withDefaults())
+              .formLogin(withDefaults())
+              .userDetailsService(this.endUserDetailsService)
+              .cors(withDefaults())
           .csrf()
           .disable();
     }
@@ -102,6 +121,7 @@ public class WebSecurityConfiguration {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
       http.authorizeRequests(authorize -> authorize.anyRequest().authenticated())
+              .cors(withDefaults())
           .formLogin(withDefaults())
           .userDetailsService(this.endUserDetailsService)
           .headers().contentSecurityPolicy(

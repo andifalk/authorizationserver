@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 @RequestMapping(TokenEndpoint.ENDPOINT)
 @RestController
 public class TokenEndpoint {
@@ -29,10 +31,10 @@ public class TokenEndpoint {
   private final AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService;
 
   public TokenEndpoint(
-      ClientCredentialsTokenEndpointService clientCredentialsTokenEndpointService,
-      PasswordTokenEndpointService passwordTokenEndpointService,
-      RefreshTokenEndpointService refreshTokenEndpointService,
-      AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService) {
+          ClientCredentialsTokenEndpointService clientCredentialsTokenEndpointService,
+          PasswordTokenEndpointService passwordTokenEndpointService,
+          RefreshTokenEndpointService refreshTokenEndpointService,
+          AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService) {
     this.clientCredentialsTokenEndpointService = clientCredentialsTokenEndpointService;
     this.passwordTokenEndpointService = passwordTokenEndpointService;
     this.refreshTokenEndpointService = refreshTokenEndpointService;
@@ -41,25 +43,25 @@ public class TokenEndpoint {
 
   @PostMapping
   public ResponseEntity<TokenResponse> getToken(
-      @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
-      @ModelAttribute("token_request") TokenRequest tokenRequest) {
+          @RequestHeader(name = "Authorization", required = false) String authorizationHeader,
+          @ModelAttribute("token_request") TokenRequest tokenRequest) {
 
     LOG.debug("Exchange token with grant type [{}]", tokenRequest.getGrant_type());
 
     if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.CLIENT_CREDENTIALS.getGrant())) {
       return clientCredentialsTokenEndpointService.getTokenResponseForClientCredentials(
-          authorizationHeader, tokenRequest);
+              authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.PASSWORD.getGrant())) {
       return passwordTokenEndpointService.getTokenResponseForPassword(
-          authorizationHeader, tokenRequest);
+              authorizationHeader, tokenRequest);
     } else if (tokenRequest
-        .getGrant_type()
-        .equalsIgnoreCase(GrantType.AUTHORIZATION_CODE.getGrant())) {
+            .getGrant_type()
+            .equalsIgnoreCase(GrantType.AUTHORIZATION_CODE.getGrant())) {
       return authorizationCodeTokenEndpointService.getTokenResponseForAuthorizationCode(
-          authorizationHeader, tokenRequest);
+              authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.REFRESH_TOKEN.getGrant())) {
       return refreshTokenEndpointService.getTokenResponseForRefreshToken(
-          authorizationHeader, tokenRequest);
+              authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.TOKEN_EXCHANGE.getGrant())) {
       LOG.warn("Requested grant type for 'Token Exchange' is not yet supported");
       return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));
