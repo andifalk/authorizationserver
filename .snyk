@@ -1,0 +1,6 @@
+version: v1.5.0
+ignore:
+  'SNYK-JAVA-COMH2DATABASE-31685':
+    - 'in com.h2database:h2':
+        reason: 'No newer version of H2 available'
+        expires: '2020-05-25T01:00:00.000Z'
