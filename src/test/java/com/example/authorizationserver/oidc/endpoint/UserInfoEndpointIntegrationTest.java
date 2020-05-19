@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Optional;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -26,9 +27,12 @@ import static org.hamcrest.Matchers.not;
 @WebIntegrationTest
 class UserInfoEndpointIntegrationTest {
 
-  @Autowired private TokenService tokenService;
-  @Autowired private UserService userService;
-  @Autowired private WebApplicationContext webApplicationContext;
+  @Autowired
+  private TokenService tokenService;
+  @Autowired
+  private UserService userService;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
   private User bwayne_user;
 
   @BeforeEach
@@ -42,20 +46,20 @@ class UserInfoEndpointIntegrationTest {
   void userInfoWithJwtToken() throws JOSEException {
     JsonWebToken jsonWebToken =
             tokenService.createPersonalizedJwtAccessToken(
-                    bwayne_user, "confidential-demo", "nonce", Duration.ofMinutes(5));
+                    bwayne_user, "confidential-demo", "nonce", Collections.singleton("OPENID"), Duration.ofMinutes(5));
     UserInfo userInfo =
-        given()
-            .header("Authorization", "Bearer " + jsonWebToken.getValue())
-            .when()
-            .get("/userinfo")
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(UserInfo.class);
+            given()
+                    .header("Authorization", "Bearer " + jsonWebToken.getValue())
+                    .when()
+                    .get("/userinfo")
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(UserInfo.class);
     assertThat(userInfo).isNotNull();
     assertThat(userInfo.getName()).isEqualTo("bwayne");
   }
@@ -65,21 +69,21 @@ class UserInfoEndpointIntegrationTest {
 
     OpaqueToken opaqueToken =
             tokenService.createPersonalizedOpaqueAccessToken(
-                    bwayne_user, "confidential-demo", Duration.ofMinutes(5));
+                    bwayne_user, "confidential-demo", Collections.singleton("OPENID"), Duration.ofMinutes(5));
 
     UserInfo userInfo =
-        given()
-            .header("Authorization", "Bearer " + opaqueToken.getValue())
-            .when()
-            .get("/userinfo")
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(UserInfo.class);
+            given()
+                    .header("Authorization", "Bearer " + opaqueToken.getValue())
+                    .when()
+                    .get("/userinfo")
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(UserInfo.class);
     assertThat(userInfo).isNotNull();
     assertThat(userInfo.getName()).isEqualTo("bwayne");
   }

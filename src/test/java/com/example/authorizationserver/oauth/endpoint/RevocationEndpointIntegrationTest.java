@@ -1,10 +1,7 @@
 package com.example.authorizationserver.oauth.endpoint;
 
 import com.example.authorizationserver.annotation.WebIntegrationTest;
-import com.example.authorizationserver.oauth.endpoint.introspection.IntrospectionEndpoint;
-import com.example.authorizationserver.oauth.endpoint.introspection.resource.IntrospectionResponse;
 import com.example.authorizationserver.oauth.endpoint.revocation.resource.RevocationResponse;
-import com.example.authorizationserver.oidc.common.Scope;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
@@ -20,8 +17,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.example.authorizationserver.oauth.endpoint.revocation.RevocationEndpoint.ENDPOINT;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -34,8 +31,10 @@ class RevocationEndpointIntegrationTest {
 
   @Autowired
   private TokenService tokenService;
-  @Autowired private UserService userService;
-  @Autowired private WebApplicationContext webApplicationContext;
+  @Autowired
+  private UserService userService;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
   private User bwayne_user;
 
   @BeforeEach
@@ -49,7 +48,7 @@ class RevocationEndpointIntegrationTest {
   void revocationForPersonalJwtToken() {
     JsonWebToken jsonWebToken =
             tokenService.createPersonalizedJwtAccessToken(
-                    bwayne_user, "confidential-jwt", "nonce", Duration.ofMinutes(5));
+                    bwayne_user, "confidential-jwt", "nonce", Set.of("OPENID"), Duration.ofMinutes(5));
     RevocationResponse revocationResponse =
             given()
                     .header(
@@ -77,7 +76,7 @@ class RevocationEndpointIntegrationTest {
   @Test
   void revocationForAnonymousJwtToken() {
     JsonWebToken jsonWebToken =
-            tokenService.createAnonymousJwtAccessToken("confidential-jwt", Duration.ofMinutes(5));
+            tokenService.createAnonymousJwtAccessToken("confidential-jwt", Set.of("OPENID"), Duration.ofMinutes(5));
     RevocationResponse revocationResponse =
             given()
                     .header(
@@ -106,7 +105,7 @@ class RevocationEndpointIntegrationTest {
   void revocationForPersonalIdToken() {
     JsonWebToken jsonWebToken =
             tokenService.createIdToken(
-                    bwayne_user, "confidential-jwt", "nonce", List.of(Scope.OPENID.name()), Duration.ofMinutes(5));
+                    bwayne_user, "confidential-jwt", "nonce", Set.of("OPENID"), Duration.ofMinutes(5));
     RevocationResponse revocationResponse =
             given()
                     .header(
@@ -137,7 +136,7 @@ class RevocationEndpointIntegrationTest {
 
     OpaqueToken opaqueToken =
             tokenService.createPersonalizedOpaqueAccessToken(
-                    bwayne_user, "confidential-opaque", Duration.ofMinutes(5));
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     RevocationResponse revocationResponse =
             given()
@@ -168,7 +167,7 @@ class RevocationEndpointIntegrationTest {
   void revocationForAnonymousOpaqueToken() {
 
     OpaqueToken opaqueToken =
-            tokenService.createAnonymousOpaqueAccessToken("confidential-opaque", Duration.ofMinutes(5));
+            tokenService.createAnonymousOpaqueAccessToken("confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     RevocationResponse revocationResponse =
             given()
@@ -199,7 +198,7 @@ class RevocationEndpointIntegrationTest {
   void revocationForAnonymousOpaqueTokenWithoutAuth() {
 
     OpaqueToken opaqueToken =
-            tokenService.createAnonymousOpaqueAccessToken("confidential-opaque", Duration.ofMinutes(5));
+            tokenService.createAnonymousOpaqueAccessToken("confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     RevocationResponse revocationResponse =
             given()
@@ -225,7 +224,7 @@ class RevocationEndpointIntegrationTest {
 
     RevocationResponse revocationResponse =
             given()
-                    .header("Authorization","Basic invalid:invalid")
+                    .header("Authorization", "Basic invalid:invalid")
                     .contentType(ContentType.URLENC)
                     .formParam("token", "test")
                     .when()
@@ -274,7 +273,7 @@ class RevocationEndpointIntegrationTest {
 
     OpaqueToken opaqueToken =
             tokenService.createPersonalizedOpaqueAccessToken(
-                    bwayne_user, "confidential-opaque", Duration.ofMinutes(5));
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     RevocationResponse revocationResponse =
             given()
@@ -306,7 +305,7 @@ class RevocationEndpointIntegrationTest {
 
     OpaqueToken opaqueToken =
             tokenService.createPersonalizedOpaqueAccessToken(
-                    bwayne_user, "confidential-opaque", Duration.ofMillis(1));
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMillis(1));
 
     Thread.sleep(5);
 
@@ -340,7 +339,7 @@ class RevocationEndpointIntegrationTest {
 
     OpaqueToken opaqueToken =
             tokenService.createPersonalizedOpaqueAccessToken(
-                    bwayne_user, "confidential-opaque", Duration.ofMillis(1));
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMillis(1));
 
     RevocationResponse revocationResponse =
             given()

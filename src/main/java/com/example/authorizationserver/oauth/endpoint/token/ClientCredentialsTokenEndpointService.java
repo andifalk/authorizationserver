@@ -9,6 +9,7 @@ import com.example.authorizationserver.oauth.endpoint.token.resource.TokenReques
 import com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse;
 import com.example.authorizationserver.security.client.RegisteredClientAuthenticationService;
 import com.example.authorizationserver.token.store.TokenService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse.BEARER_TOKEN_TYPE;
 
@@ -82,23 +86,28 @@ public class ClientCredentialsTokenEndpointService {
 
     if (registeredClient.getGrantTypes().contains(GrantType.CLIENT_CREDENTIALS)) {
 
+      Set<String> scopes = new HashSet<>();
+      if (StringUtils.isNotBlank(tokenRequest.getScope())) {
+        scopes = new HashSet<>(Arrays.asList(tokenRequest.getScope().split(" ")));
+      }
+
       LOG.info(
-          "Creating token response for client credentials for client [{}]",
-          tokenRequest.getClient_id());
+              "Creating token response for client credentials for client [{}]",
+              tokenRequest.getClient_id());
       return ResponseEntity.ok(
-          new TokenResponse(
-              AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
-                  ? tokenService
-                      .createAnonymousJwtAccessToken(
-                          clientCredentials.getClientId(), accessTokenLifetime)
+              new TokenResponse(
+                      AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                              ? tokenService
+                              .createAnonymousJwtAccessToken(
+                                      clientCredentials.getClientId(), scopes, accessTokenLifetime)
                       .getValue()
                   : tokenService
                       .createAnonymousOpaqueAccessToken(
-                          clientCredentials.getClientId(), accessTokenLifetime)
+                              clientCredentials.getClientId(), scopes, accessTokenLifetime)
                       .getValue(),
               tokenService
                   .createAnonymousRefreshToken(
-                      clientCredentials.getClientId(), refreshTokenLifetime)
+                          clientCredentials.getClientId(), scopes, refreshTokenLifetime)
                   .getValue(),
               accessTokenLifetime.toSeconds(),
               null,

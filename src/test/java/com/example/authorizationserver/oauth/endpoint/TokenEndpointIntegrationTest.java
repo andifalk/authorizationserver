@@ -25,8 +25,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.example.authorizationserver.oauth.endpoint.token.TokenEndpoint.ENDPOINT;
 import static com.example.authorizationserver.oauth.pkce.ProofKeyForCodeExchangeVerifier.CHALLENGE_METHOD_S_256;
@@ -63,13 +63,13 @@ class TokenEndpointIntegrationTest {
 
     AuthorizationCode authorizationCode =
         authorizationCodeService.createAndStoreAuthorizationState(
-            "confidential-jwt",
-            RegisteredClient.DEFAULT_REDIRECT_URI,
-            List.of("openid", "profile"),
-            bwayne_user.getIdentifier().toString(),
-            "1234",
-            null,
-            null);
+                "confidential-jwt",
+                RegisteredClient.DEFAULT_REDIRECT_URI,
+                Set.of("openid", "profile"),
+                bwayne_user.getIdentifier().toString(),
+                "1234",
+                null,
+                null);
 
     TokenResponse tokenResponse =
         given()
@@ -117,7 +117,7 @@ class TokenEndpointIntegrationTest {
             authorizationCodeService.createAndStoreAuthorizationState(
                     "confidential-jwt",
                     RegisteredClient.DEFAULT_REDIRECT_URI,
-                    List.of("profile"),
+                    Set.of("profile"),
                     bwayne_user.getIdentifier().toString(),
                     "1234",
                     null,
@@ -172,7 +172,7 @@ class TokenEndpointIntegrationTest {
             authorizationCodeService.createAndStoreAuthorizationState(
                     "public-jwt",
                     RegisteredClient.DEFAULT_REDIRECT_URI,
-                    List.of("openid", "profile"),
+                    Set.of("openid", "profile"),
                     bwayne_user.getIdentifier().toString(),
                     "1234",
                     codeChallenge,
@@ -303,7 +303,7 @@ class TokenEndpointIntegrationTest {
   void getTokenForAnonymousRefreshTokenGrantSuccess() {
 
     OpaqueToken refreshToken =
-        tokenService.createAnonymousRefreshToken("confidential-jwt", Duration.ofMinutes(5));
+            tokenService.createAnonymousRefreshToken("confidential-jwt", Set.of("OPENID"), Duration.ofMinutes(5));
 
     TokenResponse tokenResponse =
         given()
@@ -350,8 +350,8 @@ class TokenEndpointIntegrationTest {
   void getTokenForPersonalizedRefreshTokenGrantSuccess() {
 
     OpaqueToken refreshToken =
-        tokenService.createPersonalizedRefreshToken(
-            "confidential-jwt", bwayne_user, Duration.ofMinutes(5));
+            tokenService.createPersonalizedRefreshToken(
+                    "confidential-jwt", bwayne_user, Set.of("OPENID"), Duration.ofMinutes(5));
 
     TokenResponse tokenResponse =
         given()

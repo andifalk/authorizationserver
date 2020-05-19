@@ -11,6 +11,7 @@ import com.example.authorizationserver.security.client.RegisteredClientAuthentic
 import com.example.authorizationserver.security.user.UserAuthenticationService;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.user.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse.BEARER_TOKEN_TYPE;
 
@@ -87,8 +91,8 @@ public class PasswordTokenEndpointService {
       User authenticatedUser;
       try {
         authenticatedUser =
-            userAuthenticationService.authenticate(
-                tokenRequest.getUsername(), tokenRequest.getPassword());
+                userAuthenticationService.authenticate(
+                        tokenRequest.getUsername(), tokenRequest.getPassword());
       } catch (AuthenticationException ex) {
         return TokenEndpointHelper.reportUnauthorizedClientError();
       }
@@ -96,27 +100,33 @@ public class PasswordTokenEndpointService {
       Duration accessTokenLifetime = authorizationServerProperties.getAccessToken().getLifetime();
       Duration refreshTokenLifetime = authorizationServerProperties.getRefreshToken().getLifetime();
 
+      Set<String> scopes = new HashSet<>();
+      if (StringUtils.isNotBlank(tokenRequest.getScope())) {
+        scopes = new HashSet<>(Arrays.asList(tokenRequest.getScope().split(" ")));
+      }
+
       LOG.info(
-          "Creating token response for client credentials for client [{}]",
-          clientCredentials.getClientId());
+              "Creating token response for client credentials for client [{}]",
+              clientCredentials.getClientId());
 
       return ResponseEntity.ok(
-          new TokenResponse(
-              AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
-                  ? tokenService
-                      .createPersonalizedJwtAccessToken(
-                          authenticatedUser,
-                          clientCredentials.getClientId(),
-                          null,
-                          accessTokenLifetime)
+              new TokenResponse(
+                      AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
+                              ? tokenService
+                              .createPersonalizedJwtAccessToken(
+                                      authenticatedUser,
+                                      clientCredentials.getClientId(),
+                                      null,
+                                      scopes,
+                                      accessTokenLifetime)
                       .getValue()
                   : tokenService
                       .createPersonalizedOpaqueAccessToken(
-                          authenticatedUser, clientCredentials.getClientId(), accessTokenLifetime)
+                              authenticatedUser, clientCredentials.getClientId(), scopes, accessTokenLifetime)
                       .getValue(),
               tokenService
                   .createPersonalizedRefreshToken(
-                      clientCredentials.getClientId(), authenticatedUser, refreshTokenLifetime)
+                          clientCredentials.getClientId(), authenticatedUser, scopes, refreshTokenLifetime)
                   .getValue(),
               accessTokenLifetime.toSeconds(),
               null,

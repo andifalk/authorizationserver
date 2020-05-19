@@ -12,6 +12,7 @@ import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
 import com.example.authorizationserver.user.model.User;
 import com.example.authorizationserver.user.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.example.authorizationserver.oauth.endpoint.token.resource.TokenResponse.BEARER_TOKEN_TYPE;
@@ -88,27 +92,33 @@ public class RefreshTokenEndpointService {
       OpaqueToken opaqueWebToken = tokenService.findOpaqueToken(tokenRequest.getRefresh_token());
       if (opaqueWebToken != null && opaqueWebToken.isRefreshToken()) {
         opaqueWebToken.validate();
+
+        Set<String> scopes = new HashSet<>();
+        if (StringUtils.isNotBlank(tokenRequest.getScope())) {
+          scopes = new HashSet<>(Arrays.asList(tokenRequest.getScope().split(" ")));
+        }
+
         String subject = opaqueWebToken.getSubject();
         if (TokenService.ANONYMOUS_TOKEN.equals(subject)) {
 
           LOG.info(
-              "Creating anonymous token response for refresh token with client [{}]",
-              tokenRequest.getClient_id());
+                  "Creating anonymous token response for refresh token with client [{}]",
+                  tokenRequest.getClient_id());
 
           return ResponseEntity.ok(
-              new TokenResponse(
+                  new TokenResponse(
                   AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
                       ? tokenService
                           .createAnonymousJwtAccessToken(
-                              clientCredentials.getClientId(), accessTokenLifetime)
+                                  clientCredentials.getClientId(), scopes, accessTokenLifetime)
                           .getValue()
                       : tokenService
                           .createAnonymousOpaqueAccessToken(
-                              clientCredentials.getClientId(), accessTokenLifetime)
+                                  clientCredentials.getClientId(), scopes, accessTokenLifetime)
                           .getValue(),
                   tokenService
                       .createAnonymousRefreshToken(
-                          clientCredentials.getClientId(), refreshTokenLifetime)
+                              clientCredentials.getClientId(), scopes, refreshTokenLifetime)
                       .getValue(),
                   accessTokenLifetime.toSeconds(),
                   null,
@@ -127,22 +137,25 @@ public class RefreshTokenEndpointService {
                     AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
                         ? tokenService
                             .createPersonalizedJwtAccessToken(
-                                authenticatedUser.get(),
-                                clientCredentials.getClientId(),
-                                null,
-                                accessTokenLifetime)
+                                    authenticatedUser.get(),
+                                    clientCredentials.getClientId(),
+                                    null,
+                                    scopes,
+                                    accessTokenLifetime)
                             .getValue()
                         : tokenService
                             .createPersonalizedOpaqueAccessToken(
-                                authenticatedUser.get(),
-                                clientCredentials.getClientId(),
-                                accessTokenLifetime)
+                                    authenticatedUser.get(),
+                                    clientCredentials.getClientId(),
+                                    scopes,
+                                    accessTokenLifetime)
                             .getValue(),
                     tokenService
                         .createPersonalizedRefreshToken(
-                            clientCredentials.getClientId(),
-                            authenticatedUser.get(),
-                            refreshTokenLifetime)
+                                clientCredentials.getClientId(),
+                                authenticatedUser.get(),
+                                scopes,
+                                refreshTokenLifetime)
                         .getValue(),
                     accessTokenLifetime.toSeconds(),
                     null,

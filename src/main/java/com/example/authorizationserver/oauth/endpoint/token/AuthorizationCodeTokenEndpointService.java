@@ -33,7 +33,7 @@ import static com.example.authorizationserver.oauth.endpoint.token.resource.Toke
 @Service
 public class AuthorizationCodeTokenEndpointService {
   private static final Logger LOG =
-      LoggerFactory.getLogger(AuthorizationCodeTokenEndpointService.class);
+          LoggerFactory.getLogger(AuthorizationCodeTokenEndpointService.class);
 
   private final RegisteredClientService registeredClientService;
   private final AuthorizationCodeService authorizationCodeService;
@@ -44,13 +44,13 @@ public class AuthorizationCodeTokenEndpointService {
   private final RegisteredClientAuthenticationService registeredClientAuthenticationService;
 
   public AuthorizationCodeTokenEndpointService(
-      TokenService tokenService,
-      RegisteredClientService registeredClientService,
-      AuthorizationCodeService authorizationCodeService,
-      UserService userService,
-      ProofKeyForCodeExchangeVerifier proofKeyForCodeExchangeVerifier,
-      AuthorizationServerConfigurationProperties authorizationServerProperties,
-      RegisteredClientAuthenticationService registeredClientAuthenticationService) {
+          TokenService tokenService,
+          RegisteredClientService registeredClientService,
+          AuthorizationCodeService authorizationCodeService,
+          UserService userService,
+          ProofKeyForCodeExchangeVerifier proofKeyForCodeExchangeVerifier,
+          AuthorizationServerConfigurationProperties authorizationServerProperties,
+          RegisteredClientAuthenticationService registeredClientAuthenticationService) {
     this.tokenService = tokenService;
     this.registeredClientService = registeredClientService;
     this.authorizationCodeService = authorizationCodeService;
@@ -92,12 +92,12 @@ public class AuthorizationCodeTokenEndpointService {
     client MUST authenticate with the authorization server.
   */
   public ResponseEntity<TokenResponse> getTokenResponseForAuthorizationCode(
-      String authorizationHeader, TokenRequest tokenRequest) {
+          String authorizationHeader, TokenRequest tokenRequest) {
 
     LOG.debug("Exchange token for 'authorization code' with [{}]", tokenRequest);
 
     ClientCredentials clientCredentials =
-        TokenEndpointHelper.retrieveClientCredentials(authorizationHeader, tokenRequest);
+            TokenEndpointHelper.retrieveClientCredentials(authorizationHeader, tokenRequest);
 
     if (clientCredentials == null) {
       return TokenEndpointHelper.reportInvalidClientError();
@@ -118,141 +118,142 @@ public class AuthorizationCodeTokenEndpointService {
 
     if (!clientCredentials.getClientId().equals(authorizationCode.getClientId())) {
       LOG.warn(
-          "Client id mismatch for authorization code, [{}] does not match [{}]",
-          authorizationCode.getClientId(),
-          clientCredentials.getClientId());
+              "Client id mismatch for authorization code, [{}] does not match [{}]",
+              authorizationCode.getClientId(),
+              clientCredentials.getClientId());
       return TokenEndpointHelper.reportInvalidClientError();
     }
 
     return registeredClientService
-        .findOneByClientId(clientCredentials.getClientId())
-        .map(
-            registeredClient -> {
-              if (!registeredClient.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE)) {
-                return TokenEndpointHelper.reportInvalidGrantError();
-              }
+            .findOneByClientId(clientCredentials.getClientId())
+            .map(
+                    registeredClient -> {
+                      if (!registeredClient.getGrantTypes().contains(GrantType.AUTHORIZATION_CODE)) {
+                        return TokenEndpointHelper.reportInvalidGrantError();
+                      }
 
-              if (StringUtils.isNotBlank(authorizationCode.getCode_challenge())) {
-                if (StringUtils.isBlank(tokenRequest.getCode_verifier())) {
-                  LOG.warn("Code verifier is required for code challenge");
-                  return TokenEndpointHelper.reportInvalidClientError();
-                }
-                try {
-                  proofKeyForCodeExchangeVerifier.verifyCodeChallenge(
-                      authorizationCode.getCode_challenge_method(),
-                      tokenRequest.getCode_verifier(),
-                      authorizationCode.getCode_challenge());
-                } catch (CodeChallengeError ex) {
-                  LOG.warn("PKCE challenge verification failed", ex);
-                  return TokenEndpointHelper.reportUnauthorizedClientError();
-                }
-              } else {
-                // Public clients require PKCE
-                if (!registeredClient.isConfidential()
-                    && StringUtils.isBlank(authorizationCode.getCode_challenge())) {
-                  LOG.warn(
-                      "PKCE with code challenge is required for public client [{}]",
-                      registeredClient.getClientId());
-                  return TokenEndpointHelper.reportInvalidClientError();
-                }
+                      if (StringUtils.isNotBlank(authorizationCode.getCode_challenge())) {
+                        if (StringUtils.isBlank(tokenRequest.getCode_verifier())) {
+                          LOG.warn("Code verifier is required for code challenge");
+                          return TokenEndpointHelper.reportInvalidClientError();
+                        }
+                        try {
+                          proofKeyForCodeExchangeVerifier.verifyCodeChallenge(
+                                  authorizationCode.getCode_challenge_method(),
+                                  tokenRequest.getCode_verifier(),
+                                  authorizationCode.getCode_challenge());
+                        } catch (CodeChallengeError ex) {
+                          LOG.warn("PKCE challenge verification failed", ex);
+                          return TokenEndpointHelper.reportUnauthorizedClientError();
+                        }
+                      } else {
+                        // Public clients require PKCE
+                        if (!registeredClient.isConfidential()
+                                && StringUtils.isBlank(authorizationCode.getCode_challenge())) {
+                          LOG.warn(
+                                  "PKCE with code challenge is required for public client [{}]",
+                                  registeredClient.getClientId());
+                          return TokenEndpointHelper.reportInvalidClientError();
+                        }
 
-                // Confidential clients must present the client secret if PKCE is not used
-                try {
-                  registeredClientAuthenticationService.authenticate(
-                      clientCredentials.getClientId(), clientCredentials.getClientSecret());
-                } catch (AuthenticationException ex) {
-                  return TokenEndpointHelper.reportInvalidClientError();
-                }
-              }
+                        // Confidential clients must present the client secret if PKCE is not used
+                        try {
+                          registeredClientAuthenticationService.authenticate(
+                                  clientCredentials.getClientId(), clientCredentials.getClientSecret());
+                        } catch (AuthenticationException ex) {
+                          return TokenEndpointHelper.reportInvalidClientError();
+                        }
+                      }
 
-              return userService
-                  .findOneByIdentifier(UUID.fromString(authorizationCode.getSubject()))
-                  .map(
-                      user -> {
-                        LOG.info(
-                            "Creating token response for user {}, client id {} and scopes {}",
-                            user.getUsername(),
-                            authorizationCode.getClientId(),
-                            authorizationCode.getScopes());
+                      return userService
+                              .findOneByIdentifier(UUID.fromString(authorizationCode.getSubject()))
+                              .map(
+                                      user -> {
+                                        LOG.info(
+                                                "Creating token response for user {}, client id {} and scopes {}",
+                                                user.getUsername(),
+                                                authorizationCode.getClientId(),
+                                                authorizationCode.getScopes());
 
-                        Duration accessTokenLifetime =
-                            authorizationServerProperties.getAccessToken().getLifetime();
-                        Duration refreshTokenLifetime =
-                            authorizationServerProperties.getRefreshToken().getLifetime();
-                        Duration idTokenLifetime =
-                            authorizationServerProperties.getIdToken().getLifetime();
+                                        Duration accessTokenLifetime =
+                                                authorizationServerProperties.getAccessToken().getLifetime();
+                                        Duration refreshTokenLifetime =
+                                                authorizationServerProperties.getRefreshToken().getLifetime();
+                                        Duration idTokenLifetime =
+                                                authorizationServerProperties.getIdToken().getLifetime();
 
-                        authorizationCodeService.removeCode(authorizationCode.getCode());
+                                        authorizationCodeService.removeCode(authorizationCode.getCode());
 
-                        return ResponseEntity.ok(
-                            createTokenResponse(
-                                authorizationCode,
-                                registeredClient,
-                                user,
-                                accessTokenLifetime,
-                                refreshTokenLifetime,
-                                idTokenLifetime));
-                      })
-                  .orElse(TokenEndpointHelper.reportInvalidGrantError());
-            })
-        .orElse(TokenEndpointHelper.reportInvalidGrantError());
+                                        return ResponseEntity.ok(
+                                                createTokenResponse(
+                                                        authorizationCode,
+                                                        registeredClient,
+                                                        user,
+                                                        accessTokenLifetime,
+                                                        refreshTokenLifetime,
+                                                        idTokenLifetime));
+                                      })
+                              .orElse(TokenEndpointHelper.reportInvalidGrantError());
+                    })
+            .orElse(TokenEndpointHelper.reportInvalidGrantError());
   }
 
   private TokenResponse createTokenResponse(
-      AuthorizationCode authorizationCode,
-      RegisteredClient registeredClient,
-      User user,
-      Duration accessTokenLifetime,
-      Duration refreshTokenLifetime,
-      Duration idTokenLifetime) {
+          AuthorizationCode authorizationCode,
+          RegisteredClient registeredClient,
+          User user,
+          Duration accessTokenLifetime,
+          Duration refreshTokenLifetime,
+          Duration idTokenLifetime) {
     return new TokenResponse(
-        createAccessToken(authorizationCode, registeredClient, user, accessTokenLifetime),
-        createRefreshToken(authorizationCode, user, refreshTokenLifetime),
-        accessTokenLifetime.toSeconds(),
-        createIdToken(authorizationCode, user, idTokenLifetime),
-        BEARER_TOKEN_TYPE);
+            createAccessToken(authorizationCode, registeredClient, user, accessTokenLifetime),
+            createRefreshToken(authorizationCode, user, refreshTokenLifetime),
+            accessTokenLifetime.toSeconds(),
+            createIdToken(authorizationCode, user, idTokenLifetime),
+            BEARER_TOKEN_TYPE);
   }
 
   private String createIdToken(
-      AuthorizationCode authorizationCode, User user, Duration idTokenLifetime) {
+          AuthorizationCode authorizationCode, User user, Duration idTokenLifetime) {
     return authorizationCode.getScopes().stream()
             .map(String::toUpperCase)
             .collect(Collectors.toList())
             .contains(Scope.OPENID.name())
-        ? tokenService
+            ? tokenService
             .createIdToken(
-                user,
-                authorizationCode.getClientId(),
-                authorizationCode.getNonce(),
-                authorizationCode.getScopes(),
-                idTokenLifetime)
+                    user,
+                    authorizationCode.getClientId(),
+                    authorizationCode.getNonce(),
+                    authorizationCode.getScopes(),
+                    idTokenLifetime)
             .getValue()
-        : null;
+            : null;
   }
 
   private String createRefreshToken(
-      AuthorizationCode authorizationCode, User user, Duration refreshTokenLifetime) {
+          AuthorizationCode authorizationCode, User user, Duration refreshTokenLifetime) {
     return tokenService
-        .createPersonalizedRefreshToken(authorizationCode.getClientId(), user, refreshTokenLifetime)
-        .getValue();
+            .createPersonalizedRefreshToken(authorizationCode.getClientId(), user, authorizationCode.getScopes(), refreshTokenLifetime)
+            .getValue();
   }
 
   private String createAccessToken(
-      AuthorizationCode authorizationCode,
-      RegisteredClient registeredClient,
-      User user,
-      Duration accessTokenLifetime) {
+          AuthorizationCode authorizationCode,
+          RegisteredClient registeredClient,
+          User user,
+          Duration accessTokenLifetime) {
     return AccessTokenFormat.JWT.equals(registeredClient.getAccessTokenFormat())
-        ? tokenService
+            ? tokenService
             .createPersonalizedJwtAccessToken(
-                user,
-                authorizationCode.getClientId(),
-                authorizationCode.getNonce(),
-                accessTokenLifetime)
+                    user,
+                    authorizationCode.getClientId(),
+                    authorizationCode.getNonce(),
+                    authorizationCode.getScopes(),
+                    accessTokenLifetime)
             .getValue()
-        : tokenService
+            : tokenService
             .createPersonalizedOpaqueAccessToken(
-                user, authorizationCode.getClientId(), accessTokenLifetime)
+                    user, authorizationCode.getClientId(), authorizationCode.getScopes(), accessTokenLifetime)
             .getValue();
   }
 }

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.example.authorizationserver.oauth.endpoint.introspection.IntrospectionEndpoint.ENDPOINT;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -28,9 +29,12 @@ import static org.hamcrest.Matchers.not;
 @WebIntegrationTest
 class IntrospectionEndpointIntegrationTest {
 
-  @Autowired private TokenService tokenService;
-  @Autowired private UserService userService;
-  @Autowired private WebApplicationContext webApplicationContext;
+  @Autowired
+  private TokenService tokenService;
+  @Autowired
+  private UserService userService;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
   private User bwayne_user;
 
   @BeforeEach
@@ -43,27 +47,27 @@ class IntrospectionEndpointIntegrationTest {
   @Test
   void introspectionWithPersonalJwtToken() {
     JsonWebToken jsonWebToken =
-        tokenService.createPersonalizedJwtAccessToken(
-            bwayne_user, "confidential-jwt", "nonce", Duration.ofMinutes(5));
+            tokenService.createPersonalizedJwtAccessToken(
+                    bwayne_user, "confidential-jwt", "nonce", Set.of("OPENID"), Duration.ofMinutes(5));
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString("confidential-jwt:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("token", jsonWebToken.getValue())
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString("confidential-jwt:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", jsonWebToken.getValue())
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(true);
     assertThat(introspectionResponse.getSub()).isEqualTo(bwayne_user.getIdentifier().toString());
@@ -72,26 +76,26 @@ class IntrospectionEndpointIntegrationTest {
   @Test
   void introspectionWithAnonymousJwtToken() {
     JsonWebToken jsonWebToken =
-        tokenService.createAnonymousJwtAccessToken("confidential-jwt", Duration.ofMinutes(5));
+            tokenService.createAnonymousJwtAccessToken("confidential-jwt", Set.of("OPENID"), Duration.ofMinutes(5));
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString("confidential-jwt:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("token", jsonWebToken.getValue())
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString("confidential-jwt:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", jsonWebToken.getValue())
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(true);
     assertThat(introspectionResponse.getSub()).isEqualTo(TokenService.ANONYMOUS_TOKEN);
@@ -101,29 +105,29 @@ class IntrospectionEndpointIntegrationTest {
   void introspectionWithPersonalOpaqueToken() {
 
     OpaqueToken opaqueToken =
-        tokenService.createPersonalizedOpaqueAccessToken(
-            bwayne_user, "confidential-opaque", Duration.ofMinutes(5));
+            tokenService.createPersonalizedOpaqueAccessToken(
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString(
-                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("token", opaqueToken.getValue())
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString(
+                                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", opaqueToken.getValue())
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(true);
     assertThat(introspectionResponse.getSub()).isEqualTo(bwayne_user.getIdentifier().toString());
@@ -133,28 +137,28 @@ class IntrospectionEndpointIntegrationTest {
   void introspectionWithAnonymousOpaqueToken() {
 
     OpaqueToken opaqueToken =
-        tokenService.createAnonymousOpaqueAccessToken("confidential-opaque", Duration.ofMinutes(5));
+            tokenService.createAnonymousOpaqueAccessToken("confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString(
-                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("token", opaqueToken.getValue())
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString(
+                                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", opaqueToken.getValue())
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(true);
     assertThat(introspectionResponse.getSub()).isEqualTo(TokenService.ANONYMOUS_TOKEN);
@@ -164,20 +168,20 @@ class IntrospectionEndpointIntegrationTest {
   void introspectionWithInvalidAuthentication() {
 
     IntrospectionResponse introspectionResponse =
-        given()
-            .header("Authorization", "Basic 12345:122")
-            .contentType(ContentType.URLENC)
-            .formParam("token", "test")
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(401)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header("Authorization", "Basic 12345:122")
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", "test")
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(401)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.getError()).isEqualTo("invalid_client");
   }
@@ -186,29 +190,29 @@ class IntrospectionEndpointIntegrationTest {
   void introspectionWithInvalidToken() {
 
     OpaqueToken opaqueToken =
-        tokenService.createPersonalizedOpaqueAccessToken(
-            bwayne_user, "confidential-opaque", Duration.ofMinutes(5));
+            tokenService.createPersonalizedOpaqueAccessToken(
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMinutes(5));
 
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString(
-                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("token", "1234")
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString(
+                                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", "1234")
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(false);
     assertThat(introspectionResponse.getSub()).isNull();
@@ -218,31 +222,31 @@ class IntrospectionEndpointIntegrationTest {
   void introspectionWithExpiredToken() throws InterruptedException {
 
     OpaqueToken opaqueToken =
-        tokenService.createPersonalizedOpaqueAccessToken(
-            bwayne_user, "confidential-opaque", Duration.ofMillis(1));
+            tokenService.createPersonalizedOpaqueAccessToken(
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMillis(1));
 
     Thread.sleep(5);
 
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString(
-                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("token", opaqueToken.getValue())
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString(
+                                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("token", opaqueToken.getValue())
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(false);
     assertThat(introspectionResponse.getSub()).isNull();
@@ -252,29 +256,29 @@ class IntrospectionEndpointIntegrationTest {
   void introspectionWithMissingToken() {
 
     OpaqueToken opaqueToken =
-        tokenService.createPersonalizedOpaqueAccessToken(
-            bwayne_user, "confidential-opaque", Duration.ofMillis(1));
+            tokenService.createPersonalizedOpaqueAccessToken(
+                    bwayne_user, "confidential-opaque", Set.of("OPENID"), Duration.ofMillis(1));
 
     IntrospectionResponse introspectionResponse =
-        given()
-            .header(
-                "Authorization",
-                "Basic "
-                    + Base64.getEncoder()
-                        .encodeToString(
-                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
-            .contentType(ContentType.URLENC)
-            .formParam("dummy", "1234")
-            .when()
-            .post(ENDPOINT)
-            .then()
-            .log()
-            .ifValidationFails()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body(not(empty()))
-            .extract()
-            .as(IntrospectionResponse.class);
+            given()
+                    .header(
+                            "Authorization",
+                            "Basic "
+                                    + Base64.getEncoder()
+                                    .encodeToString(
+                                            "confidential-opaque:demo".getBytes(StandardCharsets.UTF_8)))
+                    .contentType(ContentType.URLENC)
+                    .formParam("dummy", "1234")
+                    .when()
+                    .post(ENDPOINT)
+                    .then()
+                    .log()
+                    .ifValidationFails()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body(not(empty()))
+                    .extract()
+                    .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(false);
     assertThat(introspectionResponse.getSub()).isNull();

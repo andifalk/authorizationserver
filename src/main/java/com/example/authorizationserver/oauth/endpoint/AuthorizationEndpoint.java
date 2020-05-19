@@ -30,8 +30,9 @@ import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Authorization endpoint as specified in RFC 6749: The OAuth 2.0 Authorization Framework
@@ -250,7 +251,7 @@ public class AuthorizationEndpoint {
           redirectUri, "invalid_request", "implicit grant is not supported", state);
     }
 
-    List<String> scopes = Arrays.asList(scope.split(" "));
+    Set<String> scopes = new HashSet<>(Arrays.asList(scope.split(" ")));
     LOG.info(
         "Authenticated user {} for client id {} and scopes {}",
         endUserDetails.getIdentifier(),

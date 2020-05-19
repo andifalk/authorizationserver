@@ -2,13 +2,13 @@ package com.example.authorizationserver.oauth.store;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 public class AuthorizationCode {
 
   private final String clientId;
   private final URI redirectUri;
-  private final List<String> scopes;
+  private final Set<String> scopes;
   private final String code;
   private final LocalDateTime expiry;
   private final String subject;
@@ -17,14 +17,14 @@ public class AuthorizationCode {
   private final String code_challenge_method;
 
   public AuthorizationCode(
-      String clientId,
-      URI redirectUri,
-      List<String> scopes,
-      String code,
-      String subject,
-      String nonce,
-      String code_challenge,
-      String code_challenge_method) {
+          String clientId,
+          URI redirectUri,
+          Set<String> scopes,
+          String code,
+          String subject,
+          String nonce,
+          String code_challenge,
+          String code_challenge_method) {
     this.clientId = clientId;
     this.redirectUri = redirectUri;
     this.scopes = scopes;
@@ -60,7 +60,7 @@ public class AuthorizationCode {
     return expiry;
   }
 
-  public List<String> getScopes() {
+  public Set<String> getScopes() {
     return scopes;
   }
 
@@ -79,26 +79,26 @@ public class AuthorizationCode {
   @Override
   public String toString() {
     return "AuthorizationState{"
-        + "clientId='"
-        + clientId
-        + '\''
-        + ", redirectUri="
-        + redirectUri
-        + ", scopes="
-        + scopes
-        + ", code='"
-        + code
-        + '\''
-        + ", expiry="
-        + expiry
-        + ", subject="
-        + subject
-        + ", nonce="
-        + nonce
-        + ", code_challenge="
-        + code_challenge
-        + ", code_challenge_method="
-        + code_challenge_method
-        + '}';
+            + "clientId='"
+            + clientId
+            + '\''
+            + ", redirectUri="
+            + redirectUri
+            + ", scopes="
+            + scopes
+            + ", code='"
+            + code
+            + '\''
+            + ", expiry="
+            + expiry
+            + ", subject="
+            + subject
+            + ", nonce="
+            + nonce
+            + ", code_challenge="
+            + code_challenge
+            + ", code_challenge_method="
+            + code_challenge_method
+            + '}';
   }
 }

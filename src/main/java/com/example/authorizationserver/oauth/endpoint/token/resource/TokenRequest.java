@@ -62,16 +62,23 @@ public class TokenRequest {
    */
   private final String refresh_token;
 
+  /**
+   * The scope of the access request. OPTIONAL if grant type is {@link
+   * com.example.authorizationserver.oauth.common.GrantType#CLIENT_CREDENTIALS}
+   */
+  private final String scope;
+
   public TokenRequest(
-      @NotBlank String grant_type,
-      @NotBlank String code,
-      @NotNull URI redirect_uri,
-      String client_id,
-      String client_secret,
-      String code_verifier,
-      String username,
-      String password,
-      String refresh_token) {
+          @NotBlank String grant_type,
+          @NotBlank String code,
+          @NotNull URI redirect_uri,
+          String client_id,
+          String client_secret,
+          String code_verifier,
+          String username,
+          String password,
+          String refresh_token,
+          String scope) {
     this.grant_type = grant_type;
     this.code = code;
     this.redirect_uri = redirect_uri;
@@ -81,6 +88,7 @@ public class TokenRequest {
     this.username = username;
     this.password = password;
     this.refresh_token = refresh_token;
+    this.scope = scope;
   }
 
   public String getGrant_type() {
@@ -119,31 +127,38 @@ public class TokenRequest {
     return refresh_token;
   }
 
+  public String getScope() {
+    return scope;
+  }
+
   @Override
   public String toString() {
     return "TokenRequest{"
-        + "grant_type='"
-        + grant_type
-        + '\''
-        + ", code='"
-        + code
-        + '\''
+            + "grant_type='"
+            + grant_type
+            + '\''
+            + ", code='"
+            + code
+            + '\''
         + ", redirect_uri="
-        + redirect_uri
-        + ", client_id='"
-        + client_id
-        + '\''
-        + ", client_secret='*****'"
-        + ", code_verifier='"
-        + code_verifier
-        + '\''
-        + ", refresh_token='"
-        + refresh_token
-        + '\''
-        + ", username='"
-        + username
-        + '\''
-        + ", password='*****'"
-        + '}';
+            + redirect_uri
+            + ", client_id='"
+            + client_id
+            + '\''
+            + ", client_secret='*****'"
+            + ", code_verifier='"
+            + code_verifier
+            + '\''
+            + ", refresh_token='"
+            + refresh_token
+            + '\''
+            + ", scope='"
+            + scope
+            + '\''
+            + ", username='"
+            + username
+            + '\''
+            + ", password='*****'"
+            + '}';
   }
 }

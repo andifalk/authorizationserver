@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class AuthorizationCodeService {
@@ -18,24 +18,24 @@ public class AuthorizationCodeService {
   }
 
   public AuthorizationCode createAndStoreAuthorizationState(
-      String clientId,
-      URI redirectUri,
-      List<String> scopes,
-      String subject,
-      String nonce,
-      String code_challenge,
-      String code_challenge_method) {
+          String clientId,
+          URI redirectUri,
+          Set<String> scopes,
+          String subject,
+          String nonce,
+          String code_challenge,
+          String code_challenge_method) {
     String code = RandomStringUtils.random(32, true, true);
     AuthorizationCode authorizationCode =
-        new AuthorizationCode(
-            clientId,
-            redirectUri,
-            scopes,
-            code,
-            subject,
-            nonce,
-            code_challenge,
-            code_challenge_method);
+            new AuthorizationCode(
+                    clientId,
+                    redirectUri,
+                    scopes,
+                    code,
+                    subject,
+                    nonce,
+                    code_challenge,
+                    code_challenge_method);
     codeMap.put(code, authorizationCode);
     return authorizationCode;
   }
