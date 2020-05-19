@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.2.7.RELEASE'
+    id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
     id 'com.adarshr.test-logger' version '2.0.0'
-    id 'org.owasp.dependencycheck' version '5.3.2'
+    id 'org.owasp.dependencycheck' version '5.3.2.1'
     id 'org.asciidoctor.convert' version '1.5.9.2'
 }
 
@@ -30,8 +30,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'com.nimbusds:nimbus-jose-jwt:8.16'
-    implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation('org.springframework.boot:spring-boot-starter-validation')
+    implementation 'com.nimbusds:nimbus-jose-jwt:8.17'
+    implementation 'org.apache.commons:commons-lang3'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
