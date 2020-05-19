@@ -15,6 +15,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,6 +27,7 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 @RestController
 @RequestMapping(IntrospectionEndpoint.ENDPOINT)
 public class IntrospectionEndpoint {
@@ -37,7 +39,7 @@ public class IntrospectionEndpoint {
   private final JsonWebTokenService jsonWebTokenService;
 
   public IntrospectionEndpoint(
-      TokenService tokenService, UserService userService, JsonWebTokenService jsonWebTokenService) {
+          TokenService tokenService, UserService userService, JsonWebTokenService jsonWebTokenService) {
     this.tokenService = tokenService;
     this.userService = userService;
     this.jsonWebTokenService = jsonWebTokenService;
@@ -45,8 +47,8 @@ public class IntrospectionEndpoint {
 
   @PostMapping
   public ResponseEntity<IntrospectionResponse> introspect(
-      @RequestHeader("Authorization") String authorizationHeader,
-      @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest) {
+          @RequestHeader("Authorization") String authorizationHeader,
+          @ModelAttribute("introspection_request") IntrospectionRequest introspectionRequest) {
 
     ClientCredentials clientCredentials;
 
@@ -57,23 +59,23 @@ public class IntrospectionEndpoint {
         return reportInvalidClientError();
       }
 
-    String tokenValue = introspectionRequest.getToken();
+      String tokenValue = introspectionRequest.getToken();
 
-    if (tokenValue == null || tokenValue.isBlank()) {
-      return ResponseEntity.ok(new IntrospectionResponse(false));
-    }
-
-    JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
-    if (jsonWebToken != null) {
-      return ResponseEntity.ok(getIntrospectionResponse(jsonWebToken));
-    } else {
-      OpaqueToken opaqueWebToken = tokenService.findOpaqueToken(tokenValue);
-      if (opaqueWebToken != null) {
-        return ResponseEntity.ok(getIntrospectionResponse(opaqueWebToken));
-      } else {
+      if (tokenValue == null || tokenValue.isBlank()) {
         return ResponseEntity.ok(new IntrospectionResponse(false));
       }
-    }
+
+      JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
+      if (jsonWebToken != null) {
+        return ResponseEntity.ok(getIntrospectionResponse(jsonWebToken));
+      } else {
+        OpaqueToken opaqueWebToken = tokenService.findOpaqueToken(tokenValue);
+        if (opaqueWebToken != null) {
+          return ResponseEntity.ok(getIntrospectionResponse(opaqueWebToken));
+        } else {
+          return ResponseEntity.ok(new IntrospectionResponse(false));
+        }
+      }
     } catch (BadCredentialsException ex) {
       return reportInvalidClientError();
     }
@@ -111,7 +113,7 @@ public class IntrospectionEndpoint {
                   introspectionResponse.setIat(opaqueWebToken.getIssuedAt().atZone(ZoneId.systemDefault()).toEpochSecond());
                   return introspectionResponse;
                 })
-            .orElse(new IntrospectionResponse(false));
+                .orElse(new IntrospectionResponse(false));
       }
     } catch (BadCredentialsException ex) {
       return new IntrospectionResponse(false);
@@ -123,7 +125,7 @@ public class IntrospectionEndpoint {
 
     try {
       JWTClaimsSet jwtClaimsSet =
-          jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
+              jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
       clientId = jwtClaimsSet.getStringClaim("client_id");
       String subject = jwtClaimsSet.getSubject();
 
@@ -153,16 +155,16 @@ public class IntrospectionEndpoint {
                   introspectionResponse.setExp(jwtClaimsSet.getExpirationTime().getTime());
                   return introspectionResponse;
                 })
-            .orElse(new IntrospectionResponse(false));
+                .orElse(new IntrospectionResponse(false));
       }
     } catch (ParseException | JOSEException e) {
       return new IntrospectionResponse(false);
     }
   }
 
-    private ResponseEntity<IntrospectionResponse> reportInvalidClientError() {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-              .header("WWW-Authenticate", "Basic")
-              .body(new IntrospectionResponse("invalid_client"));
-    }
+  private ResponseEntity<IntrospectionResponse> reportInvalidClientError() {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .header("WWW-Authenticate", "Basic")
+            .body(new IntrospectionResponse("invalid_client"));
+  }
 }
