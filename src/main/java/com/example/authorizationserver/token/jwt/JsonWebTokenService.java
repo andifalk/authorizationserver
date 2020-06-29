@@ -5,11 +5,13 @@ import com.example.authorizationserver.oidc.common.Scope;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.user.model.User;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Service;
+import org.springframework.util.IdGenerator;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -21,10 +23,14 @@ import java.util.Set;
 @Service
 public class JsonWebTokenService {
 
-  private final JwtPki jwtPki;
+  private static final JOSEObjectType JWT_TYP_ACCESS_TOKEN = new JOSEObjectType("at+jwt");
 
-  public JsonWebTokenService(JwtPki jwtPki) {
+  private final JwtPki jwtPki;
+  private final IdGenerator idGenerator;
+
+  public JsonWebTokenService(JwtPki jwtPki, IdGenerator idGenerator) {
     this.jwtPki = jwtPki;
+    this.idGenerator = idGenerator;
   }
 
   public JWTClaimsSet parseAndValidateToken(String token) throws ParseException, JOSEException {
@@ -34,9 +40,9 @@ public class JsonWebTokenService {
   }
 
   public String createPersonalizedToken(
+          boolean isAccessToken,
           String clientId,
           List<String> audiences,
-          String jti,
           Set<String> scopes,
           User user,
           String nonce,
@@ -51,14 +57,19 @@ public class JsonWebTokenService {
             .audience(audiences)
             .issueTime(new Date())
             .notBeforeTime(new Date())
-            .jwtID(jti)
+            .jwtID(idGenerator.generateId().toString())
             .claim("nonce", nonce)
             .claim("groups", user.getGroups())
             .claim("name", user.getUsername())
             .claim("client_id", clientId)
-            .claim("locale", "de");
+            .claim("locale", "de")
+            .claim("ctx", TokenService.PERSONAL_TOKEN);
 
-    if (scopes.contains(Scope.PROFILE)) {
+    if (!scopes.isEmpty()) {
+      builder.claim("scope", String.join(" ", scopes));
+    }
+
+    if (scopes.contains(Scope.PROFILE.name())) {
       builder
               .claim("nickname", user.getUsername())
               .claim("preferred_username", user.getUsername())
@@ -67,13 +78,13 @@ public class JsonWebTokenService {
               .claim("gender", user.getGender().name());
     }
 
-    if (scopes.contains(Scope.EMAIL)) {
+    if (scopes.contains(Scope.EMAIL.name())) {
       builder
               .claim("email", user.getEmail())
               .claim("email_verified", Boolean.TRUE);
     }
 
-    if (scopes.contains(Scope.PHONE)) {
+    if (scopes.contains(Scope.PHONE.name())) {
       builder
               .claim("phone", user.getPhone())
               .claim("phone_verified", Boolean.TRUE)
@@ -81,7 +92,7 @@ public class JsonWebTokenService {
               .claim("phone_number_verified", Boolean.TRUE);
     }
 
-    if (scopes.contains(Scope.ADDRESS)) {
+    if (scopes.contains(Scope.ADDRESS.name())) {
       builder
               .claim("formatted", user.getAddress().getStreet()
                       + "\n"
@@ -99,45 +110,53 @@ public class JsonWebTokenService {
 
     JWTClaimsSet claimsSet = builder.build();
 
-    SignedJWT signedJWT =
-            new SignedJWT(
-                    new JWSHeader.Builder(JWSAlgorithm.RS256)
-                            .keyID(jwtPki.getPublicKey().getKeyID())
-                            .build(),
-                    claimsSet);
-
+    SignedJWT signedJWT = createSignedJWT(isAccessToken, claimsSet);
     signedJWT.sign(jwtPki.getSigner());
 
     return signedJWT.serialize();
   }
 
   public String createAnonymousToken(
+          boolean isAccessToken,
           String clientId,
           List<String> audiences,
-          String jti,
+          Set<String> scopes,
           LocalDateTime expiryDateTime)
           throws JOSEException {
-    JWTClaimsSet claimsSet =
+    JWTClaimsSet.Builder builder =
             new JWTClaimsSet.Builder()
-                    .subject(TokenService.ANONYMOUS_TOKEN)
+                    .subject(clientId)
                     .issuer(jwtPki.getIssuer())
                     .expirationTime(Date.from(expiryDateTime.atZone(ZoneId.systemDefault()).toInstant()))
                     .audience(audiences)
                     .issueTime(new Date())
                     .notBeforeTime(new Date())
-                    .jwtID(jti)
+                    .jwtID(idGenerator.generateId().toString())
                     .claim("client_id", clientId)
-                    .build();
+                    .claim("ctx", TokenService.ANONYMOUS_TOKEN);
 
-    SignedJWT signedJWT =
-            new SignedJWT(
-                    new JWSHeader.Builder(JWSAlgorithm.RS256)
-                            .keyID(jwtPki.getPublicKey().getKeyID())
-                            .build(),
-                    claimsSet);
+    if (!scopes.isEmpty()) {
+      builder.claim("scope", String.join(" ", scopes));
+    }
 
+    JWTClaimsSet claimsSet = builder.build();
+
+    SignedJWT signedJWT = createSignedJWT(isAccessToken, claimsSet);
     signedJWT.sign(jwtPki.getSigner());
 
     return signedJWT.serialize();
+  }
+
+  private SignedJWT createSignedJWT(boolean isAccessToken, JWTClaimsSet claimsSet) {
+    JWSHeader.Builder jwsHeaderBuilder = new JWSHeader.Builder(JWSAlgorithm.RS256);
+    jwsHeaderBuilder.keyID(jwtPki.getPublicKey().getKeyID());
+
+    if (isAccessToken) {
+      jwsHeaderBuilder.type(JWT_TYP_ACCESS_TOKEN);
+    }
+
+    return new SignedJWT(
+            jwsHeaderBuilder.build(),
+            claimsSet);
   }
 }

@@ -9,6 +9,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.IdGenerator;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -23,13 +24,13 @@ class JsonWebTokenServiceTest {
 
   private final JsonWebTokenService cut;
 
-  JsonWebTokenServiceTest(@Autowired JwtPki jwtPki) {
-    this.cut = new JsonWebTokenService(jwtPki);
+  JsonWebTokenServiceTest(@Autowired JwtPki jwtPki, @Autowired IdGenerator idGenerator) {
+    this.cut = new JsonWebTokenService(jwtPki, idGenerator);
   }
 
   @Test
   void createPersonalizedToken() throws JOSEException, ParseException {
-    String personalizedToken = cut.createPersonalizedToken("myclient", List.of("myaudience"), "myjti",
+    String personalizedToken = cut.createPersonalizedToken(true, "myclient", List.of("myaudience"),
             Collections.singleton("openid"), new User(UUID.randomUUID(), Gender.MALE, "First", "Name",
                     "secret", "first.name@example.com", "fname", "123456", Collections.singleton("user"),
                     new Address("street", "12222", "city", "state", "country"),
@@ -40,7 +41,8 @@ class JsonWebTokenServiceTest {
 
   @Test
   void createAnonymousToken() throws JOSEException, ParseException {
-    String anonymousToken = cut.createAnonymousToken("myclient", List.of("myaudience"), "myjti", LocalDateTime.now().plusMinutes(5));
+    String anonymousToken = cut.createAnonymousToken(true, "myclient", List.of("myaudience"),
+            Collections.singleton("openid"), LocalDateTime.now().plusMinutes(5));
     JWTClaimsSet parsedToken = cut.parseAndValidateToken(anonymousToken);
     assertThat(parsedToken).isNotNull();
   }

@@ -24,6 +24,8 @@ import java.util.Set;
 public class TokenService {
 
   public static final String ANONYMOUS_TOKEN = "anonymous";
+  public static final String PERSONAL_TOKEN = "personal";
+
   private static final Logger LOG = LoggerFactory.getLogger(TokenService.class);
 
   private final AuthorizationServerConfigurationProperties authorizationServerProperties;
@@ -77,13 +79,13 @@ public class TokenService {
     try {
       token =
               jsonWebTokenService.createPersonalizedToken(
+                      false,
                       clientId,
                       Collections.singletonList(clientId),
-                      "test",
                       scopes,
                       user,
-              nonce,
-              expiryDateTime);
+                      nonce,
+                      expiryDateTime);
       JsonWebToken jsonWebToken = new JsonWebToken();
       jsonWebToken.setExpiry(expiryDateTime);
       jsonWebToken.setValue(token);
@@ -103,9 +105,9 @@ public class TokenService {
     try {
       token =
               jsonWebTokenService.createPersonalizedToken(
+                      true,
                       clientId,
                       Collections.singletonList(clientId),
-                      "test",
                       scopes,
                       user,
                       nonce,
@@ -128,9 +130,10 @@ public class TokenService {
     try {
       token =
               jsonWebTokenService.createAnonymousToken(
+                      true,
                       clientId,
                       Collections.singletonList(clientId),
-                      "test",
+                      scopes,
                       expiryDateTime);
       JsonWebToken jsonWebToken = new JsonWebToken();
       jsonWebToken.setExpiry(expiryDateTime);

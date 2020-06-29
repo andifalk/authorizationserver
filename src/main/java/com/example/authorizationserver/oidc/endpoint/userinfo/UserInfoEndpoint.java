@@ -51,7 +51,7 @@ public class UserInfoEndpoint {
       try {
         JWTClaimsSet jwtClaimsSet =
                 jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
-        if (TokenService.ANONYMOUS_TOKEN.equals(jwtClaimsSet.getSubject())) {
+        if (TokenService.ANONYMOUS_TOKEN.equals(jwtClaimsSet.getStringClaim("ctx"))) {
           return ResponseEntity.ok(new UserInfo(jwtClaimsSet.getSubject()));
         } else {
           user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));

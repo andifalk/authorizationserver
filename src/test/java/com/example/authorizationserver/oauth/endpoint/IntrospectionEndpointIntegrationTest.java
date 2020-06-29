@@ -98,7 +98,7 @@ class IntrospectionEndpointIntegrationTest {
                     .as(IntrospectionResponse.class);
     assertThat(introspectionResponse).isNotNull();
     assertThat(introspectionResponse.isActive()).isEqualTo(true);
-    assertThat(introspectionResponse.getSub()).isEqualTo(TokenService.ANONYMOUS_TOKEN);
+    assertThat(introspectionResponse.getSub()).isEqualTo("confidential-jwt");
   }
 
   @Test

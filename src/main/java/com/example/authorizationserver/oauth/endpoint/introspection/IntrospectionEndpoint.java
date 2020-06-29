@@ -122,19 +122,21 @@ public class IntrospectionEndpoint {
 
   private IntrospectionResponse getIntrospectionResponse(JsonWebToken jsonWebToken) {
     String clientId;
+    String ctx;
 
     try {
       JWTClaimsSet jwtClaimsSet =
               jsonWebTokenService.parseAndValidateToken(jsonWebToken.getValue());
       clientId = jwtClaimsSet.getStringClaim("client_id");
+      ctx = jwtClaimsSet.getStringClaim("ctx");
       String subject = jwtClaimsSet.getSubject();
 
-      if (TokenService.ANONYMOUS_TOKEN.equals(subject)) {
+      if (TokenService.ANONYMOUS_TOKEN.equals(ctx)) {
         IntrospectionResponse introspectionResponse = new IntrospectionResponse();
         introspectionResponse.setActive(true);
         introspectionResponse.setClient_id(clientId);
-        introspectionResponse.setSub(TokenService.ANONYMOUS_TOKEN);
-        introspectionResponse.setUsername(TokenService.ANONYMOUS_TOKEN);
+        introspectionResponse.setSub(clientId);
+        introspectionResponse.setUsername(clientId);
         introspectionResponse.setIss(jwtClaimsSet.getIssuer());
         introspectionResponse.setNbf(jwtClaimsSet.getNotBeforeTime().getTime());
         introspectionResponse.setIat(jwtClaimsSet.getIssueTime().getTime());
