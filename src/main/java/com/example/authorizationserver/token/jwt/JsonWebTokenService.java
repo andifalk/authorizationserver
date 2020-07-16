@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class JsonWebTokenService {
@@ -66,46 +67,47 @@ public class JsonWebTokenService {
             .claim("ctx", TokenService.PERSONAL_TOKEN);
 
     if (!scopes.isEmpty()) {
+      Set<String> scopesToCompare = scopes.stream().map(String::toUpperCase).collect(Collectors.toSet());
       builder.claim("scope", String.join(" ", scopes));
-    }
 
-    if (scopes.contains(Scope.PROFILE.name())) {
-      builder
-              .claim("nickname", user.getUsername())
-              .claim("preferred_username", user.getUsername())
-              .claim("family_name", user.getLastName())
-              .claim("given_name", user.getFirstName())
-              .claim("gender", user.getGender().name());
-    }
+      if (scopesToCompare.contains(Scope.PROFILE.name())) {
+        builder
+                .claim("nickname", user.getUsername())
+                .claim("preferred_username", user.getUsername())
+                .claim("family_name", user.getLastName())
+                .claim("given_name", user.getFirstName())
+                .claim("gender", user.getGender().name());
+      }
 
-    if (scopes.contains(Scope.EMAIL.name())) {
-      builder
-              .claim("email", user.getEmail())
-              .claim("email_verified", Boolean.TRUE);
-    }
+      if (scopesToCompare.contains(Scope.EMAIL.name())) {
+        builder
+                .claim("email", user.getEmail())
+                .claim("email_verified", Boolean.TRUE);
+      }
 
-    if (scopes.contains(Scope.PHONE.name())) {
-      builder
-              .claim("phone", user.getPhone())
-              .claim("phone_verified", Boolean.TRUE)
-              .claim("phone_number", user.getPhone())
-              .claim("phone_number_verified", Boolean.TRUE);
-    }
+      if (scopesToCompare.contains(Scope.PHONE.name())) {
+        builder
+                .claim("phone", user.getPhone())
+                .claim("phone_verified", Boolean.TRUE)
+                .claim("phone_number", user.getPhone())
+                .claim("phone_number_verified", Boolean.TRUE);
+      }
 
-    if (scopes.contains(Scope.ADDRESS.name())) {
-      builder
-              .claim("formatted", user.getAddress().getStreet()
-                      + "\n"
-                      + user.getAddress().getZip()
-                      + "\n"
-                      + user.getAddress().getCity()
-                      + "/n"
-                      + user.getAddress().getCountry())
-              .claim("street_address", user.getAddress().getStreet())
-              .claim("locality", user.getAddress().getCity())
-              .claim("region", user.getAddress().getState())
-              .claim("postal_code", user.getAddress().getZip())
-              .claim("country", user.getAddress().getCountry());
+      if (scopesToCompare.contains(Scope.ADDRESS.name())) {
+        builder
+                .claim("formatted", user.getAddress().getStreet()
+                        + "\n"
+                        + user.getAddress().getZip()
+                        + "\n"
+                        + user.getAddress().getCity()
+                        + "/n"
+                        + user.getAddress().getCountry())
+                .claim("street_address", user.getAddress().getStreet())
+                .claim("locality", user.getAddress().getCity())
+                .claim("region", user.getAddress().getState())
+                .claim("postal_code", user.getAddress().getZip())
+                .claim("country", user.getAddress().getCountry());
+      }
     }
 
     JWTClaimsSet claimsSet = builder.build();
