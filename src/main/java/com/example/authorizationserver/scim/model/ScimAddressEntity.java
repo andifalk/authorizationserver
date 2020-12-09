@@ -1,7 +1,5 @@
 package com.example.authorizationserver.scim.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -108,6 +106,7 @@ public class ScimAddressEntity extends AbstractPersistable<Long> implements Seri
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("streetAddress", streetAddress)
                 .append("locality", locality)
                 .append("region", region)
@@ -116,39 +115,5 @@ public class ScimAddressEntity extends AbstractPersistable<Long> implements Seri
                 .append("type", type)
                 .append("primary", primaryAddress)
                 .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ScimAddressEntity that = (ScimAddressEntity) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(primaryAddress, that.primaryAddress)
-                .append(streetAddress, that.streetAddress)
-                .append(locality, that.locality)
-                .append(region, that.region)
-                .append(postalCode, that.postalCode)
-                .append(country, that.country)
-                .append(type, that.type)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(streetAddress)
-                .append(locality)
-                .append(region)
-                .append(postalCode)
-                .append(country)
-                .append(type)
-                .append(primaryAddress)
-                .toHashCode();
     }
 }

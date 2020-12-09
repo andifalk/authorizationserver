@@ -1,12 +1,12 @@
 package com.example.authorizationserver.oidc.endpoint.userinfo;
 
 import com.example.authorizationserver.oauth.common.AuthenticationUtil;
+import com.example.authorizationserver.scim.model.ScimUserEntity;
+import com.example.authorizationserver.scim.service.ScimService;
 import com.example.authorizationserver.token.jwt.JsonWebTokenService;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
-import com.example.authorizationserver.user.model.User;
-import com.example.authorizationserver.user.service.UserService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.http.HttpStatus;
@@ -31,13 +31,13 @@ public class UserInfoEndpoint {
   public static final String ENDPOINT = "/userinfo";
 
   private final TokenService tokenService;
-  private final UserService userService;
+  private final ScimService scimService;
   private final JsonWebTokenService jsonWebTokenService;
 
   public UserInfoEndpoint(
-          TokenService tokenService, UserService userService, JsonWebTokenService jsonWebTokenService) {
+          TokenService tokenService, ScimService scimService, JsonWebTokenService jsonWebTokenService) {
     this.tokenService = tokenService;
-    this.userService = userService;
+    this.scimService = scimService;
     this.jsonWebTokenService = jsonWebTokenService;
   }
 
@@ -46,7 +46,7 @@ public class UserInfoEndpoint {
           @RequestHeader("Authorization") String authorizationHeader) {
     String tokenValue = AuthenticationUtil.fromBearerAuthHeader(authorizationHeader);
     JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
-    Optional<User> user;
+    Optional<ScimUserEntity> user;
     if (jsonWebToken != null) {
       try {
         JWTClaimsSet jwtClaimsSet =
@@ -54,7 +54,7 @@ public class UserInfoEndpoint {
         if (TokenService.ANONYMOUS_TOKEN.equals(jwtClaimsSet.getStringClaim("ctx"))) {
           return ResponseEntity.ok(new UserInfo(jwtClaimsSet.getSubject()));
         } else {
-          user = userService.findOneByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
+          user = scimService.findUserByIdentifier(UUID.fromString(jwtClaimsSet.getSubject()));
           return user.map(u -> ResponseEntity.ok(new UserInfo(u)))
                   .orElse(
                           ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -73,7 +73,7 @@ public class UserInfoEndpoint {
         if (TokenService.ANONYMOUS_TOKEN.equals(opaqueWebToken.getSubject())) {
           return ResponseEntity.ok(new UserInfo(opaqueWebToken.getSubject()));
         } else {
-          user = userService.findOneByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
+          user = scimService.findUserByIdentifier(UUID.fromString(opaqueWebToken.getSubject()));
           return user.map(u -> ResponseEntity.ok(new UserInfo(u)))
                   .orElse(
                           ResponseEntity.status(HttpStatus.UNAUTHORIZED)

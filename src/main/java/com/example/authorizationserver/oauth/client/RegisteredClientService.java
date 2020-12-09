@@ -2,12 +2,10 @@ package com.example.authorizationserver.oauth.client;
 
 import com.example.authorizationserver.oauth.client.dao.RegisteredClientRepository;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
-import com.example.authorizationserver.user.model.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

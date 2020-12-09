@@ -5,9 +5,9 @@ import com.example.authorizationserver.oauth.client.api.resource.ModifyRegistere
 import com.example.authorizationserver.oauth.client.model.AccessTokenFormat;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
 import com.example.authorizationserver.oauth.common.GrantType;
+import com.example.authorizationserver.scim.service.ScimService;
 import com.example.authorizationserver.security.client.RegisteredClientDetailsService;
 import com.example.authorizationserver.security.user.EndUserDetailsService;
-import com.example.authorizationserver.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,10 +32,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,135 +40,138 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(RegisteredClientApiController.class)
 class RegisteredClientApiControllerIntegrationTest {
 
-  @MockBean
-  private EndUserDetailsService endUserDetailsService;
+    @MockBean
+    private EndUserDetailsService endUserDetailsService;
 
-  @MockBean private RegisteredClientDetailsService registeredClientDetailsService;
+    @MockBean
+    private RegisteredClientDetailsService registeredClientDetailsService;
 
-  @MockBean private RegisteredClientService registeredClientService;
+    @MockBean
+    private RegisteredClientService registeredClientService;
 
-  @MockBean private UserService userService;
+    @MockBean
+    private ScimService scimService;
 
-  private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-  @BeforeEach
-  public void setUp(
-          WebApplicationContext webApplicationContext,
-          RestDocumentationContextProvider restDocumentation) {
-    this.mockMvc =
-            MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                    .apply(
-                            documentationConfiguration(restDocumentation)
-                                    .uris().withPort(9090).and().operationPreprocessors()
-                                    .withRequestDefaults(prettyPrint())
-                                    .withResponseDefaults(prettyPrint()))
-                    .build();
-  }
+    @BeforeEach
+    public void setUp(
+            WebApplicationContext webApplicationContext,
+            RestDocumentationContextProvider restDocumentation) {
+        this.mockMvc =
+                MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                        .apply(
+                                documentationConfiguration(restDocumentation)
+                                        .uris().withPort(9090).and().operationPreprocessors()
+                                        .withRequestDefaults(prettyPrint())
+                                        .withResponseDefaults(prettyPrint()))
+                        .build();
+    }
 
-  @Test
-  void findAllClients() throws Exception {
-    given(registeredClientService.findAll())
-            .willReturn(
-                    List.of(
-                            new RegisteredClient(
-                                    UUID.randomUUID(),
-                                    "clientid",
-                                    "clientsecret",
-                                    true,
-                                    AccessTokenFormat.JWT,
-                                    Set.of(GrantType.AUTHORIZATION_CODE),
-                                    Set.of("redirect"),
-                                    Set.of("cors"))));
-    mockMvc
-            .perform(get(RegisteredClientApiController.ENDPOINT))
-            .andDo(print())
-            .andExpect(status().is2xxSuccessful())
-            .andDo(document("getAllClients"));
-  }
+    @Test
+    void findAllClients() throws Exception {
+        given(registeredClientService.findAll())
+                .willReturn(
+                        List.of(
+                                new RegisteredClient(
+                                        UUID.randomUUID(),
+                                        "clientid",
+                                        "clientsecret",
+                                        true,
+                                        AccessTokenFormat.JWT,
+                                        Set.of(GrantType.AUTHORIZATION_CODE),
+                                        Set.of("redirect"),
+                                        Set.of("cors"))));
+        mockMvc
+                .perform(get(RegisteredClientApiController.ENDPOINT))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("getAllClients"));
+    }
 
-  @Test
-  void findSingleClient() throws Exception {
-    UUID userIdentifier = UUID.randomUUID();
-    given(registeredClientService.findOneByIdentifier(userIdentifier))
-            .willReturn(
-                    Optional.of(
-                            new RegisteredClient(
-                                    UUID.randomUUID(),
-                                    "clientid",
-                                    "clientsecret",
-                                    true,
-                                    AccessTokenFormat.JWT,
-                                    Set.of(GrantType.AUTHORIZATION_CODE),
-                                    Set.of("redirect"),
-                                    Set.of("cors"))));
-    mockMvc
-            .perform(get(RegisteredClientApiController.ENDPOINT + "/{clientId}", userIdentifier))
-            .andDo(print())
-            .andExpect(status().is2xxSuccessful())
-            .andDo(document("getClient"));
-  }
+    @Test
+    void findSingleClient() throws Exception {
+        UUID userIdentifier = UUID.randomUUID();
+        given(registeredClientService.findOneByIdentifier(userIdentifier))
+                .willReturn(
+                        Optional.of(
+                                new RegisteredClient(
+                                        UUID.randomUUID(),
+                                        "clientid",
+                                        "clientsecret",
+                                        true,
+                                        AccessTokenFormat.JWT,
+                                        Set.of(GrantType.AUTHORIZATION_CODE),
+                                        Set.of("redirect"),
+                                        Set.of("cors"))));
+        mockMvc
+                .perform(get(RegisteredClientApiController.ENDPOINT + "/{clientId}", userIdentifier))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("getClient"));
+    }
 
-  @Test
-  void registerClient() throws Exception {
-    UUID clientIdentifier = UUID.randomUUID();
-    RegisteredClient registeredClient =
-            new RegisteredClient(
-                    clientIdentifier,
-                    "clientid",
-                    "clientsecret",
-                    true,
-                    AccessTokenFormat.JWT,
-                    Set.of(GrantType.AUTHORIZATION_CODE),
-                    Set.of("redirect"),
-                    Set.of("cors"));
-    given(registeredClientService.create(any())).willReturn(registeredClient);
+    @Test
+    void registerClient() throws Exception {
+        UUID clientIdentifier = UUID.randomUUID();
+        RegisteredClient registeredClient =
+                new RegisteredClient(
+                        clientIdentifier,
+                        "clientid",
+                        "clientsecret",
+                        true,
+                        AccessTokenFormat.JWT,
+                        Set.of(GrantType.AUTHORIZATION_CODE),
+                        Set.of("redirect"),
+                        Set.of("cors"));
+        given(registeredClientService.create(any())).willReturn(registeredClient);
 
-    ModifyRegisteredClientResource modifyRegisteredClientResource = new ModifyRegisteredClientResource(registeredClient);
-    mockMvc
-            .perform(
-                    post(RegisteredClientApiController.ENDPOINT)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(modifyRegisteredClientResource)))
-            .andDo(print())
-            .andExpect(status().is2xxSuccessful())
-            .andDo(document("createClient"));
-  }
+        ModifyRegisteredClientResource modifyRegisteredClientResource = new ModifyRegisteredClientResource(registeredClient);
+        mockMvc
+                .perform(
+                        post(RegisteredClientApiController.ENDPOINT)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(modifyRegisteredClientResource)))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("createClient"));
+    }
 
-  @Test
-  void updateClient() throws Exception {
-    UUID clientIdentifier = UUID.randomUUID();
-    RegisteredClient registeredClient =
-            new RegisteredClient(
-                    clientIdentifier,
-                    "clientid",
-                    "clientsecret",
-                    true,
-                    AccessTokenFormat.JWT,
-                    Set.of(GrantType.AUTHORIZATION_CODE),
-                    Set.of("redirect"),
-                    Set.of("cors"));
-    given(registeredClientService.update(any(), any())).willReturn(Optional.of(registeredClient));
+    @Test
+    void updateClient() throws Exception {
+        UUID clientIdentifier = UUID.randomUUID();
+        RegisteredClient registeredClient =
+                new RegisteredClient(
+                        clientIdentifier,
+                        "clientid",
+                        "clientsecret",
+                        true,
+                        AccessTokenFormat.JWT,
+                        Set.of(GrantType.AUTHORIZATION_CODE),
+                        Set.of("redirect"),
+                        Set.of("cors"));
+        given(registeredClientService.update(any(), any())).willReturn(Optional.of(registeredClient));
 
-    ModifyRegisteredClientResource modifyRegisteredClientResource = new ModifyRegisteredClientResource(registeredClient);
-    mockMvc
-            .perform(
-                    put(RegisteredClientApiController.ENDPOINT + "/{clientId}", clientIdentifier)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(modifyRegisteredClientResource)))
-            .andDo(print())
-            .andExpect(status().is2xxSuccessful())
-            .andDo(document("updateClient"));
-  }
+        ModifyRegisteredClientResource modifyRegisteredClientResource = new ModifyRegisteredClientResource(registeredClient);
+        mockMvc
+                .perform(
+                        put(RegisteredClientApiController.ENDPOINT + "/{clientId}", clientIdentifier)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(modifyRegisteredClientResource)))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("updateClient"));
+    }
 
-  @Test
-  void deleteClient() throws Exception {
-    UUID userIdentifier = UUID.randomUUID();
-    mockMvc
-            .perform(delete(RegisteredClientApiController.ENDPOINT + "/{clientId}", userIdentifier))
-            .andDo(print())
-            .andExpect(status().is2xxSuccessful())
-            .andDo(document("deleteClient"));
-  }
+    @Test
+    void deleteClient() throws Exception {
+        UUID userIdentifier = UUID.randomUUID();
+        mockMvc
+                .perform(delete(RegisteredClientApiController.ENDPOINT + "/{clientId}", userIdentifier))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andDo(document("deleteClient"));
+    }
 }

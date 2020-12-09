@@ -1,9 +1,7 @@
 package com.example.authorizationserver.token.jwt;
 
 import com.example.authorizationserver.jwks.JwtPki;
-import com.example.authorizationserver.user.model.Address;
-import com.example.authorizationserver.user.model.Gender;
-import com.example.authorizationserver.user.model.User;
+import com.example.authorizationserver.scim.model.*;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.junit.jupiter.api.Test;
@@ -32,10 +30,15 @@ class JsonWebTokenServiceTest {
   @Test
   void createPersonalizedToken() throws JOSEException, ParseException {
     String personalizedToken = cut.createPersonalizedToken(true, "myclient", List.of("myaudience"),
-            Collections.singleton("openid"), new User(UUID.randomUUID(), Gender.MALE, "First", "Name",
-                    "secret", "first.name@example.com", "fname", "123456", Collections.singleton("user"),
-                    new Address("street", "12222", "city", "state", "country"),
-                    LocalDateTime.now()), "nonce", LocalDateTime.now().plusMinutes(5));
+            Collections.singleton("openid"), new ScimUserEntity(UUID.randomUUID(), "1234", "fname", "First", "Name", true,
+                    "secret", Set.of(new ScimEmailEntity("first.name@example.com", "work", true)),
+                    Set.of(new ScimPhoneNumberEntity("12345", "work")), Set.of(new ScimImsEntity("12345", "work")),
+                    Set.of(new ScimAddressEntity("street", "locality", "region", "12345", "country", "work", true)),
+                    Set.of(new ScimUserGroupEntity(
+                            new ScimUserEntity(UUID.randomUUID(), "username",
+                                    "family", "given", true, "secret", null, null, Set.of("USER")),
+                            new ScimGroupEntity(UUID.randomUUID(), "12345", "test_group", null))),
+                    Set.of("entitlement"), Set.of("USER")), "nonce", LocalDateTime.now().plusMinutes(5));
     JWTClaimsSet parsedToken = cut.parseAndValidateToken(personalizedToken);
     assertThat(parsedToken).isNotNull();
   }
@@ -43,10 +46,15 @@ class JsonWebTokenServiceTest {
   @Test
   void createPersonalizedTokenWithAllScopes() throws JOSEException, ParseException {
     String personalizedToken = cut.createPersonalizedToken(true, "myclient", List.of("myaudience"),
-            Set.of("openid", "profile", "email", "phone", "address"), new User(UUID.randomUUID(), Gender.MALE, "First", "Name",
-                    "secret", "first.name@example.com", "fname", "123456", Collections.singleton("user"),
-                    new Address("street", "12222", "city", "state", "country"),
-                    LocalDateTime.now()), "nonce", LocalDateTime.now().plusMinutes(5));
+            Set.of("openid", "profile", "email", "phone", "address"), new ScimUserEntity(UUID.randomUUID(), "1234", "fname", "First", "Name", true,
+                    "secret", Set.of(new ScimEmailEntity("first.name@example.com", "work", true)),
+                    Set.of(new ScimPhoneNumberEntity("12345", "work")), Set.of(new ScimImsEntity("12345", "work")),
+                    Set.of(new ScimAddressEntity("street", "locality", "region", "12345", "country", "work", true)),
+                    Set.of(new ScimUserGroupEntity(
+                            new ScimUserEntity(UUID.randomUUID(), "username",
+                                    "family", "given", true, "secret", null, null, Set.of("USER")),
+                            new ScimGroupEntity(UUID.randomUUID(), "12345", "test_group", null))),
+                    Set.of("entitlement"), Set.of("USER")), "nonce", LocalDateTime.now().plusMinutes(5));
     JWTClaimsSet parsedToken = cut.parseAndValidateToken(personalizedToken);
     assertThat(parsedToken).isNotNull();
   }

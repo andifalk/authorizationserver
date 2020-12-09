@@ -1,7 +1,5 @@
 package com.example.authorizationserver.scim.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -59,35 +57,10 @@ public class ScimEmailEntity extends AbstractPersistable<Long> implements Serial
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("email", email)
                 .append("type", type)
                 .append("primary", primaryEmail)
                 .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ScimEmailEntity that = (ScimEmailEntity) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(primaryEmail, that.primaryEmail)
-                .append(email, that.email)
-                .append(type, that.type)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(email)
-                .append(type)
-                .append(primaryEmail)
-                .toHashCode();
     }
 }

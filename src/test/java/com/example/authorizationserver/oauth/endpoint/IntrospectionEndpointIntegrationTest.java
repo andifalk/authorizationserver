@@ -2,11 +2,11 @@ package com.example.authorizationserver.oauth.endpoint;
 
 import com.example.authorizationserver.annotation.WebIntegrationTest;
 import com.example.authorizationserver.oauth.endpoint.introspection.resource.IntrospectionResponse;
+import com.example.authorizationserver.scim.model.ScimUserEntity;
+import com.example.authorizationserver.scim.service.ScimService;
 import com.example.authorizationserver.token.store.TokenService;
 import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
-import com.example.authorizationserver.user.model.User;
-import com.example.authorizationserver.user.service.UserService;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,15 +32,15 @@ class IntrospectionEndpointIntegrationTest {
   @Autowired
   private TokenService tokenService;
   @Autowired
-  private UserService userService;
+  private ScimService scimService;
   @Autowired
   private WebApplicationContext webApplicationContext;
-  private User bwayne_user;
+  private ScimUserEntity bwayne_user;
 
   @BeforeEach
   void initMockMvc() {
     RestAssuredMockMvc.webAppContextSetup(webApplicationContext);
-    Optional<User> bwayne = userService.findOneByUsername("bwayne");
+    Optional<ScimUserEntity> bwayne = scimService.findUserByUserName("bwayne");
     bwayne.ifPresent(user -> bwayne_user = user);
   }
 

@@ -1,14 +1,11 @@
-package com.example.authorizationserver.user.model;
+package com.example.authorizationserver.scim.api.resource;
 
-import com.example.authorizationserver.user.api.resource.AddressResource;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import com.example.authorizationserver.scim.model.ScimAddressEntity;
 
-import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-@Entity
-public class Address extends AbstractPersistable<Long> {
+public class AddressResource {
 
   @NotBlank
   @Size(max = 100)
@@ -29,22 +26,14 @@ public class Address extends AbstractPersistable<Long> {
   @Size(max = 100)
   private String country;
 
-  public Address() {}
+  public AddressResource() {}
 
-  public Address(String street, String zip, String city, String state, String country) {
-    this.street = street;
-    this.zip = zip;
-    this.city = city;
-    this.state = state;
-    this.country = country;
-  }
-
-  public Address(AddressResource addressResource) {
-    this.city = addressResource.getCity();
-    this.country = addressResource.getCountry();
-    this.state = addressResource.getState();
-    this.street = addressResource.getStreet();
-    this.zip = addressResource.getZip();
+  public AddressResource(ScimAddressEntity address) {
+    this.city = address.getLocality();
+    this.country = address.getCountry();
+    this.state = address.getRegion();
+    this.street = address.getStreetAddress();
+    this.zip = address.getPostalCode();
   }
 
   public String getStreet() {

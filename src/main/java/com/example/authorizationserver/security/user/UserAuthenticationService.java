@@ -1,8 +1,7 @@
 package com.example.authorizationserver.security.user;
 
-import com.example.authorizationserver.user.model.User;
+import com.example.authorizationserver.scim.model.ScimUserEntity;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -23,9 +22,9 @@ public class UserAuthenticationService {
     this.daoAuthenticationProvider.setUserDetailsService(userDetailsService);
   }
 
-  public User authenticate(String username, String password) throws AuthenticationException {
+  public ScimUserEntity authenticate(String username, String password) throws AuthenticationException {
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
     Authentication authentication = this.daoAuthenticationProvider.authenticate(authenticationToken);
-    return (User) authentication.getPrincipal();
+    return (ScimUserEntity) authentication.getPrincipal();
   }
 }

@@ -1,13 +1,9 @@
 package com.example.authorizationserver.scim.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -16,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class ScimGroupEntity extends ScimResourceEntity {
 
     @Column(unique = true)
@@ -61,31 +58,6 @@ public class ScimGroupEntity extends ScimResourceEntity {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("displayName", displayName)
-                .append("members", members)
                 .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ScimGroupEntity that = (ScimGroupEntity) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(displayName, that.displayName)
-                .append(members, that.members)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(displayName)
-                .append(members)
-                .toHashCode();
     }
 }

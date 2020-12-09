@@ -1,6 +1,6 @@
 package com.example.authorizationserver.security.user;
 
-import com.example.authorizationserver.user.service.UserService;
+import com.example.authorizationserver.scim.service.ScimService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,18 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class EndUserDetailsService implements UserDetailsService {
 
-  private final UserService userService;
+    private final ScimService scimService;
 
-  public EndUserDetailsService(UserService userService) {
-    this.userService = userService;
-  }
+    public EndUserDetailsService(ScimService scimService) {
+        this.scimService = scimService;
+    }
 
-  @Transactional(readOnly = true)
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return this.userService
-        .findOneByUsername(username)
-        .map(EndUserDetails::new)
-        .orElseThrow(() -> new UsernameNotFoundException("No user found"));
-  }
+    @Transactional(readOnly = true)
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.scimService
+                .findUserByUserName(username)
+                .map(EndUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found"));
+    }
 }
