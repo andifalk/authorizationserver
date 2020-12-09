@@ -67,8 +67,8 @@ at the [OpenID Foundation](https://openid.net/).
 
 ## Roadmap
 
-* May 2020: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
-* June/July 2020: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
+* End of 2020: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
+* January/February 2021: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
 
 ## Setup and Run the Authorization Server
 
