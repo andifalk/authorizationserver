@@ -23,7 +23,7 @@ import java.text.ParseException;
 import java.util.Optional;
 import java.util.UUID;
 
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 @RestController
 @RequestMapping(UserInfoEndpoint.ENDPOINT)
 public class UserInfoEndpoint {

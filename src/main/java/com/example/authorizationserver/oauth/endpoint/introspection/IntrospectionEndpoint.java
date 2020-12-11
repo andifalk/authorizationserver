@@ -27,7 +27,7 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 @RestController
 @RequestMapping(IntrospectionEndpoint.ENDPOINT)
 public class IntrospectionEndpoint {

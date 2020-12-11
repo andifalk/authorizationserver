@@ -40,7 +40,7 @@ import java.util.Set;
  * @link https://www.rfc-editor.org/rfc/rfc6749.html#section-3.1
  */
 @Validated
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 @RequestMapping(AuthorizationEndpoint.ENDPOINT)
 @Controller
 public class AuthorizationEndpoint {

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 /** OAuth 2.0 Token Revocation as specified in https://tools.ietf.org/html/rfc7009 */
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 @RestController
 @RequestMapping(RevocationEndpoint.ENDPOINT)
 public class RevocationEndpoint {
