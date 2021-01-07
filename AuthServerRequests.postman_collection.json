@@ -1,0 +1,905 @@
+{
+	"info": {
+		"_postman_id": "ec503d21-c806-4a3e-8b2f-62c4e5d7e653",
+		"name": "AuthServerRequests",
+		"description": "Collection for testing the authorization server manually",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Grant Flows",
+			"item": [
+				{
+					"name": "ClientCredentials Grant (Post Body)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "confidential-jwt",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "demo",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ClientCredentials Grant (Post Body, Opaque)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "confidential-opaque",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "demo",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ClientCredentials Grant (BasicAuth)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "demo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ClientCredentials Grant (BasicAuth.Opaque)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "confidential-opaque",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "demo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Password Grant (Opaque)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "confidential-opaque",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "demo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "bwayne",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "wayne",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Password Grant",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "demo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "bwayne",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "wayne",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Introspection & Revocation",
+			"item": [
+				{
+					"name": "Introspection",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "confidential-opaque",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "demo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "token",
+									"value": "ipEbJ3gASbS4VJfQW1rus9bo5U5bt5qjpR5j03eEIfAuMt7E",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/introspect",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"introspect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revocation",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "confidential-opaque",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "demo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "token",
+									"value": "gDNUkijLPiqfKGy6enK50kCsieD2GbULIRskx9DITocA8k8J",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/revoke",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UserInfo (with AuthCode + PKCE)",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "challengeAlgorithm",
+									"value": "S256",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/callback",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "client_authentication",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "accessToken",
+									"value": "eyJraWQiOiIxIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiI2NDE4MDRkYS0zNjZlLTRkYTktYWRjNC05NjI4M2M3OTBmYWYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZ2VuZGVyIjoiTUFMRSIsImlzcyI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDgwXC9hdXRoIiwiZ3JvdXBzIjpbImxpYnJhcnlfdXNlciJdLCJwaG9uZV9udW1iZXJfdmVyaWZpZWQiOnRydWUsInByZWZlcnJlZF91c2VybmFtZSI6ImJ3YXluZSIsImdpdmVuX25hbWUiOiJCcnVjZSIsImxvY2FsZSI6ImRlIiwiY2xpZW50X2lkIjoiY29uZmlkZW50aWFsLWp3dCIsImF1ZCI6ImNvbmZpZGVudGlhbC1qd3QiLCJuYmYiOjE1ODc1MDc1NDgsInBob25lX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZSI6IjA3MTEtMTIzNDU2NyIsIm5hbWUiOiJid2F5bmUiLCJuaWNrbmFtZSI6ImJ3YXluZSIsInBob25lX251bWJlciI6IjA3MTEtMTIzNDU2NyIsImV4cCI6MTU4NzUwODE0OCwiaWF0IjoxNTg3NTA3NTQ4LCJmYW1pbHlfbmFtZSI6IldheW5lIiwianRpIjoidGVzdCIsImVtYWlsIjoiYnJ1Y2Uud2F5bmVAZXhhbXBsZS5jb20ifQ.W8QqFjy9Mc_3SCNpUS_zS6DKWgYG3eGA_vzrG2pIiZQwD8bV3Z26x4mZp1inyIGWlgALYoLehjpqXRkNFLM1d1S9opqmKqbl9IBusPAfL_7AjV7ZKKrC9IWIndLYASqvOQxHBMBVIgJXMIUuU5SjEZ11iZJWoLJnDdsx-TRDCerfU17C-7aolxKhOL6VuPlGfpwP5dbbe9zxY-erkD2rECKPM-SFMuaiFN4ipaIk34iDueXihsGBPD4oiPaxXfTo6J78yRgyh5xeQ6Y6P-no2WQFbbh48RsfJR9P-ccb1ZSFXiBNX1EaDFS2Rslh-f8_UHEnf-byiNiVkewwiBBYJA",
+									"type": "string"
+								},
+								{
+									"key": "tokenType",
+									"value": "Bearer",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/auth/userinfo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"userinfo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SCIM",
+			"item": [
+				{
+					"name": "Get Users",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Users/39fd95ec-4f6f-47f7-92f0-16bbb7f832ee",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Users",
+								"39fd95ec-4f6f-47f7-92f0-16bbb7f832ee"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Groups",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Group",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenType",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "accessToken",
+									"value": "eyJraWQiOiIxIiwidHlwIjoiYXQrand0IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiI1NWJjN2EwMS0zZGIyLTQ2Y2QtOTVmOS1jNGY4ZDRhZTk1NTciLCJjdHgiOiJwZXJzb25hbCIsInJvbGVzIjpbIkFETUlOIiwiVVNFUiJdLCJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6OTA5MFwvYXV0aCIsImxvY2FsZSI6ImRlIiwiY2xpZW50X2lkIjoiY29uZmlkZW50aWFsLWp3dCIsImF1ZCI6ImNvbmZpZGVudGlhbC1qd3QiLCJuYmYiOjE2MTAwNTY4NjcsInNjb3BlIjoib3BlbmlkIiwibmFtZSI6ImFkbWluIiwiZXhwIjoxNjEwMDU3NDY3LCJpYXQiOjE2MTAwNTY4NjcsImp0aSI6ImY1ZDAzOGI5LTdhYWEtNDM0OC05NDJmLTk2ZTdhODJlODM4NCJ9.kEJuWy7FVUMQ-Mb2fBYd68ezfPiS-pQM4vlErpkbvsuy2laweU2yP_v1JpLf8jGbskN-INfYGHN2qLtTR1EMWyiqyjbf8zknI1JOpMU8cxsx_UMBEAOeRdhQv1RbNyJkBNK5w-urNOCNYt4esPiPulF8ZE9WqtKw9bLKKYm1lOFoK893UEApjUXjNe5qjt84hU2rYFW_j0LklvRXiM1s6wVRMwN6n4UrjeOgtCgGo9DdMS3BmJRVrD3vdfKv8olYuCI6C3kQAb_GtkKG9ARefhKxw16h-QEJb9PBgL2b5trLmW2b_JcHYO4kzhT-ntPiPcppwQs4FdMtjjqi6wyDCA",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n     \"schemas\":[\"urn:ietf:params:scim:schemas:core:2.0:Group\"],\n     \"displayName\":\"mygroup\",\n     \"externalId\":\"12345\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Group",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Groups/88ae8d70-9b17-41b5-853e-7c7308d98b0c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Groups",
+								"88ae8d70-9b17-41b5-853e-7c7308d98b0c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
