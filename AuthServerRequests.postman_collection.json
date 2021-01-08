@@ -574,6 +574,87 @@
 					"response": []
 				},
 				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"schemas\" : [ \"urn:ietf:params:scim:schemas:core:2.0:User\" ],\n  \"externalId\" : \"1488a992-e47f-4630-8cf8-e2927c6fa622\",\n  \"userName\" : \"mmuster\",\n  \"familyName\" : \"Muster\",\n  \"givenName\" : \"Max\",\n  \"active\" : true,\n  \"emails\" : [ {\n    \"value\" : \"test@example.com\",\n    \"type\" : \"work\",\n    \"primary\" : true\n  } ],\n  \"roles\" : [ \"USER\" ],\n  \"password\" : \"secret4test\",\n  \"displayName\" : \"Max Muster\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get User",
 					"request": {
 						"auth": {
@@ -628,6 +709,88 @@
 						},
 						"method": "GET",
 						"header": [],
+						"url": {
+							"raw": "http://localhost:9090/auth/api/Users/39fd95ec-4f6f-47f7-92f0-16bbb7f832ee",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9090",
+							"path": [
+								"auth",
+								"api",
+								"Users",
+								"39fd95ec-4f6f-47f7-92f0-16bbb7f832ee"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "tokenName",
+									"value": "UserToken",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "123456",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/demo-client/login/oauth2/code/demo",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "demo",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "confidential-jwt",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:9090/auth/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schemas\": [\n        \"urn:ietf:params:scim:schemas:core:2.0:User\"\n    ],\n    \"meta\": {\n        \"location\": \"http://localhost:9090/auth/api/Users/39fd95ec-4f6f-47f7-92f0-16bbb7f832ee\"\n    },\n    \"identifier\": \"39fd95ec-4f6f-47f7-92f0-16bbb7f832ee\",\n    \"externalId\": \"39fd95ec-4f6f-47f7-92f0-16bbb7f832ee\",\n    \"userName\": \"bwayne1\",\n    \"familyName\": \"Wayne\",\n    \"givenName\": \"Bruce\",\n    \"active\": true,\n    \"emails\": [\n        {\n            \"value\": \"bruce.wayne@example.com\",\n            \"type\": \"work\",\n            \"primary\": true\n        }\n    ],\n    \"phoneNumbers\": [],\n    \"ims\": [],\n    \"photos\": [],\n    \"addresses\": [],\n    \"groups\": [\n        {\n            \"value\": \"355382ea-9c94-40d4-a2dc-5c4feb0b2554\",\n            \"display\": \"library_user\",\n            \"$ref\": \"http://localhost:9090/auth/api/Groups/355382ea-9c94-40d4-a2dc-5c4feb0b2554\"\n        }\n    ],\n    \"entitlements\": [],\n    \"roles\": [\n        \"USER\"\n    ],\n    \"x509Certificates\": [],\n    \"displayName\": \"Bruce Wayne\"\n}"
+						},
 						"url": {
 							"raw": "http://localhost:9090/auth/api/Users/39fd95ec-4f6f-47f7-92f0-16bbb7f832ee",
 							"protocol": "http",
