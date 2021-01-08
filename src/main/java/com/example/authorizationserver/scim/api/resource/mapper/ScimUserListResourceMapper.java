@@ -2,7 +2,6 @@ package com.example.authorizationserver.scim.api.resource.mapper;
 
 import com.example.authorizationserver.scim.api.resource.ScimMetaResource;
 import com.example.authorizationserver.scim.api.resource.ScimUserListResource;
-import com.example.authorizationserver.scim.api.resource.ScimUserResource;
 import com.example.authorizationserver.scim.model.ScimUserEntity;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +11,8 @@ public class ScimUserListResourceMapper {
     public ScimUserListResource mapEntityToResource(ScimUserEntity scimUserEntity, String location) {
         return new ScimUserListResource(
                 new ScimMetaResource("User",
-                        scimUserEntity.getCreatedDate().isPresent() ? scimUserEntity.getCreatedDate().get() : null,
-                        scimUserEntity.getLastModifiedDate().isPresent() ? scimUserEntity.getLastModifiedDate().get() : null,
+                        scimUserEntity.getCreatedDate(),
+                        scimUserEntity.getLastModifiedDate(),
                         scimUserEntity.getVersion().toString(), location),
                 scimUserEntity.getIdentifier(), scimUserEntity.getExternalId(), scimUserEntity.getUserName(),
                 scimUserEntity.getFamilyName(), scimUserEntity.getGivenName(), scimUserEntity.getMiddleName(),

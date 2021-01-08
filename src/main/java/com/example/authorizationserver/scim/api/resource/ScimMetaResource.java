@@ -5,15 +5,16 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class ScimMetaResource implements Serializable {
 
     private String resourceType;
 
-    private LocalDateTime created;
+    private Instant created;
 
-    private LocalDateTime lastModified;
+    private Instant lastModified;
 
     private String version;
 
@@ -22,7 +23,7 @@ public class ScimMetaResource implements Serializable {
     public ScimMetaResource() {
     }
 
-    public ScimMetaResource(String resourceType, LocalDateTime created, LocalDateTime lastModified, String version, String location) {
+    public ScimMetaResource(String resourceType, Instant created, Instant lastModified, String version, String location) {
         this.resourceType = resourceType;
         this.created = created;
         this.lastModified = lastModified;
@@ -38,19 +39,19 @@ public class ScimMetaResource implements Serializable {
         this.resourceType = resourceType;
     }
 
-    public LocalDateTime getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(Instant created) {
         this.created = created;
     }
 
-    public LocalDateTime getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(LocalDateTime lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 

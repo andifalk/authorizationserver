@@ -1,8 +1,10 @@
 package com.example.authorizationserver.scim.service;
 
+import com.example.authorizationserver.scim.api.resource.ScimUserResource;
 import com.example.authorizationserver.scim.dao.ScimGroupEntityRepository;
 import com.example.authorizationserver.scim.dao.ScimUserEntityRepository;
 import com.example.authorizationserver.scim.dao.ScimUserGroupEntityRepository;
+import com.example.authorizationserver.scim.model.ScimAddressEntity;
 import com.example.authorizationserver.scim.model.ScimGroupEntity;
 import com.example.authorizationserver.scim.model.ScimUserEntity;
 import com.example.authorizationserver.scim.model.ScimUserGroupEntity;
@@ -14,6 +16,7 @@ import org.springframework.util.IdGenerator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -89,36 +92,37 @@ public class ScimService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public ScimUserEntity updateUser(ScimUserEntity scimUserEntity) {
-        return scimUserEntityRepository.findOneByIdentifier(scimUserEntity.getIdentifier())
+    public ScimUserEntity updateUser(UUID userIdentifier, ScimUserResource scimUserResource) {
+        return scimUserEntityRepository.findOneByIdentifier(userIdentifier)
                 .map(ue -> {
-                    ue.setActive(scimUserEntity.isActive());
-                    ue.setGroups(scimUserEntity.getGroups());
-                    ue.setAddresses(scimUserEntity.getAddresses());
-                    ue.setEmails(scimUserEntity.getEmails());
-                    ue.setEntitlements(scimUserEntity.getEntitlements());
-                    ue.setFamilyName(scimUserEntity.getFamilyName());
-                    ue.setGivenName(scimUserEntity.getGivenName());
-                    ue.setHonorificPrefix(scimUserEntity.getHonorificPrefix());
-                    ue.setHonorificSuffix(scimUserEntity.getHonorificSuffix());
-                    ue.setIms(scimUserEntity.getIms());
-                    ue.setLocale(scimUserEntity.getLocale());
-                    ue.setMiddleName(scimUserEntity.getMiddleName());
-                    ue.setNickName(scimUserEntity.getNickName());
-                    ue.setPassword(scimUserEntity.getPassword());
-                    ue.setPhoneNumbers(scimUserEntity.getPhoneNumbers());
-                    ue.setPhotos(scimUserEntity.getPhotos());
-                    ue.setPreferredLanguage(scimUserEntity.getPreferredLanguage());
-                    ue.setProfileUrl(scimUserEntity.getProfileUrl());
-                    ue.setRoles(scimUserEntity.getRoles());
-                    ue.setTimezone(scimUserEntity.getTimezone());
-                    ue.setTitle(scimUserEntity.getTitle());
-                    ue.setUserName(scimUserEntity.getUserName());
-                    ue.setUserType(scimUserEntity.getUserType());
-                    ue.setX509Certificates(scimUserEntity.getX509Certificates());
-                    ue.setExternalId(scimUserEntity.getExternalId());
+                    ue.setActive(scimUserResource.isActive());
+                    ue.setUserName(scimUserResource.getUserName());
+                    ue.setFamilyName(scimUserResource.getFamilyName());
+                    ue.setGivenName(scimUserResource.getGivenName());
+                    ue.setHonorificPrefix(scimUserResource.getHonorificPrefix());
+                    ue.setHonorificSuffix(scimUserResource.getHonorificSuffix());
+                    ue.setLocale(scimUserResource.getLocale());
+                    ue.setMiddleName(scimUserResource.getMiddleName());
+                    ue.setNickName(scimUserResource.getNickName());
+                    ue.setPreferredLanguage(scimUserResource.getPreferredLanguage());
+                    ue.setProfileUrl(scimUserResource.getProfileUrl());
+                    ue.setTimezone(scimUserResource.getTimezone());
+                    ue.setTitle(scimUserResource.getTitle());
+                    ue.setExternalId(scimUserResource.getExternalId());
+                    ue.setRoles(scimUserResource.getRoles());
+                    ue.setEntitlements(scimUserResource.getEntitlements());
+                    ue.setUserType(scimUserResource.getUserType());
+                    if (ue.getAddresses() != null && !ue.getAddresses().isEmpty()) {
+                        ue.setAddresses(
+                                ue.getAddresses()
+                                        .stream()
+                                        .map(ra -> new ScimAddressEntity(
+                                                ra.getStreetAddress(), ra.getLocality(),
+                                                ra.getRegion(), ra.getPostalCode(),
+                                                ra.getCountry(), ra.getType(), ra.isPrimaryAddress())).collect(Collectors.toSet()));
+                    }
                     return scimUserEntityRepository.save(ue);
-                }).orElseThrow(() -> new ScimUserNotFoundException(scimUserEntity.getIdentifier()));
+                }).orElseThrow(() -> new ScimUserNotFoundException(userIdentifier));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -15,13 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -30,7 +30,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
@@ -65,7 +64,8 @@ class ScimUserRestControllerIntegrationTest {
 
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @TestConfiguration
     static class TestConfig {
@@ -247,7 +247,7 @@ class ScimUserRestControllerIntegrationTest {
         given(scimService.findUserByIdentifier(userIdentifier))
                 .willReturn(
                         Optional.of(scimUserEntity));
-        given(scimService.updateUser(any())).willReturn(scimUserEntity);
+        given(scimService.updateUser(any(), any())).willReturn(scimUserEntity);
 
         RequestContextHolder.setRequestAttributes(new ServletWebRequest(new MockHttpServletRequest()));
 

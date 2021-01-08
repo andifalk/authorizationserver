@@ -10,8 +10,8 @@ public class ScimGroupListResourceMapper {
 
     public ScimGroupListResource mapEntityToResource(ScimGroupEntity scimGroupEntity, String location) {
         return new ScimGroupListResource(new
-                ScimMetaResource("Group", scimGroupEntity.getCreatedDate().isPresent()? scimGroupEntity.getCreatedDate().get() : null,
-                scimGroupEntity.getLastModifiedDate().isPresent() ? scimGroupEntity.getLastModifiedDate().get() : null,
+                ScimMetaResource("Group", scimGroupEntity.getCreatedDate(),
+                scimGroupEntity.getLastModifiedDate(),
                 scimGroupEntity.getVersion().toString(), location), scimGroupEntity.getIdentifier(),
                 scimGroupEntity.getExternalId(), scimGroupEntity.getDisplayName());
     }

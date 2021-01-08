@@ -1,17 +1,21 @@
 package com.example.authorizationserver.scim.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.jpa.domain.AbstractAuditable;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.springframework.lang.Nullable;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @MappedSuperclass
-public abstract class ScimResourceEntity extends AbstractAuditable<ScimUserEntity, Long> implements Serializable {
+public abstract class ScimResourceEntity extends AbstractPersistable<Long> implements Serializable {
 
     @Version
     private Long version;
@@ -22,12 +26,26 @@ public abstract class ScimResourceEntity extends AbstractAuditable<ScimUserEntit
     @Size(max = 50)
     private String externalId;
 
+    @CreatedDate
+    private Instant createdDate;
+
+    @LastModifiedDate
+    private Instant lastModifiedDate;
+
     public ScimResourceEntity() {
     }
 
     public ScimResourceEntity(UUID identifier, String externalId) {
         this.identifier = identifier;
         this.externalId = externalId;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
     public UUID getIdentifier() {
