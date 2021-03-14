@@ -27,6 +27,90 @@
    file name: jruby-complete-9.1.17.0.jar: bcprov-jdk15on-1.56.jar
    ]]></notes>
         <sha1>a153c6f9744a3e9dd6feab5e210e1c9861362ec7</sha1>
-        <cve>CVE-2018-1000613</cve>
+        <cpe>cpe:/a:bouncycastle:legion-of-the-bouncy-castle</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: bcprov-jdk15on-1.56.jar
+   ]]></notes>
+        <sha1>a153c6f9744a3e9dd6feab5e210e1c9861362ec7</sha1>
+        <cpe>cpe:/a:bouncycastle:legion-of-the-bouncy-castle-java-crytography-api</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jopenssl.jar (shaded: rubygems:jruby-openssl:0.9.21)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/rubygems/jruby\-openssl@.*$</packageUrl>
+        <cpe>cpe:/a:jruby:jruby</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jopenssl.jar (shaded: rubygems:jruby-openssl:0.9.21)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/rubygems/jruby\-openssl@.*$</packageUrl>
+        <cpe>cpe:/a:openssl:openssl</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: readline.jar (shaded: rubygems:jruby-readline:1.2.2)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/rubygems/jruby\-readline@.*$</packageUrl>
+        <cpe>cpe:/a:jruby:jruby</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar (shaded: org.jruby:dirgra:0.3)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jruby/dirgra@.*$</packageUrl>
+        <cpe>cpe:/a:jruby:jruby</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: snakeyaml-1.18.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: snakeyaml-1.18.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <vulnerabilityName>CVE-2017-18640</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jquery.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2012-6708</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jquery.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2015-9251</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jquery.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2019-11358</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jquery.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2020-11022</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-9.1.17.0.jar: jquery.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2020-11023</cve>
     </suppress>
 </suppressions>

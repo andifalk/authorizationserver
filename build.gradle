@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.1'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'org.springframework.boot' version '2.4.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'com.adarshr.test-logger' version '2.1.0'
-    id 'org.owasp.dependencycheck' version '6.0.3'
+    id 'com.adarshr.test-logger' version '2.1.1'
+    id 'org.owasp.dependencycheck' version '6.1.2'
     id 'org.asciidoctor.convert' version '1.5.9.2'
 }
 
@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.1.5'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.7'
     implementation 'org.apache.commons:commons-lang3'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
