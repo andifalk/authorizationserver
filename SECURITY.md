@@ -1,15 +1,8 @@
 # Security Policy
 
-## Supported Versions
-
-The following versions of this project are
-currently being supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| 1.1.x   | :x:                |
+This project is not intended for production use.
+Vulnerabilities are fixed regularly but without any SLA or anything like this.
 
 ## Reporting a Vulnerability
 
-If you found a vulnerability just contact me via email or PN on twitter.
+If you found a vulnerability just contact me via email or PN on Twitter.
