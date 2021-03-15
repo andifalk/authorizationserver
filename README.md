@@ -39,10 +39,11 @@ at the [OpenID Foundation](https://openid.net/).
   * Opaque Tokens + [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662)
   * [OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html)
 * [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html)
-* Simple User Access Management API
+* [JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://datatracker.ietf.org/doc/draft-ietf-oauth-access-token-jwt/)
+* Simple User Access Management API (Following [SCIM2 standard](http://www.simplecloud.info/#Specification))
 * Simple User Access Management Web UI (Read access only)
 * Management of OAuth2/OIDC Clients API
-* Management of OAuth2/OIDC Clients Web UI (Read access only)J2
+* Management of OAuth2/OIDC Clients Web UI (Read access only)
 
 ## Features (NOT Supported)
 
@@ -57,7 +58,6 @@ at the [OpenID Foundation](https://openid.net/).
 * [RFC 8707: OAuth 2.0 Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707.html)
 * [RFC 8705: OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
 * [OAuth 2.0 Demonstration of Proof-of-Possession at the Application Layer (DPoP)](https://datatracker.ietf.org/doc/draft-ietf-oauth-dpop/)
-* [JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://datatracker.ietf.org/doc/draft-ietf-oauth-access-token-jwt/)
 * [The OAuth 2.0 Authorization Framework: JWT Secured Authorization Request (JAR)](https://datatracker.ietf.org/doc/draft-ietf-oauth-jwsreq/)
 * [OAuth 2.0 Pushed Authorization Requests](https://datatracker.ietf.org/doc/draft-ietf-oauth-par/)
 * [OAuth 2.0 Rich Authorization Requests](https://datatracker.ietf.org/doc/draft-ietf-oauth-rar/)
