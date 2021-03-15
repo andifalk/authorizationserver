@@ -48,6 +48,7 @@ at the [OpenID Foundation](https://openid.net/).
 
 * OAuth 2.0 Grant Flows:
   * [Implicit Grant](https://www.rfc-editor.org/rfc/rfc6749#section-4.2) (Not supported by intention, because of [OAuth 2.0 Security Best Current Practice](https://www.ietf.org/id/draft-ietf-oauth-security-topics-15.html))
+  * [OIDC Hybrid Grant Flow](https://openid.net/specs/openid-connect-core-1_0.html#HybridFlowSteps) (Not supported by intention, because of [OAuth 2.0 Security Best Current Practice](https://www.ietf.org/id/draft-ietf-oauth-security-topics-15.html) as this flow (same as the implicit flow) also returns the id token via the insecure front channel)
 
 ## Features (Planned)
 
@@ -64,11 +65,10 @@ at the [OpenID Foundation](https://openid.net/).
 * [OAuth 2.0 Incremental Authorization](https://datatracker.ietf.org/doc/draft-ietf-oauth-incremental-authz/)
 * [The OAuth 2.1 Authorization Framework](https://datatracker.ietf.org/doc/draft-parecki-oauth-v2-1/)
 
-
 ## Roadmap
 
-* End of 2020: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
-* January/February 2021: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
+* Q1 2021: [Release 1.0](https://github.com/andifalk/authorizationserver/milestone/1) - Mandatory OAuth 2.0 & OIDC grant flows, user and client management, H2 in-memory storage
+* Q2 2021: [Release 1.1](https://github.com/andifalk/authorizationserver/milestone/2) - Support additional OAuth 2.0 RFCs/Drafts + support other databases for storage
 
 ## Setup and Run the Authorization Server
 
