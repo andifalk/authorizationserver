@@ -135,6 +135,18 @@ A `DELETE` request is used to delete a group.
 
 operation::deleteGroup[snippets='http-request,httpie-request,curl-request,http-response']
 
+==== Add a member to Group
+
+A `PUT` request is used to add a member to a group.
+
+operation::addMemberToGroup[snippets='http-request,httpie-request,curl-request,http-response']
+
+==== Remove a member from Group
+
+A `PUT` request is used to remove a member from a group.
+
+operation::addMemberToGroup[snippets='http-request,httpie-request,curl-request,http-response']
+
 [[clients]]
 === Registered Clients
 

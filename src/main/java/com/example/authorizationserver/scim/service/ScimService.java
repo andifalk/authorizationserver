@@ -131,6 +131,8 @@ public class ScimService {
         scimUserEntityRepository.deleteOneByIdentifier(userIdentifier);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public void addUserGroupMapping(UUID userIdentifier, UUID groupIdentifier) {
         scimUserEntityRepository.findOneByIdentifier(userIdentifier).map(
             user ->
@@ -138,6 +140,21 @@ public class ScimService {
                     group -> scimUserGroupEntityRepository.save(new ScimUserGroupEntity(user, group))
                 ).orElseThrow(() -> new ScimGroupNotFoundException(groupIdentifier))
 
+        ).orElseThrow(() -> new ScimUserNotFoundException(userIdentifier));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void removeUserGroupMapping(UUID userIdentifier, UUID groupIdentifier) {
+        scimGroupEntityRepository.findOneByIdentifier(groupIdentifier).map(
+                group ->
+                        group.getMembers()
+                                .stream()
+                                .filter(p ->
+                                        p.getUser().getIdentifier().equals(userIdentifier) && p.getGroup().getIdentifier().equals(groupIdentifier)
+                                ).findFirst().map(
+                                        uge -> group.getMembers().remove(uge)
+                        ).orElseThrow(() -> new ScimUserNotFoundException(userIdentifier))
         ).orElseThrow(() -> new ScimUserNotFoundException(userIdentifier));
     }
 }
