@@ -1,10 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.3'
+    id 'org.springframework.boot' version '2.5.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'com.adarshr.test-logger' version '2.1.1'
     id 'org.owasp.dependencycheck' version '6.1.2'
-    id 'org.asciidoctor.convert' version '1.5.9.2'
 }
 
 group = 'com.example'
@@ -27,41 +26,21 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.7'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.5.10'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.13'
     implementation 'org.apache.commons:commons-lang3'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.rest-assured:spring-mock-mvc'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-}
-
-ext {
-    snippetsDir = file('build/generated-snippets')
 }
 
 test {
     useJUnitPlatform()
-    outputs.dir snippetsDir
-}
-
-asciidoctor {
-    inputs.dir snippetsDir
-    dependsOn test
-}
-
-bootJar {
-    dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
-    }
 }
 
 dependencyCheck {
