@@ -4,6 +4,8 @@ import com.example.authorizationserver.oauth.client.RegisteredClientService;
 import com.example.authorizationserver.oauth.client.api.resource.ModifyRegisteredClientResource;
 import com.example.authorizationserver.oauth.client.api.resource.RegisteredClientResource;
 import com.example.authorizationserver.oauth.client.model.RegisteredClient;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,14 @@ public class RegisteredClientApiController {
     this.registeredClientService = registeredClientService;
   }
 
+  @Operation(
+          summary = "Retrieves list of registered clients",
+          tags = {"Client Registration"},
+          parameters = {
+                  @Parameter(name = "groupId", description = "The identifier of the group", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869"),
+                  @Parameter(name = "userId", description = "The identifier of the user", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+          }
+  )
   @GetMapping
   public List<RegisteredClientResource> clients() {
     return registeredClientService.findAll().stream()
@@ -41,6 +51,13 @@ public class RegisteredClientApiController {
         .collect(Collectors.toList());
   }
 
+  @Operation(
+          summary = "Retrieves a single registered client",
+          tags = {"Client Registration"},
+          parameters = {
+                  @Parameter(name = "clientId", description = "The identifier of the client", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+          }
+  )
   @GetMapping("/{clientId}")
   public ResponseEntity<RegisteredClientResource> client(@PathVariable("clientId") UUID clientId) {
     return registeredClientService.findOneByIdentifier(clientId)
@@ -48,6 +65,10 @@ public class RegisteredClientApiController {
             .orElse(ResponseEntity.notFound().build());
   }
 
+  @Operation(
+          summary = "Registers a new client",
+          tags = {"Client Registration"}
+  )
   @PostMapping
   public ResponseEntity<RegisteredClientResource> registerNewClient(
           @RequestBody @Valid ModifyRegisteredClientResource modifyRegisteredClientResource, HttpServletRequest httpServletRequest) {
@@ -63,6 +84,13 @@ public class RegisteredClientApiController {
     return ResponseEntity.created(uri).body(new RegisteredClientResource(registeredClient));
   }
 
+  @Operation(
+          summary = "Updates a single registered client",
+          tags = {"Client Registration"},
+          parameters = {
+                  @Parameter(name = "clientId", description = "The identifier of the client", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+          }
+  )
   @PutMapping("/{clientId}")
   public ResponseEntity<RegisteredClientResource> update(@PathVariable("clientId") UUID clientId,
                                              @Valid @RequestBody ModifyRegisteredClientResource modifyRegisteredClientResource) {
@@ -73,6 +101,13 @@ public class RegisteredClientApiController {
             .orElse(ResponseEntity.notFound().build());
   }
 
+  @Operation(
+          summary = "Deletes a registered client",
+          tags = {"Client Registration"},
+          parameters = {
+                  @Parameter(name = "clientId", description = "The identifier of the client", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+          }
+  )
   @DeleteMapping("/{clientId}")
   public ResponseEntity<Void> deleteUser(@PathVariable("clientId") UUID clientId) {
     registeredClientService.deleteOneByIdentifier(clientId);

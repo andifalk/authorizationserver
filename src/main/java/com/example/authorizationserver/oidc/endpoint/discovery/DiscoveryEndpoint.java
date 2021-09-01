@@ -8,6 +8,7 @@ import com.example.authorizationserver.oauth.endpoint.revocation.RevocationEndpo
 import com.example.authorizationserver.oauth.endpoint.token.TokenEndpoint;
 import com.example.authorizationserver.oidc.common.Scope;
 import com.example.authorizationserver.oidc.endpoint.userinfo.UserInfoEndpoint;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,10 @@ public class DiscoveryEndpoint {
     this.jwtPki = jwtPki;
   }
 
+  @Operation(
+          summary = "Retrieves the public OpenID Connect configuration",
+          tags = {"OpenID Connect Discovery"}
+  )
   @GetMapping
   public Discovery discoveryEndpoint() {
 

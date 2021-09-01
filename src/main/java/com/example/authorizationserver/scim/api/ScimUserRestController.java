@@ -9,6 +9,8 @@ import com.example.authorizationserver.scim.api.resource.mapper.ScimUserResource
 import com.example.authorizationserver.scim.model.ScimUserEntity;
 import com.example.authorizationserver.scim.service.ScimService;
 import com.example.authorizationserver.security.user.EndUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +47,10 @@ public class ScimUserRestController {
         this.createScimUserResourceMapper = createScimUserResourceMapper;
     }
 
+    @Operation(
+            summary = "Creates a new user",
+            tags = {"SCIM Users and Groups"}
+    )
     @PostMapping(USER_ENDPOINT)
     public ResponseEntity<ScimUserResource> createUser(@Valid @RequestBody CreateScimUserResource createScimUserResource) {
         ScimUserEntity scimUserEntity = createScimUserResourceMapper.mapResourceToEntity(createScimUserResource);
@@ -57,6 +63,10 @@ public class ScimUserRestController {
         return ResponseEntity.ok().location(location).body(scimUserResourceMapper.mapEntityToResource(scimUserEntity, location.toASCIIString()));
     }
 
+    @Operation(
+            summary = "Retrieves list of users",
+            tags = {"SCIM Users and Groups"}
+    )
     @GetMapping(USER_ENDPOINT)
     public List<ScimUserListResource> getAllUsers() {
         return scimService.findAllUsers().stream().map(ue -> {
@@ -68,6 +78,13 @@ public class ScimUserRestController {
             return scimUserListResourceMapper.mapEntityToResource(ue, location.toASCIIString());}).collect(Collectors.toList());
     }
 
+    @Operation(
+            summary = "Retrieves a single user",
+            tags = {"SCIM Users and Groups"},
+            parameters = {
+                    @Parameter(name = "userId", description = "The identifier of the user", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+            }
+    )
     @GetMapping(USER_ENDPOINT + "/{userId}")
     public ResponseEntity<ScimUserResource> getUser(@PathVariable("userId") UUID userIdentifier) {
         return scimService.findUserByIdentifier(userIdentifier).map(ue -> {
@@ -80,6 +97,13 @@ public class ScimUserRestController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(
+            summary = "Updates a single user",
+            tags = {"SCIM Users and Groups"},
+            parameters = {
+                    @Parameter(name = "userId", description = "The identifier of the user", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+            }
+    )
     @PutMapping(USER_ENDPOINT + "/{userId}")
     public ResponseEntity<ScimUserResource> updateUser(@PathVariable("userId") UUID userIdentifier, @RequestBody @Valid ScimUserResource scimUserResource) {
         URI location =
@@ -92,6 +116,13 @@ public class ScimUserRestController {
         return ResponseEntity.ok().location(location).body(scimUserResourceMapper.mapEntityToResource(ue, location.toASCIIString()));
     }
 
+    @Operation(
+            summary = "Deletes a single user",
+            tags = {"SCIM Users and Groups"},
+            parameters = {
+                    @Parameter(name = "userId", description = "The identifier of the user", required = true, example = "4b2889df-3af6-4ad5-a889-4816c0ed8869")
+            }
+    )
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping(USER_ENDPOINT + "/{userId}")
     public void deleteUser(@PathVariable("userId") UUID userIdentifier) {
@@ -99,6 +130,10 @@ public class ScimUserRestController {
     }
 
 
+    @Operation(
+            summary = "Retrieves the authenticated user",
+            tags = {"SCIM Users and Groups"}
+    )
     @GetMapping(ME_ENDPOINT)
     public ResponseEntity<ScimUserResource> getAuthenticatedUser(@AuthenticationPrincipal EndUserDetails user) {
         return scimService.findUserByIdentifier(user.getIdentifier()).map(ue -> {

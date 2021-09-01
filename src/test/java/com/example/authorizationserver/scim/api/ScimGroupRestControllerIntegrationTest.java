@@ -3,55 +3,36 @@ package com.example.authorizationserver.scim.api;
 import com.example.authorizationserver.scim.api.resource.ScimGroupResource;
 import com.example.authorizationserver.scim.api.resource.mapper.ScimGroupListResourceMapper;
 import com.example.authorizationserver.scim.api.resource.mapper.ScimGroupResourceMapper;
-import com.example.authorizationserver.scim.model.ScimEmailEntity;
 import com.example.authorizationserver.scim.model.ScimGroupEntity;
-import com.example.authorizationserver.scim.model.ScimUserEntity;
-import com.example.authorizationserver.scim.model.ScimUserGroupEntity;
 import com.example.authorizationserver.scim.service.ScimService;
 import com.example.authorizationserver.security.client.RegisteredClientDetailsService;
 import com.example.authorizationserver.security.user.EndUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@ExtendWith({RestDocumentationExtension.class})
 @WebMvcTest(ScimGroupRestController.class)
 class ScimGroupRestControllerIntegrationTest {
 
@@ -85,15 +66,9 @@ class ScimGroupRestControllerIntegrationTest {
 
     @BeforeEach
     public void setUp(
-            WebApplicationContext webApplicationContext,
-            RestDocumentationContextProvider restDocumentation) {
+            WebApplicationContext webApplicationContext) {
         this.mockMvc =
                 MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                        .apply(
-                                documentationConfiguration(restDocumentation)
-                                        .uris().withPort(9090).and().operationPreprocessors()
-                                        .withRequestDefaults(prettyPrint())
-                                        .withResponseDefaults(prettyPrint()))
                         .build();
     }
 
@@ -108,8 +83,7 @@ class ScimGroupRestControllerIntegrationTest {
         mockMvc
                 .perform(get(ScimGroupRestController.GROUP_ENDPOINT))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("getAllGroups"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -123,8 +97,7 @@ class ScimGroupRestControllerIntegrationTest {
         mockMvc
                 .perform(get(ScimGroupRestController.GROUP_ENDPOINT + "/{groupId}", groupIdentifier))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("getGroup"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -141,8 +114,7 @@ class ScimGroupRestControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(scimGroupResource)))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("createGroup"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -151,8 +123,7 @@ class ScimGroupRestControllerIntegrationTest {
         mockMvc
                 .perform(delete(ScimGroupRestController.GROUP_ENDPOINT + "/{groupid}", groupIdentifier))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("deleteGroup"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -169,8 +140,7 @@ class ScimGroupRestControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(scimGroupResource)))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("updateGroup"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -187,8 +157,7 @@ class ScimGroupRestControllerIntegrationTest {
                 .perform(put(ScimGroupRestController.GROUP_ENDPOINT + "/{groupid}/members/{userId}", groupIdentifier, userIdentifier)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("addMemberToGroup"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -205,7 +174,6 @@ class ScimGroupRestControllerIntegrationTest {
                 .perform(delete(ScimGroupRestController.GROUP_ENDPOINT + "/{groupid}/members/{userId}", groupIdentifier, userIdentifier)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("removeMemberFromGroup"));
+                .andExpect(status().is2xxSuccessful());
     }
 }

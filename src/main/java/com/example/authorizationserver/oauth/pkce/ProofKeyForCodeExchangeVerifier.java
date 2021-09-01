@@ -18,6 +18,6 @@ public interface ProofKeyForCodeExchangeVerifier {
    *
    * @throws CodeChallengeError if verification of code challenge with code verifier fails
    */
-  public void verifyCodeChallenge(String challengeMethod, String codeVerifier, String codeChallenge)
+  void verifyCodeChallenge(String challengeMethod, String codeVerifier, String codeChallenge)
       throws CodeChallengeError;
 }

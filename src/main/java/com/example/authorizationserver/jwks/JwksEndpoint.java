@@ -1,5 +1,6 @@
 package com.example.authorizationserver.jwks;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,10 @@ public class JwksEndpoint {
     this.jwtPki = jwtPki;
   }
 
+  @Operation(
+          summary = "Retrieves the JSON web key set with public key(s) to validate tokens",
+          tags = {"OpenID Connect Discovery"}
+  )
   @GetMapping
   public Map<String, Object> jwksEndpoint() {
     return jwtPki.getJwkSet().toJSONObject();

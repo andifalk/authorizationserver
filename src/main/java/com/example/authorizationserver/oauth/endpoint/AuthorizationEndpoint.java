@@ -269,7 +269,7 @@ public class AuthorizationEndpoint {
             code_challenge_method);
 
     return "redirect:"
-        + redirectUri.toString()
+        + redirectUri
         + "?code="
         + authorizationCode.getCode()
         + "&state="

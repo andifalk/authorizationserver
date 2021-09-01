@@ -50,7 +50,8 @@ public class WebSecurityConfiguration {
         @Override
         public void configure(WebSecurity web) {
             web.ignoring().mvcMatchers("/token", "/introspect",
-                    "/revoke", "/userinfo", "/.well-known/openid-configuration", "/jwks");
+                    "/revoke", "/userinfo", "/.well-known/openid-configuration", "/jwks",
+                    "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**");
         }
 
         protected void configure(HttpSecurity http) throws Exception {

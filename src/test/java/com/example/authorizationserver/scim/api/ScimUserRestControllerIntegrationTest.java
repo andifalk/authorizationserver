@@ -14,7 +14,6 @@ import com.example.authorizationserver.security.user.EndUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -22,8 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -41,15 +38,10 @@ import java.util.UUID;
 import static java.util.Collections.emptySet;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@ExtendWith({RestDocumentationExtension.class})
 @WebMvcTest(ScimUserRestController.class)
 class ScimUserRestControllerIntegrationTest {
 
@@ -98,15 +90,9 @@ class ScimUserRestControllerIntegrationTest {
 
     @BeforeEach
     public void setUp(
-            WebApplicationContext webApplicationContext,
-            RestDocumentationContextProvider restDocumentation) {
+            WebApplicationContext webApplicationContext) {
         this.mockMvc =
                 MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                        .apply(
-                                documentationConfiguration(restDocumentation)
-                                        .uris().withPort(9090).and().operationPreprocessors()
-                                        .withRequestDefaults(prettyPrint())
-                                        .withResponseDefaults(prettyPrint()))
                         .build();
     }
 
@@ -133,8 +119,7 @@ class ScimUserRestControllerIntegrationTest {
         mockMvc
                 .perform(get(ScimUserRestController.USER_ENDPOINT))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("getAllUsers"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -161,8 +146,7 @@ class ScimUserRestControllerIntegrationTest {
         mockMvc
                 .perform(get(ScimUserRestController.USER_ENDPOINT + "/{userid}", userIdentifier))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("getUser"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -191,8 +175,7 @@ class ScimUserRestControllerIntegrationTest {
         mockMvc
                 .perform(get(ScimUserRestController.ME_ENDPOINT))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("getAuthenticatedUser"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -222,8 +205,7 @@ class ScimUserRestControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(createScimUserResource)))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("createUser"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -260,8 +242,7 @@ class ScimUserRestControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(scimUserResource)))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("updateUser"));
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -270,7 +251,6 @@ class ScimUserRestControllerIntegrationTest {
         mockMvc
                 .perform(delete(ScimUserRestController.USER_ENDPOINT + "/{userid}", userIdentifier))
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful())
-                .andDo(document("deleteUser"));
+                .andExpect(status().is2xxSuccessful());
     }
 }
