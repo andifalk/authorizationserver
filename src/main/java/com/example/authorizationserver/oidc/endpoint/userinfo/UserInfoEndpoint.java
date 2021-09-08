@@ -9,15 +9,12 @@ import com.example.authorizationserver.token.store.model.JsonWebToken;
 import com.example.authorizationserver.token.store.model.OpaqueToken;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestHeaderException;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.Optional;
@@ -27,6 +24,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping(UserInfoEndpoint.ENDPOINT)
 public class UserInfoEndpoint {
+  private static final Logger LOG =
+          LoggerFactory.getLogger(UserInfoEndpoint.class);
 
   public static final String ENDPOINT = "/userinfo";
 
@@ -45,6 +44,9 @@ public class UserInfoEndpoint {
   public ResponseEntity<UserInfo> userInfo(
           @RequestHeader("Authorization") String authorizationHeader) {
     String tokenValue = AuthenticationUtil.fromBearerAuthHeader(authorizationHeader);
+
+    LOG.debug("Calling userinfo with bearer token header {}", tokenValue);
+
     JsonWebToken jsonWebToken = tokenService.findJsonWebToken(tokenValue);
     Optional<ScimUserEntity> user;
     if (jsonWebToken != null) {
