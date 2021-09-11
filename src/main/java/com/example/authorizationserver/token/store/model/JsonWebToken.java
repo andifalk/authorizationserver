@@ -15,6 +15,10 @@ public class JsonWebToken extends Token {
     return accessToken;
   }
 
+  public boolean isIdToken() {
+    return !accessToken;
+  }
+
   public void setAccessToken(boolean idToken) {
     this.accessToken = idToken;
   }

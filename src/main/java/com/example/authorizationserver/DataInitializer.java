@@ -221,6 +221,16 @@ public class DataInitializer implements CommandLineRunner {
                                 Set.of(GrantType.AUTHORIZATION_CODE),
                                 Collections.singleton(
                                         "http://localhost:8080/demo-client/login/oauth2/code/demo"),
+                                Collections.singleton("*")),
+                        new RegisteredClient(
+                                UUID.randomUUID(),
+                                "token-exchange",
+                                passwordEncoder.encode("demo"),
+                                true,
+                                AccessTokenFormat.JWT,
+                                Set.of(GrantType.TOKEN_EXCHANGE),
+                                Collections.singleton(
+                                        "http://localhost:8080/demo-client/login/oauth2/code/demo"),
                                 Collections.singleton("*")))
                         .map(registeredClientRepository::save)
                         .collect(Collectors.toSet());
