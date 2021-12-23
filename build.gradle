@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.6.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'com.adarshr.test-logger' version '2.1.1'
-    id 'org.owasp.dependencycheck' version '6.1.2'
+    id 'org.owasp.dependencycheck' version '6.5.1'
 }
 
 group = 'com.example'
@@ -26,8 +26,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.5.10'
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.13'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.2'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.15.2'
     implementation 'org.apache.commons:commons-lang3'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
