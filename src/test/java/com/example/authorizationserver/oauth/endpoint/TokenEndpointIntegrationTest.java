@@ -398,7 +398,7 @@ class TokenEndpointIntegrationTest {
         assertThat(tokenResponse.getError()).describedAs("error must not be present").isNull();
     }
 
-    @ValueSource(strings = {"urn:ietf:params:oauth:grant-type:token-exchange", "invalid"})
+    @ValueSource(strings = {"urn:ietf:params:oauth:grant-type:saml2-bearer", "invalid"})
     @ParameterizedTest
     void getTokenForTokenExchangeGrantNotSupportedFail(String grant) {
 

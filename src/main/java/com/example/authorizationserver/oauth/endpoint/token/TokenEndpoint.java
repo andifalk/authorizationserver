@@ -29,16 +29,18 @@ public class TokenEndpoint {
   private final PasswordTokenEndpointService passwordTokenEndpointService;
   private final RefreshTokenEndpointService refreshTokenEndpointService;
   private final AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService;
+  private final TokenExchangeEndpointService tokenExchangeEndpointService;
 
   public TokenEndpoint(
           ClientCredentialsTokenEndpointService clientCredentialsTokenEndpointService,
           PasswordTokenEndpointService passwordTokenEndpointService,
           RefreshTokenEndpointService refreshTokenEndpointService,
-          AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService) {
+          AuthorizationCodeTokenEndpointService authorizationCodeTokenEndpointService, TokenExchangeEndpointService tokenExchangeEndpointService) {
     this.clientCredentialsTokenEndpointService = clientCredentialsTokenEndpointService;
     this.passwordTokenEndpointService = passwordTokenEndpointService;
     this.refreshTokenEndpointService = refreshTokenEndpointService;
     this.authorizationCodeTokenEndpointService = authorizationCodeTokenEndpointService;
+    this.tokenExchangeEndpointService = tokenExchangeEndpointService;
   }
 
   @PostMapping
@@ -63,8 +65,7 @@ public class TokenEndpoint {
       return refreshTokenEndpointService.getTokenResponseForRefreshToken(
               authorizationHeader, tokenRequest);
     } else if (tokenRequest.getGrant_type().equalsIgnoreCase(GrantType.TOKEN_EXCHANGE.getGrant())) {
-      LOG.warn("Requested grant type for 'Token Exchange' is not yet supported");
-      return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));
+      return tokenExchangeEndpointService.getTokenResponseForTokenExchange(authorizationHeader, tokenRequest);
     } else {
       LOG.warn("Requested grant type [{}] is unsupported", tokenRequest.getGrant_type());
       return ResponseEntity.badRequest().body(new TokenResponse("unsupported_grant_type"));

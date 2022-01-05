@@ -37,4 +37,13 @@ public final class TokenEndpointHelper {
   static ResponseEntity<TokenResponse> reportInvalidGrantError() {
     return ResponseEntity.badRequest().body(new TokenResponse("invalid_grant"));
   }
+
+  static ResponseEntity<TokenResponse> reportInvalidRequestError() {
+    return ResponseEntity.badRequest().body(new TokenResponse("invalid_request"));
+  }
+
+  static ResponseEntity<TokenResponse> reportInvalidTargetError() {
+    return ResponseEntity.badRequest().body(new TokenResponse("invalid_target"));
+  }
+
 }

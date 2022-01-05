@@ -1,5 +1,7 @@
 package com.example.authorizationserver.oauth.endpoint.token.resource;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * Token Response as specified by:
  *
@@ -12,22 +14,38 @@ public class TokenResponse {
 
   private String access_token;
   private String token_type;
+  private String issued_token_type;
   private String refresh_token;
+  private String scope;
   private long expires_in;
   private String id_token;
   private String error;
 
   public TokenResponse(
-      String access_token,
-      String refresh_token,
-      long expires_in,
-      String id_token,
-      String token_type) {
+          String access_token,
+          String refresh_token,
+          long expires_in,
+          String id_token,
+          String token_type) {
+    this(access_token, refresh_token, expires_in, id_token, token_type, null, null);
+  }
+
+  @JsonCreator
+  public TokenResponse(
+          String access_token,
+          String refresh_token,
+          long expires_in,
+          String id_token,
+          String token_type,
+          String issued_token_type,
+          String scope) {
     this.access_token = access_token;
     this.refresh_token = refresh_token;
     this.expires_in = expires_in;
     this.id_token = id_token;
     this.token_type = token_type;
+    this.issued_token_type = issued_token_type;
+    this.scope = scope;
   }
 
   public TokenResponse(String error) {
@@ -72,6 +90,22 @@ public class TokenResponse {
 
   public void setId_token(String id_token) {
     this.id_token = id_token;
+  }
+
+  public String getIssued_token_type() {
+    return issued_token_type;
+  }
+
+  public void setIssued_token_type(String issued_token_type) {
+    this.issued_token_type = issued_token_type;
+  }
+
+  public String getScope() {
+    return scope;
+  }
+
+  public void setScope(String scope) {
+    this.scope = scope;
   }
 
   public String getError() {
